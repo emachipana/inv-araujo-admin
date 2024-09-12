@@ -59,3 +59,9 @@ export const Section = styled.section`
   gap: 2rem;
   padding-bottom: 3rem;
 `;
+
+export const Image = styled.img`
+  width: ${({ width }) => width || 100}px;
+  object-fit: cover;
+  border-radius: ${({ radius }) => radius || 1}rem;
+`;
