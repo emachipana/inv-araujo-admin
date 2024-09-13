@@ -9,11 +9,13 @@ import { COLORS } from "../../../styles/colors";
 import { Alert, Spinner } from "reactstrap";
 import Button from "../../../components/Button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { login, error, setError } = useAuth();
-
+  const navigate = useNavigate();
+  
   const credentials = {
     username: "",
     password: ""
@@ -23,6 +25,7 @@ function Login() {
     try{
       setIsLoading(true);
       await login(values, "admin");
+      navigate("/admin");
       setIsLoading(false);
       setError(null)
     }catch(error) {
