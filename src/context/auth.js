@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import apiFetch from "../services/apiFetch";
 import { TOKEN_NAME } from "../config";
 
@@ -9,7 +8,6 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
@@ -34,7 +32,6 @@ const AuthProvider = ({ children }) => {
     if(origin === "admin" && user.role !== "ADMINISTRADOR") throw new Error("No tienes los permisos necesarios");
     localStorage.setItem(TOKEN_NAME, token);
     setUser(user);
-    navigate("/admin");
 
     return user;
   }
@@ -42,7 +39,6 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem(TOKEN_NAME);
     setUser(null);
-    navigate("/admin/login");
   }
 
   return (

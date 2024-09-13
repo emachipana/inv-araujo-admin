@@ -35,7 +35,7 @@ export const Container = styled.div`
   width: 100%;
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   grid-template-rows: 70px 1fr;
   background-color: ${COLORS.smoke};
   position: relative;
