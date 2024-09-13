@@ -16,6 +16,10 @@ export const Container = styled.div`
   right: 0;
   margin: auto;
   box-shadow: 0px 0px 12px 2px rgba(0, 0, 0, .2);
+
+  @media screen and (max-width: 830px) {
+    width: 90%;
+  }
 `;
 
 export const Section = styled.section`
@@ -32,6 +36,11 @@ export const Section = styled.section`
     background-size: cover;
     background-repeat: no-repeat;
   `}
+
+  @media screen and (max-width: 700px) {
+    width: 100%;
+    display: ${({ isImage }) => isImage ? "none" : "flex"};
+  }
 `;
 
 export const Logo = styled.img`
@@ -52,4 +61,8 @@ export const Form = styled.form`
   align-items: flex-start;
   justify-content: center;
   gap: 1.5rem;
+
+  @media screen and (max-width: 400px) {
+    width: 90%;
+  }
 `;
