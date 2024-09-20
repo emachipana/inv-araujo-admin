@@ -7,6 +7,7 @@ import { MdAddCircleOutline } from "react-icons/md";
 import { Container as Navigation } from "../Categories/styles";
 import { useAdmin } from "../../context/admin";
 import Category from "./Category";
+import AddCategory from "./AddCategory";
 
 function EditCategories() {
   const { categories } = useAdmin();
@@ -50,7 +51,7 @@ function EditCategories() {
                 categories.map((category, index) => (
                   <Category
                     id={category.id}
-                    subCategories={category.subCategories}
+                    subCategories={category.subCategories || []}
                     key={index}
                   >
                     { category.name }
@@ -59,9 +60,7 @@ function EditCategories() {
               }
             </>
           : (currentAction === "addCategory"
-              ? <>
-                  Agregar categoria
-                </>
+              ? <AddCategory setCurrentAction={setCurrentAction} />
               : <>
                   Agregar subcategoria
                 </>

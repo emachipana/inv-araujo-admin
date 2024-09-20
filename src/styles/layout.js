@@ -8,7 +8,7 @@ export const Text = styled.p`
   text-decoration: ${({ isLink }) => isLink ? "underline" : "none"};
   cursor: ${({ isLink }) => isLink ? "pointer" : "inherit"};
   text-align: ${({ align }) => align || "center"};
-  transition: color .2s ease;
+  transition: color .1s ease;
 
   &:hover {
     color: ${({ hColor, color }) => hColor || color};

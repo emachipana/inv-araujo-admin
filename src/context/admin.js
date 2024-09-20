@@ -68,6 +68,11 @@ const AdminProvider = ({ children }) => {
     setCategories([...tempCategories]);
   }
 
+  const addCategory = async (body) => {
+    const newCategory = await apiFetch("categories", { body });
+    setCategories(categories => [...categories, newCategory.data]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -82,7 +87,8 @@ const AdminProvider = ({ children }) => {
         updateCategory,
         updateSubCategory,
         deleteCategory,
-        deleteSubCategory
+        deleteSubCategory,
+        addCategory
       }}
     >
       { children }

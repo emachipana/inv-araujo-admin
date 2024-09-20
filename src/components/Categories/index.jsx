@@ -43,6 +43,7 @@ function Categories() {
           </>
       }
       <Modal
+        align="flex-start"
         isActive={editModal}
         setIsActive={setEditModal}
         size="lg"

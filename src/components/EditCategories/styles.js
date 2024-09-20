@@ -15,6 +15,8 @@ export const Section = styled.section`
   width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   padding: 1rem;
 `;
@@ -36,4 +38,17 @@ export const Wrapper = styled.div`
   background-color: white;
   box-shadow: 0 2px 3px 1px rgba(0, 0, 0, .2);
   border-radius: 0.5rem;
+`;
+
+export const Form = styled.form`
+  width: 65%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  background-color: white;
+  border-radius: 1rem;
+  gap: 1rem;
+  padding: 1rem;
+  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, .2);
 `;
