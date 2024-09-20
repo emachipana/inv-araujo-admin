@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Login from "../pages/admin/login";
+import Login from "../pages/admin/Login";
 
 function UnauthenticatedApp() {
   return (

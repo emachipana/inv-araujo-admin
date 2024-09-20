@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IoNotifications } from "react-icons/io5";
-import { MdEmail, MdDarkMode } from "react-icons/md";
+import { MdDarkMode } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { Container, Header, Hr, Item, Logo, Notification, Point } from "./styles";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
@@ -55,13 +55,6 @@ function AdminNavbar({ setIsOpen }) {
       <FlexRow gap={1.5}>
         <Notification>
           <IoNotifications 
-            size={25}
-            color={COLORS.white}
-          />
-          <Point />
-        </Notification>
-        <Notification>
-          <MdEmail 
             size={25}
             color={COLORS.white}
           />
