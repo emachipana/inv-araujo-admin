@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { shadowSm } from "../../styles/layout";
 
 export const Container = styled.div`
   width: 100%;
@@ -17,13 +18,13 @@ export const Section = styled.section`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   padding: 1rem;
 `;
 
 export const CategoryContainer = styled.div`
   width: 100%;
-  padding: ${({ padding }) => padding || "1rem"};
+  padding: ${({ padding }) => padding || "0 1rem"};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -36,8 +37,9 @@ export const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   background-color: white;
-  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, .2);
-  border-radius: 0.5rem;
+  box-shadow: ${shadowSm};
+  border-radius: 0.8rem;
+  padding: 1rem 0;
 `;
 
 export const Form = styled.form`
@@ -50,5 +52,13 @@ export const Form = styled.form`
   border-radius: 1rem;
   gap: 1rem;
   padding: 1rem;
-  box-shadow: 0 2px 3px 1px rgba(0, 0, 0, .2);
+  box-shadow: ${shadowSm};
+
+  @media screen and (max-width: 550px) {
+    width: 80%;
+  }
+
+  @media screen and (max-width: 420px) {
+    width: 100%;
+  }
 `;

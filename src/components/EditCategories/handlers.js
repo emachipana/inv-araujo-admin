@@ -30,3 +30,16 @@ export const onSave = async (category, id, body, setIsToEdit, setCategory, updat
     setIsLoading(false);
   }
 }
+
+export const onSubmit = async (values, setIsLoading, addCategory, setCurrentAction, setError) => {
+  try {
+    setIsLoading(true);
+    await addCategory(values);
+    setIsLoading(false);
+    setCurrentAction("categories");
+  }catch(error) {
+    setIsLoading(false);
+    console.error(error);
+    setError(error.message);
+  }
+}

@@ -8,9 +8,11 @@ import { Container as Navigation } from "../Categories/styles";
 import { useAdmin } from "../../context/admin";
 import Category from "./Category";
 import AddCategory from "./AddCategory";
+import AddSubCategory from "./AddSubCategory";
+import AlertError from "../AlertError";
 
 function EditCategories() {
-  const { categories } = useAdmin();
+  const { categories, error, setError } = useAdmin();
   const [currentAction, setCurrentAction] = useState("categories");
 
   return (
@@ -61,12 +63,19 @@ function EditCategories() {
             </>
           : (currentAction === "addCategory"
               ? <AddCategory setCurrentAction={setCurrentAction} />
-              : <>
-                  Agregar subcategoria
-                </>
+              : <AddSubCategory setCurrentAction={setCurrentAction} />
             )
         }
       </Section>
+      {
+        error
+        &&
+        <AlertError
+          error={error}
+          setError={setError}
+          from="categories"
+        />
+      }
     </Container>
   );
 }

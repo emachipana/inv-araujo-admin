@@ -9,7 +9,6 @@ import { useAdmin } from "../../context/admin";
 import { Spinner } from "reactstrap";
 import { closeEdit, handleChange, handleBlur, setupEdit, onSave } from "./handlers";
 import SubCategory from "./SubCategory";
-import AlertError from "../AlertError";
 
 function Category({ id, children, subCategories }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,7 +19,7 @@ function Category({ id, children, subCategories }) {
     error: "",
     touched: false
   });
-  const { updateCategory, deleteCategory, error, setError } = useAdmin();
+  const { updateCategory, deleteCategory, setError } = useAdmin();
 
   const onDelete = async () => {
     try {
@@ -113,7 +112,7 @@ function Category({ id, children, subCategories }) {
         &&
         <>
           <hr 
-            style={{width: "100%", margin: 0, border: "1px solid"}}
+            style={{width: "100%", margin: "0.8rem 0 0 0", border: "1px solid"}}
           />
           {
             subCategories.map((subCategory, index) => (
@@ -127,15 +126,6 @@ function Category({ id, children, subCategories }) {
             ))
           }
         </>
-      }
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-          from="categories"
-        />
       }
     </Wrapper>
   );

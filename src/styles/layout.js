@@ -65,3 +65,5 @@ export const Image = styled.img`
   object-fit: cover;
   border-radius: ${({ radius }) => radius || 1}rem;
 `;
+
+export const shadowSm = "0 2px 3px 1px rgba(0, 0, 0, .2)";

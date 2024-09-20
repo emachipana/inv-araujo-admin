@@ -29,7 +29,7 @@ function SubCategory({ id, children, categoryId }) {
   }
 
   return (
-    <Container padding="1rem 1.5rem 1rem 3rem">
+    <Container padding="0.8rem 1.5rem 0rem 3rem">
       <FlexRow>
         { 
           isToEdit

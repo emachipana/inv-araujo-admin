@@ -1,23 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useState } from "react";
 import { Container, Label, Main, Section, TextError } from "./styles";
-import { COLORS } from "../../styles/colors";
-
-export const onBlur = (e, setFocused, handleBlur) => {
-  setFocused(false);
-
-  handleBlur && handleBlur(e);
-}
-
-export const setColor = (error, touched, focused) => {
-  return error && touched
-  ? COLORS.red
-  : (touched && !error
-    ? COLORS.persian
-    : (focused
-        ? COLORS.persian
-        : COLORS.taupe));
-}
+import { onBlur, setColor } from "./handlers";
 
 function Input({ 
   id, disabled, label, placeholder, labelSize,

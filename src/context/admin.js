@@ -73,6 +73,17 @@ const AdminProvider = ({ children }) => {
     setCategories(categories => [...categories, newCategory.data]);
   }
 
+  const addSubCategory = async (body) => {
+    const { categoryId } = body;
+    const newSubCategory = await apiFetch("categories", { body });
+    const category = categories.find(category => category.id === (categoryId * 1));
+    category.subCategories = [...category.subCategories, newSubCategory.data];
+    const index = categories.findIndex(category => category.id === categoryId);
+    const tempCategories = categories;
+    tempCategories[index] = category;
+    setCategories([...tempCategories]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -88,7 +99,8 @@ const AdminProvider = ({ children }) => {
         updateSubCategory,
         deleteCategory,
         deleteSubCategory,
-        addCategory
+        addCategory,
+        addSubCategory
       }}
     >
       { children }

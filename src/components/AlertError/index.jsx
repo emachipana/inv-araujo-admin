@@ -11,7 +11,7 @@ function AlertError({ setError, error, from = null }) {
 
     if(error.includes("delete or update a parent row") && from === "categories") return "La categoria tiene productos asociados";
 
-    return error;
+    return error.replaceAll('"', "");
   }
 
   const onClick = () => {
