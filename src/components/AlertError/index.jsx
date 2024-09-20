@@ -3,8 +3,16 @@ import { useState } from "react";
 import { Container } from "./styles";
 import { Alert } from "reactstrap";
 
-function AlertError({ setError, error }) {
+function AlertError({ setError, error, from = null }) {
   const [isVisible, setIsVisible] = useState(true);
+
+  const parser = () => {
+    if(error.includes("Bad credentials")) return "Credenciales incorrectas";
+
+    if(error.includes("delete or update a parent row") && from === "categories") return "La categoria tiene productos asociados";
+
+    return error;
+  }
 
   const onClick = () => {
     setIsVisible(false);
@@ -20,7 +28,7 @@ function AlertError({ setError, error }) {
         isOpen={isVisible}
         toggle={onClick}
       >
-        { error.includes("Bad credentials") ? "Credenciales incorrectas" : error }
+        { parser() }
       </Alert>
     </Container>
   );
