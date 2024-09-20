@@ -20,8 +20,8 @@ export const setColor = (error, touched, focused) => {
 }
 
 function Input({ 
-  id, disabled, label, placeholder,
-  type, value, handleChange, handleBlur,
+  id, disabled, label, placeholder, labelSize,
+  type, value, handleChange, handleBlur, fontSize,
   error, touched, Icon, backgroundColor, ...props }) {
 
   const [focused, setFocused] = useState(false);
@@ -29,7 +29,7 @@ function Input({
 
   return (
     <Container>
-      { label && <Label htmlFor={id}>{ label }</Label> }
+      { label && <Label size={labelSize} htmlFor={id}>{ label }</Label> }
       <Section
         isFile={type === "file"}
         color={color}
@@ -38,6 +38,7 @@ function Input({
         { Icon && <Icon size={25} color={color} /> }
         <input 
           id={id}
+          style={{fontSize: fontSize || "1rem"}}
           disabled={disabled}
           placeholder={placeholder}
           type={type || "text"}

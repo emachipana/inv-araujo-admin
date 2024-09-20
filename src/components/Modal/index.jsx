@@ -3,13 +3,14 @@
 import { IoClose } from "react-icons/io5";
 import { Close, Container, Section } from "./styles";
 
-function Modal({ isActive, setIsActive, children, size, padding }) {
+function Modal({ isActive, setIsActive, children, size, padding, align }) {
   const handleClick = () => setIsActive(!isActive);
 
   return (
     isActive
     &&
     <Container
+      align={align}
       onClick={handleClick}
       isActive={isActive}
     >

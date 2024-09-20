@@ -15,7 +15,7 @@ export const Container = styled.div`
   background-color: rgba(0, 0, 0, .5);
   animation: modal .4s ease-out;
   display: flex;
-  align-items: center;
+  align-items: ${({ align }) => align || "center"};
   justify-content: center;
   padding: 2rem 1rem 1rem 1rem;
   overflow-y: auto;
