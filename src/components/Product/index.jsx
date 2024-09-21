@@ -110,18 +110,22 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
         </Button>
       </Description>
       { !active && <Blocker /> }
-      <Toggle onClick={(e) => e.stopPropagation()}>
-        <input 
-          type="checkbox"
-          className="checkbox"
-          id="checkbox"
-          checked={active}
-          onChange={handleChange}
-        />
-        <label className="switch" htmlFor="checkbox">
-          <span className="slider"></span>
-        </label>
-      </Toggle>
+      {
+        isInAdmin
+        &&
+        <Toggle onClick={(e) => e.stopPropagation()}>
+          <input 
+            type="checkbox"
+            className="checkbox"
+            id="checkbox"
+            checked={active}
+            onChange={handleChange}
+          />
+          <label className="switch" htmlFor="checkbox">
+            <span className="slider"></span>
+          </label>
+        </Toggle>
+      }
     </Container>
   );
 }
