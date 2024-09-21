@@ -114,14 +114,14 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
         isInAdmin
         &&
         <Toggle onClick={(e) => e.stopPropagation()}>
-          <input 
+          <input
             type="checkbox"
             className="checkbox"
-            id="checkbox"
+            id={id}
             checked={active}
             onChange={handleChange}
           />
-          <label className="switch" htmlFor="checkbox">
+          <label className="switch" htmlFor={id}>
             <span className="slider"></span>
           </label>
         </Toggle>
