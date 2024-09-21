@@ -84,6 +84,18 @@ const AdminProvider = ({ children }) => {
     setCategories([...tempCategories]);
   }
 
+  const updateProduct = async (id, body) => {
+    const updatedProduct = await apiFetch(`products/${id}`, { body, method: "PUT" });
+    const tempProducts = products;
+    const tempBackup = backup;
+    const index = tempProducts.findIndex(product => product.id === id);
+    const indexBackup = tempBackup.findIndex(product => product.id === id);
+    tempProducts[index] = updatedProduct.data;
+    tempBackup[indexBackup] = updatedProduct.data;
+    setProducts([...tempProducts]);
+    setBackup([...tempBackup]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -100,7 +112,8 @@ const AdminProvider = ({ children }) => {
         deleteCategory,
         deleteSubCategory,
         addCategory,
-        addSubCategory
+        addSubCategory,
+        updateProduct
       }}
     >
       { children }
