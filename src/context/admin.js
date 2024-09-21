@@ -77,7 +77,7 @@ const AdminProvider = ({ children }) => {
     const { categoryId } = body;
     const newSubCategory = await apiFetch("categories", { body });
     const category = categories.find(category => category.id === (categoryId * 1));
-    category.subCategories = [...category.subCategories, newSubCategory.data];
+    category.subCategories = [...category.subCategories || [], {...newSubCategory.data, subCategories: []}];
     const index = categories.findIndex(category => category.id === categoryId);
     const tempCategories = categories;
     tempCategories[index] = category;
