@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "./styles";
 import NewCategory from "../Category/New";
 import Category from "../Category";
@@ -7,11 +7,28 @@ import { Spinner } from "reactstrap";
 import Modal from "../Modal";
 import EditCategories from "../EditCategories";
 import { FaRegEdit } from "react-icons/fa";
+import apiFetch from "../../services/apiFetch";
 
 function Categories() {
   const [currentCategory, setCurrentCategory] = useState("Todo");
   const [editModal, setEditModal] = useState(false);
-  const { categories, isLoading } = useAdmin();
+  const { categories, isLoading, setProducts, backup, setError } = useAdmin();
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        if(currentCategory === "Todo") return setProducts(backup);
+        const category = categories.find(category => category.name === currentCategory);
+        const products = await apiFetch(`products?categoryId=${category.id}`);
+        setProducts(products);
+      }catch(error) {
+        console.error(error);
+        setError(error.message);
+      }
+    }
+
+    fetch();
+  }, [currentCategory, backup, categories, setProducts, setError]);
 
   return (
     <Container isLoading={isLoading}>
