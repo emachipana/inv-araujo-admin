@@ -5,7 +5,8 @@ export const Filter = styled.section`
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
 `;
 
 export const Group = styled.div`
@@ -14,7 +15,7 @@ export const Group = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.2rem 0.5rem;
+  padding: 0.15rem 0.4rem;
   gap: 0.3rem;
 `;
 

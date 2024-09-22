@@ -9,42 +9,56 @@ import { useState } from "react";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import Product from "../../../components/Product";
+import Button from "../../../components/Button";
+import { IoMdAddCircleOutline } from "react-icons/io";
+import ProductList from "../../../components/ProducList";
 
 function Products() {
   const { products, isLoading } = useAdmin();
-  const [type, setType] = useState("group");
+  const [type, setType] = useState(localStorage.getItem("productType") || "group");
+
+  const handleClick = (type) => {
+    setType(type);
+    localStorage.setItem("productType", type);
+  }
 
   return (
     <>
       <Title>Productos</Title>
       <Categories />
       <Filter>
-        <FlexRow gap={1}>
+        <FlexRow gap={0.8}>
+          <Group>
+            <Wrapper 
+              isActive={type === "list"} 
+              onClick={() => handleClick("list")}
+            >
+              <FaListUl
+                size={17}
+              />
+            </Wrapper>
+            <Wrapper 
+              isActive={type === "group"}
+              onClick={() => handleClick("group")}
+            >
+              <HiSquares2X2
+                size={19}
+              />
+            </Wrapper>
+          </Group>
           <Wrapper>
             <IoSearchOutline
               size={25}
             />
           </Wrapper>
-          <Group>
-            <Wrapper 
-              isActive={type === "list"} 
-              onClick={() => setType("list")}
-            >
-              <FaListUl
-                size={18}
-              />
-            </Wrapper>
-            <Wrapper 
-              isActive={type === "group"}
-              onClick={() => setType("group")}
-            >
-              <HiSquares2X2
-
-                size={20}
-              />
-            </Wrapper>
-          </Group>
         </FlexRow>
+        <Button
+          fontSize={15}
+          Icon={IoMdAddCircleOutline}
+          iconSize={18}
+        >
+          Nuevo producto
+        </Button>
       </Filter>
       <Section>
         {
@@ -58,7 +72,7 @@ function Products() {
                     product={product}
                   />
                 ))
-              : "view in list"
+              : <ProductList />
             )
         }
       </Section>

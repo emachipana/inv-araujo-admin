@@ -66,14 +66,15 @@ export const Discount = styled.div`
 
 export const TextDescription = styled.p`
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: ${({ lines }) => lines || 2};
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-weight: 500;
-  font-size: 14px;
-  color: ${COLORS.taupe};
-  line-height: 14px;
-  margin-top: -4px;
+  font-size: ${({ size }) => size || "14px"};
+  color: ${({ color }) => color || COLORS.taupe};
+  line-height: ${({ height }) => height || "14px"};
+  width: 150px;
+  text-align: start;
 `;
 
 export const Brand = styled.div`
