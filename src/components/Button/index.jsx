@@ -31,7 +31,7 @@ function Button({ Icon, color, fontSize, iconSize, children, ...props }) {
       color={colorList[color || "primary"]}
       fontSize={fontSize}
     >
-      { Icon && <Icon size={(iconSize || 22)}/> }
+      { Icon && <Icon size={(iconSize || 22)} style={{marginTop: "-2px"}} /> }
       { children }
     </Container>
   );
