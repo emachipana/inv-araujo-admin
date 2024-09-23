@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import { useState } from "react";
 import { validate } from "./validate";
-import { Form, Group, Title } from "./styles";
+import { Group, Title } from "./styles";
 import Input from "../Input";
 import TextArea from "../Input/TextArea";
 import Button from "../Button";
@@ -10,6 +10,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { useAdmin } from "../../context/admin";
 import Select from "../Input/Select";
 import { useNavigate } from "react-router-dom";
+import { Form } from "../../styles/layout";
 
 function ProductForm({ initialValues = {
   name: "",

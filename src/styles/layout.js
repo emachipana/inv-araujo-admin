@@ -68,3 +68,12 @@ export const Image = styled.img`
 `;
 
 export const shadowSm = "0 2px 3px 1px rgba(0, 0, 0, .2)";
+
+export const Form = styled.form`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+`;
