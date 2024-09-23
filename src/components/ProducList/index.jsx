@@ -108,117 +108,121 @@ function ProductList() {
       </thead>
       <tbody>
         {
-          products.map((product, index) => (
-            <tr key={index} onClick={() => navigate(`${product.id}`)}>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                 { index + 1 }
-                </Text>
-              </th>
-              <th>
-                <FlexRow
-                  gap={0.2}
-                  width="180px"
-                  justify="flex-start"
-                >
-                  <Image
-                      width={55}
-                      alt={`${product.name}`}
-                      src={product.images[0] ? product.images[0]?.image.url : "/img/default_product.png"}                            
-                  />
+          products.map((product, index) => {
+            const { images = [] } = product;
+
+            return (
+              <tr key={index} onClick={() => navigate(`${product.id}`)}>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                  { index + 1 }
+                  </Text>
+                </th>
+                <th>
+                  <FlexRow
+                    gap={0.2}
+                    width="180px"
+                    justify="flex-start"
+                  >
+                    <Image
+                        width={55}
+                        alt={`${product.name}`}
+                        src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
+                    />
+                    <TextDescription
+                      lines={1}
+                      height="18px"
+                      size={15}
+                      color={COLORS.dim}
+                    >
+                      { product.name }
+                    </TextDescription>
+                  </FlexRow>
+                </th>
+                <th>
                   <TextDescription
-                    lines={1}
+                    lines={3}
                     height="18px"
                     size={15}
                     color={COLORS.dim}
                   >
-                    { product.name }
+                    { product.description }
                   </TextDescription>
-                </FlexRow>
-              </th>
-              <th>
-                <TextDescription
-                  lines={3}
-                  height="18px"
-                  size={15}
-                  color={COLORS.dim}
-                >
-                  { product.description }
-                </TextDescription>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  S/. { product.price }
-                </Text>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  S/. { product.discount ? product.discount.price : 0 }
-                </Text>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  { product.discount ? `-${product.discount.percentage}` : 0 }%
-                </Text>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  { product.stock }
-                </Text>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  { product.category.name }
-                </Text>
-              </th>
-              <th>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  { product.brand }
-                </Text>
-              </th>
-              <th>
-                <Badge color={product.active ? "primary" : "danger"}>
-                  { product.active ? "activo" : "inactivo" }
-                </Badge>
-              </th>
-              <th>
-                <FaEdit
-                  onClick={(event) => handleClick(event, product.id)}
-                  size={20}
-                  style={{cursor: "pointer"}}
-                  color={COLORS.dim}
-                />
-              </th>
-            </tr>
-          ))
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    S/. { product.price }
+                  </Text>
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    S/. { product.discount ? product.discount.price : 0 }
+                  </Text>
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    { product.discount ? `-${product.discount.percentage}` : 0 }%
+                  </Text>
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    { product.stock }
+                  </Text>
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    { product.category.name }
+                  </Text>
+                </th>
+                <th>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    { product.brand }
+                  </Text>
+                </th>
+                <th>
+                  <Badge color={product.active ? "primary" : "danger"}>
+                    { product.active ? "activo" : "inactivo" }
+                  </Badge>
+                </th>
+                <th>
+                  <FaEdit
+                    onClick={(event) => handleClick(event, product.id)}
+                    size={20}
+                    style={{cursor: "pointer"}}
+                    color={COLORS.dim}
+                  />
+                </th>
+              </tr>
+            );
+          })
         }
       </tbody>
     </Table>

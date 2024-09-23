@@ -8,7 +8,7 @@ import { COLORS } from "../../styles/colors";
 import { useAdmin } from "../../context/admin";
 
 function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
-  const { id, images, name, price, discount, description, brand, category, active } = product;
+  const { id, images = [], name, price, discount, description, brand, category, active } = product;
   const { updateProduct, setError } = useAdmin();
   const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
       }
       <Image 
         alt={`${name}-image`}
-        src={images[0] ? images[0]?.image.url : "/img/default_product.png"}
+        src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}
       />
       <Description>
         <FlexRow width="100%" justify="space-between">
@@ -66,8 +66,9 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
             size={12.5}
             color={COLORS.taupe}
             weight={700}
+            style={{textTransform: "uppercase"}}
           >
-            { category?.name.toUpperCase() }
+            { category.name }
           </Text>
           <Brand>{ brand }</Brand>
         </FlexRow>
