@@ -15,7 +15,7 @@ const AdminProvider = ({ children }) => {
       try {
         const categories = await apiFetch("categories");
         const products = await apiFetch("products");
-        setCategories(categories.filter(category => category.name));
+        setCategories(categories);
         setProducts(products)
         setBackup(products);
         setIsLoading(false);
@@ -96,6 +96,13 @@ const AdminProvider = ({ children }) => {
     setBackup([...tempBackup]);
   }
 
+  const addProduct = async (body) => {
+    const newProduct = await apiFetch("products", { body });
+    setProducts(products => [...products, newProduct.data]);
+    setBackup(products => [...products, newProduct.data]);
+    return newProduct.data;
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -113,7 +120,8 @@ const AdminProvider = ({ children }) => {
         deleteSubCategory,
         addCategory,
         addSubCategory,
-        updateProduct
+        updateProduct,
+        addProduct
       }}
     >
       { children }
