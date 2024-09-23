@@ -6,10 +6,11 @@ import { useAuth } from "../../../context/auth";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
-import { Alert, Spinner } from "reactstrap";
+import { Spinner } from "reactstrap";
 import Button from "../../../components/Button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AlertError from "../../../components/AlertError";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -106,12 +107,10 @@ function Login() {
               </Text>
               {
                 error && 
-                <Alert
-                  color="danger"
-                  style={{alignSelf: "center"}}
-                >
-                  { error }
-                </Alert>
+                <AlertError 
+                  error={error}
+                  setError={setError}
+                />
               }
               <Button
                 style={{alignSelf: "center"}}

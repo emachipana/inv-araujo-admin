@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Container, Label, Main, Section, TextError } from "./styles";
 import { onBlur, setColor } from "./handlers";
 
-function Input({ 
+function TextArea({ 
   id, disabled, label, placeholder, labelSize,
-  type, value, handleChange, handleBlur, fontSize,
-  error, touched, Icon, backgroundColor, ...props }) {
+  value, handleChange, handleBlur, fontSize,
+  error, touched, backgroundColor, ...props }) {
 
   const [focused, setFocused] = useState(false);
   const color = setColor(error, touched, focused);
@@ -15,17 +15,15 @@ function Input({
     <Container>
       { label && <Label size={labelSize} htmlFor={id}>{ label }</Label> }
       <Section
-        isFile={type === "file"}
+        type="textarea"
         color={color}
         backgroundColor={backgroundColor}
       >
-        { Icon && <Icon size={25} color={color} /> }
-        <input 
+        <textarea
           id={id}
-          style={{fontSize: fontSize || "1rem"}}
+          style={{fontSize: fontSize || "1rem", resize: "none"}}
           disabled={disabled}
           placeholder={placeholder}
-          type={type || "text"}
           value={value}
           onChange={handleChange}
           onBlur={(e) => onBlur(e, setFocused, handleBlur)}
@@ -39,4 +37,4 @@ function Input({
   );
 }
 
-export default Input;
+export default TextArea;

@@ -21,7 +21,7 @@ export const Label = styled.label`
 
 export const Section = styled.section`
   width: 100%;
-  height: ${({ isFile }) => isFile ? "auto" : "40px"};
+  height: ${({ isFile, type }) => isFile ? "auto" : (type === "textarea" ? "80px" : "38px")};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -31,6 +31,7 @@ export const Section = styled.section`
   outline: ${({ isFile }) => isFile ? "none" : ""};
   border-radius: 0.5rem;
   background-color: ${({ backgroundColor }) => backgroundColor || "transparent"};
+  overflow: hidden;
 `;
 
 export const Main = css`

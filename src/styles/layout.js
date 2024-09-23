@@ -8,7 +8,7 @@ export const Text = styled.p`
   text-decoration: ${({ isLink }) => isLink ? "underline" : "none"};
   cursor: ${({ isLink }) => isLink ? "pointer" : "inherit"};
   text-align: ${({ align }) => align || "center"};
-  transition: color .2s ease;
+  transition: color .1s ease;
 
   &:hover {
     color: ${({ hColor, color }) => hColor || color};
@@ -56,12 +56,15 @@ export const Section = styled.section`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 2rem;
+  gap: 1.5rem;
   padding-bottom: 3rem;
 `;
 
 export const Image = styled.img`
   width: ${({ width }) => width || 100}px;
   object-fit: cover;
-  border-radius: ${({ radius }) => radius || 1}rem;
+  border-radius: ${({ radius }) => radius || "1rem"};
+  mix-blend-mode: multiply;
 `;
+
+export const shadowSm = "0 2px 3px 1px rgba(0, 0, 0, .2)";
