@@ -9,6 +9,7 @@ export const Container = styled.div`
   width: fit-content;
   height: auto;
   animation: up 1s ease;
+  z-index: 100;
 
   @keyframes up {
     from {
