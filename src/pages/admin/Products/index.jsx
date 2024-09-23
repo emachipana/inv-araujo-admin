@@ -12,9 +12,13 @@ import Product from "../../../components/Product";
 import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import ProductList from "../../../components/ProducList";
+import AlertError from "../../../components/AlertError";
+import Modal from "../../../components/Modal";
+import ProductForm from "../../../components/ProductForm";
 
 function Products() {
-  const { products, isLoading } = useAdmin();
+  const [createModal, setCreateModal] = useState(false);
+  const { products, isLoading, error, setError } = useAdmin();
   const [type, setType] = useState(localStorage.getItem("productType") || "group");
 
   const handleClick = (type) => {
@@ -53,6 +57,7 @@ function Products() {
           </Wrapper>
         </FlexRow>
         <Button
+          onClick={() => setCreateModal(!createModal)}
           fontSize={15}
           Icon={IoMdAddCircleOutline}
           iconSize={18}
@@ -76,6 +81,21 @@ function Products() {
             )
         }
       </Section>
+      <Modal
+        isActive={createModal}
+        setIsActive={setCreateModal}
+      >
+        <ProductForm isToCreate />
+      </Modal>
+      {
+        error
+        &&
+        <AlertError
+          from="categories"
+          error={error}
+          setError={setError}
+        />
+      }
     </>
   );
 }

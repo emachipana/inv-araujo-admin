@@ -9,10 +9,9 @@ import { useAdmin } from "../../context/admin";
 import Category from "./Category";
 import AddCategory from "./AddCategory";
 import AddSubCategory from "./AddSubCategory";
-import AlertError from "../AlertError";
 
 function EditCategories() {
-  const { categories, error, setError } = useAdmin();
+  const { categories } = useAdmin();
   const [currentAction, setCurrentAction] = useState("categories");
 
   return (
@@ -67,15 +66,6 @@ function EditCategories() {
             )
         }
       </Section>
-      {
-        error
-        &&
-        <AlertError
-          error={error}
-          setError={setError}
-          from="categories"
-        />
-      }
     </Container>
   );
 }
