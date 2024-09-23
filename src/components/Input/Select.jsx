@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Container, Label, Section, Main, TextError } from "./styles";
 import { onBlur, setColor } from "./handlers";
 
-function Select({ id, label, labelSize, fontSize, handleChange, options = [], handleBlur, error, touched, backgroundColor }) {
+function Select({ id, label, value, labelSize, fontSize, handleChange, options = [], handleBlur, error, touched, backgroundColor }) {
   const [focused, setFocused] = useState(false);
   const color = setColor(error, touched, focused);
 
@@ -21,11 +21,17 @@ function Select({ id, label, labelSize, fontSize, handleChange, options = [], ha
           onChange={handleChange}
           css={Main}
           onBlur={(e) => onBlur(e, setFocused, handleBlur)}
+          defaultValue={value || "default"}
         >
-          <option selected disabled value="">Eligen una</option>
+          <option disabled value="default">Eligen una</option>
           {
             options.map((item, index) => (
-              <option value={item.id} key={index}>{ item.content }</option>
+              <option 
+                value={item.id}
+                key={index}
+              >
+                { item.content }
+              </option>
             ))
           }
         </select>
