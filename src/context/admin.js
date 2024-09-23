@@ -86,14 +86,7 @@ const AdminProvider = ({ children }) => {
 
   const updateProduct = async (id, body) => {
     const updatedProduct = await apiFetch(`products/${id}`, { body, method: "PUT" });
-    const tempProducts = products;
-    const tempBackup = backup;
-    const index = tempProducts.findIndex(product => product.id === id);
-    const indexBackup = tempBackup.findIndex(product => product.id === id);
-    tempProducts[index] = updatedProduct.data;
-    tempBackup[indexBackup] = updatedProduct.data;
-    setProducts([...tempProducts]);
-    setBackup([...tempBackup]);
+    setProduct(id, updatedProduct.data);
   }
 
   const addProduct = async (body) => {
@@ -101,6 +94,17 @@ const AdminProvider = ({ children }) => {
     setProducts(products => [...products, newProduct.data]);
     setBackup(products => [...products, newProduct.data]);
     return newProduct.data;
+  }
+
+  const setProduct = (id, product) => {
+    const tempProducts = products;
+    const tempBackup = backup;
+    const index = tempProducts.findIndex(product => product.id === id);
+    const indexBackup = tempBackup.findIndex(product => product.id === id);
+    tempProducts[index] = product;
+    tempBackup[indexBackup] = product;
+    setProducts([...tempProducts]);
+    setBackup([...tempBackup]);
   }
 
   return (
@@ -121,7 +125,8 @@ const AdminProvider = ({ children }) => {
         addCategory,
         addSubCategory,
         updateProduct,
-        addProduct
+        addProduct,
+        setProduct
       }}
     >
       { children }
