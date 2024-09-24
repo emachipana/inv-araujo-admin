@@ -107,6 +107,14 @@ const AdminProvider = ({ children }) => {
     setBackup([...tempBackup]);
   }
 
+  const deleteProduct = async (id) => {
+    await apiFetch(`products/${id}`, { method: "DELETE" });
+    const updatedProducts = products.filter(product => product.id !== id);
+    const updatedBackup = backup.filter(product => product.id !== id);
+    setProducts([...updatedProducts]);
+    setBackup([...updatedBackup]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -126,7 +134,8 @@ const AdminProvider = ({ children }) => {
         addSubCategory,
         updateProduct,
         addProduct,
-        setProduct
+        setProduct,
+        deleteProduct
       }}
     >
       { children }
