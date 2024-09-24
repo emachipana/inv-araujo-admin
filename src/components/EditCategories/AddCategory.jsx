@@ -8,9 +8,9 @@ import { useAdmin } from "../../context/admin";
 import { validate } from "./validate";
 import { onSubmit } from "./handlers";
 
-function AddCategory({ setCurrentAction }) {
+function AddCategory({ setCurrentAction, to, addCategory }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { addCategory, setError } = useAdmin();
+  const { setError } = useAdmin();
 
   const values = {name: ""}
 
@@ -18,7 +18,7 @@ function AddCategory({ setCurrentAction }) {
     <Formik
       initialValues={values}
       validate={validate}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, setError)}
+      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, setError, to)}
     >
       {({
         values,
@@ -32,7 +32,7 @@ function AddCategory({ setCurrentAction }) {
         <Form onSubmit={handleSubmit}>
           <Input
             fontSize={15}
-            label="Categoría"
+            label={to === "categories" ? "Categoría" : "Tubérculo"}
             labelSize={16}
             error={errors.name}
             id="name"

@@ -9,7 +9,7 @@ import { COLORS } from "../../styles/colors";
 import { useAdmin } from "../../context/admin";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
-function SubCategory({ id, children, categoryId }) {
+function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory, deleteSubCategory }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isToEdit, setIsToEdit] = useState(false);
   const [category, setCategory] = useState({
@@ -17,7 +17,7 @@ function SubCategory({ id, children, categoryId }) {
     error: "",
     touched: false
   });
-  const { updateSubCategory, deleteSubCategory, setError } = useAdmin();
+  const { setError } = useAdmin();
 
   const onDelete = async () => {
     try {
@@ -63,7 +63,7 @@ function SubCategory({ id, children, categoryId }) {
                     onClick={() => onSave(
                       category,
                       id,
-                      { categoryId, name: category.value },
+                      {categoryId, name: category.value},
                       setIsToEdit,
                       setCategory,
                       updateSubCategory,
@@ -80,7 +80,7 @@ function SubCategory({ id, children, categoryId }) {
             </>
           : <>
               <FaEdit
-                onClick={() => setupEdit(children, setIsToEdit, setCategory)}
+                onClick={() => isFromTuber ? updateSubCategory(id, categoryId) : setupEdit(children, setIsToEdit, setCategory)}
                 size={17}
                 color={COLORS.dim}
                 style={{cursor: "pointer"}}

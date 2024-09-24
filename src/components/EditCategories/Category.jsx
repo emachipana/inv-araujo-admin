@@ -10,7 +10,7 @@ import { Spinner } from "reactstrap";
 import { closeEdit, handleChange, handleBlur, setupEdit, onSave } from "./handlers";
 import SubCategory from "./SubCategory";
 
-function Category({ id, children, subCategories }) {
+function Category({ id, children, isFromTuber, subCategories, forCategory, forSubCategory }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isToEdit, setIsToEdit] = useState(false);
@@ -19,11 +19,11 @@ function Category({ id, children, subCategories }) {
     error: "",
     touched: false
   });
-  const { updateCategory, deleteCategory, setError } = useAdmin();
+  const { setError } = useAdmin();
 
   const onDelete = async () => {
     try {
-      await deleteCategory(id);
+      await forCategory.deleteCategory(id);
     }catch(error) {
       setError(error.message);
       console.error(error);
@@ -78,7 +78,7 @@ function Category({ id, children, subCategories }) {
                         { name: category.value },
                         setIsToEdit,
                         setCategory,
-                        updateCategory,
+                        forCategory.updateCategory,
                         setIsLoading
                       )}
                     />
@@ -117,9 +117,12 @@ function Category({ id, children, subCategories }) {
           {
             subCategories.map((subCategory, index) => (
               <SubCategory
+                isFromTuber={isFromTuber}
                 key={index}
                 categoryId={id}
                 id={subCategory.id}
+                deleteSubCategory={forSubCategory.deleteSubCategory}
+                updateSubCategory={forSubCategory.updateSubCategory}
               >
                 { subCategory.name }
               </SubCategory>
