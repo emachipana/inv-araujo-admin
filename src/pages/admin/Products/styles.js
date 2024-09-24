@@ -1,5 +1,7 @@
 import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 import { COLORS } from "../../../styles/colors";
+import { shadowSm } from "../../../styles/layout";
 
 export const Filter = styled.section`
   width: 100%;
@@ -48,3 +50,20 @@ export const Section = styled.section`
     justify-content: center;
   }
 `;
+
+export const Container = css`
+  border-radius: 1rem;
+  width: 100%;
+  overflow: hidden;
+  table-layout: auto;
+  box-shadow: ${shadowSm};
+  border-collapse: collapse;
+
+  th {
+    text-align: center;
+    vertical-align: middle;
+    height: 70px;
+    min-width: 40px;
+  }
+`;
+

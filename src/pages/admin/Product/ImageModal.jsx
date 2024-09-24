@@ -45,6 +45,7 @@ function ImageModal({ product, isActive, setIsActive, setProduct }) {
       setProduct(newProduct);
       setIsLoading(false);
       setIsActive(false);
+      setPreviewImage(null);
     }catch(error) {
       setError(error.message);
       console.error(error);
@@ -52,10 +53,15 @@ function ImageModal({ product, isActive, setIsActive, setProduct }) {
     }
   }
 
+  const handleClose = () => {
+    setPreviewImage(null);
+    setIsActive();
+  }
+
   return (
     <Modal
       isActive={isActive}
-      setIsActive={setIsActive}
+      setIsActive={handleClose}
     >
       <Formik
         initialValues={initialValues}
