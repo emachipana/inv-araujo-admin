@@ -63,3 +63,11 @@ export const Image = styled.img`
   border-radius: 1rem;
   mix-blend-mode: multiply;
 `;
+
+export const Container = styled.div`
+  background-color: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: ${shadowSm};
+  margin: auto;
+`;

@@ -87,6 +87,7 @@ const AdminProvider = ({ children }) => {
   const updateProduct = async (id, body) => {
     const updatedProduct = await apiFetch(`products/${id}`, { body, method: "PUT" });
     setProduct(id, updatedProduct.data);
+    return updatedProduct.data;
   }
 
   const addProduct = async (body) => {

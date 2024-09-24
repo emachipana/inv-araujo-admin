@@ -22,11 +22,12 @@ export const Container = styled.div`
 
 export const Image = styled.img`
   width: 100%;
-  height: 48%;
+  max-height: 100%;
   cursor: pointer;
   object-fit: contain;
   transition: transform .3s ease-out;
   mix-blend-mode: multiply;
+  border-radius: 0.5rem;
 
   &:hover {
     transform: scale(1.05);

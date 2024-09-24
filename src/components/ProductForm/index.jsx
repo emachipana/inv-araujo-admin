@@ -20,17 +20,17 @@ function ProductForm({ initialValues = {
   price: "",
   stock: "",
   isActive: true
-}, isToCreate }) {
+}, isToCreate, productId }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { categories, setError, addProduct } = useAdmin();
+  const { categories, setError, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const product = await addProduct(values);
+      const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
-      navigate(`${product.id}`);
+      navigate(`/admin/productos/${product.id}`);
     }catch(error) {
       console.error(error);
       setIsLoading(false);
@@ -142,9 +142,11 @@ function ProductForm({ initialValues = {
               isLoading
               ? <>
                   <Spinner size="sm" />
-                  Agregando...
+                  {
+                    isToCreate ? "Agregando..." : "Editando..."
+                  }
                 </>
-              : "Agregar"
+              : isToCreate ? "Agregar" : "Editar"
             }
           </Button>
         </Form>
