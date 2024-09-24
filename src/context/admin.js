@@ -8,6 +8,9 @@ const AdminProvider = ({ children }) => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [backup, setBackup] = useState([]);
+  const [tubers, setTubers] = useState([]);
+  const [vitroOrders, setVitroOrders] = useState([]);
+  const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -15,6 +18,11 @@ const AdminProvider = ({ children }) => {
       try {
         const categories = await apiFetch("categories");
         const products = await apiFetch("products");
+        const tubers = await apiFetch("tubers");
+        const vitroOrders = await apiFetch("vitroOrders");
+        setVitroOrders(vitroOrders);
+        setVitroOrdersBack(vitroOrders);
+        setTubers(tubers);
         setCategories(categories);
         setProducts(products)
         setBackup(products);
@@ -78,7 +86,7 @@ const AdminProvider = ({ children }) => {
     const newSubCategory = await apiFetch("categories", { body });
     const category = categories.find(category => category.id === (categoryId * 1));
     category.subCategories = [...category.subCategories || [], {...newSubCategory.data, subCategories: []}];
-    const index = categories.findIndex(category => category.id === categoryId);
+    const index = categories.findIndex(category => category.id === (categoryId * 1));
     const tempCategories = categories;
     tempCategories[index] = category;
     setCategories([...tempCategories]);
@@ -131,6 +139,53 @@ const AdminProvider = ({ children }) => {
     return updatedProduct;
   }
 
+  const updateTuber = async (id, body) => {
+    const newTuber = await apiFetch(`tubers/${id}`, { body, method: "PUT" });
+    const tempTubers = tubers;
+    const index = tubers.findIndex(tuber => tuber.id === id);
+    tempTubers[index] = newTuber.data;
+    setTubers([...tempTubers]);
+  }
+
+  const deleteTuber = async (id) => {
+    await apiFetch(`tubers/${id}`, { method: "DELETE" });
+    const updatedTubers = tubers.filter(tuber => tuber.id !== id);
+    setTubers([...updatedTubers]);
+  }
+
+  const addTuber = async (body) => {
+    const newTuber = await apiFetch("tubers", { body });
+    setTubers(tubers => [...tubers, newTuber.data]);
+  }
+
+  const addVariety = async (body) => {
+    const { tuberId } = body;
+    const newVariety = await apiFetch("varieties", { body });
+    const tuber = tubers.find(tuber => tuber.id === (tuberId * 1));
+    tuber.varieties = [...tuber.varieties || [], newVariety.data];
+    const index = tubers.findIndex(tuber => tuber.id === (tuberId * 1));
+    const tempTubers = tubers;
+    tempTubers[index] = tuber;
+    setTubers([...tempTubers]);
+  }
+
+  const updateVariety = async (body) => {
+    const { id, ...toUpdate } = body;
+    await apiFetch(`varieties/${id}`, { body: toUpdate, method: "PUT" });
+    const tubers = await apiFetch("tubers");
+    setTubers(tubers);
+  }
+
+  const deleteVariety = async (id, tuberId) => {
+    await apiFetch(`varieties/${id}`, { method: "DELETE" });
+    const tuber = tubers.find(tuber => tuber.id === tuberId);
+    const tempTubers = tubers;
+    const index = tubers.findIndex(tuber => tuber.id === tuberId);
+    tuber.varieties = tuber.varieties.filter(variety => variety.id !== id);
+    tempTubers[index] = tuber;
+    setTubers([...tempTubers]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -139,6 +194,11 @@ const AdminProvider = ({ children }) => {
         backup,
         error,
         isLoading,
+        tubers,
+        vitroOrders,
+        vitroOrdersBack,
+        setTubers,
+        setVitroOrders,
         setCategories,
         setProducts,
         setError,
@@ -152,7 +212,13 @@ const AdminProvider = ({ children }) => {
         addProduct,
         setProduct,
         deleteProduct,
-        addProductImage
+        addProductImage,
+        updateTuber,
+        deleteTuber,
+        deleteVariety,
+        addTuber,
+        addVariety,
+        updateVariety
       }}
     >
       { children }
