@@ -56,10 +56,12 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
           </Text>
         </Discount>
       }
-      <Image 
-        alt={`${name}-image`}
-        src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}
-      />
+      <div style={{width: "100%", height: "48%"}}>
+        <Image 
+          alt={`${name}-image`}
+          src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}
+        />
+      </div>
       <Description>
         <FlexRow width="100%" justify="space-between">
           <Text 

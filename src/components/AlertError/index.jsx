@@ -11,6 +11,8 @@ function AlertError({ setError, error, from = null }) {
 
     if(error.includes("delete or update a parent row") && from === "categories") return "La categoria tiene productos asociados";
 
+    if(error.includes("must be greater") && from === "product") return "El descuento tiene que ser menor al precio del producto";
+
     return error.replaceAll('"', "");
   }
 

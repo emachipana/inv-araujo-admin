@@ -1,7 +1,7 @@
 import { Formik } from "formik";
 import { useState } from "react";
 import { validate } from "./validate";
-import { Form, Group, Title } from "./styles";
+import { Group, Title } from "./styles";
 import Input from "../Input";
 import TextArea from "../Input/TextArea";
 import Button from "../Button";
@@ -10,6 +10,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { useAdmin } from "../../context/admin";
 import Select from "../Input/Select";
 import { useNavigate } from "react-router-dom";
+import { Form } from "../../styles/layout";
 
 function ProductForm({ initialValues = {
   name: "",
@@ -19,17 +20,17 @@ function ProductForm({ initialValues = {
   price: "",
   stock: "",
   isActive: true
-}, isToCreate }) {
+}, isToCreate, productId }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { categories, setError, addProduct } = useAdmin();
+  const { categories, setError, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const product = await addProduct(values);
+      const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
-      navigate(`${product.id}`);
+      navigate(`/admin/productos/${product.id}`);
     }catch(error) {
       console.error(error);
       setIsLoading(false);
@@ -141,9 +142,11 @@ function ProductForm({ initialValues = {
               isLoading
               ? <>
                   <Spinner size="sm" />
-                  Agregando...
+                  {
+                    isToCreate ? "Agregando..." : "Editando..."
+                  }
                 </>
-              : "Agregar"
+              : isToCreate ? "Agregar" : "Editar"
             }
           </Button>
         </Form>

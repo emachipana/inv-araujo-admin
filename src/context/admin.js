@@ -86,14 +86,8 @@ const AdminProvider = ({ children }) => {
 
   const updateProduct = async (id, body) => {
     const updatedProduct = await apiFetch(`products/${id}`, { body, method: "PUT" });
-    const tempProducts = products;
-    const tempBackup = backup;
-    const index = tempProducts.findIndex(product => product.id === id);
-    const indexBackup = tempBackup.findIndex(product => product.id === id);
-    tempProducts[index] = updatedProduct.data;
-    tempBackup[indexBackup] = updatedProduct.data;
-    setProducts([...tempProducts]);
-    setBackup([...tempBackup]);
+    setProduct(id, updatedProduct.data);
+    return updatedProduct.data;
   }
 
   const addProduct = async (body) => {
@@ -101,6 +95,40 @@ const AdminProvider = ({ children }) => {
     setProducts(products => [...products, newProduct.data]);
     setBackup(products => [...products, newProduct.data]);
     return newProduct.data;
+  }
+
+  const setProduct = (id, product) => {
+    const tempProducts = products;
+    const tempBackup = backup;
+    const index = tempProducts.findIndex(product => product.id === id);
+    const indexBackup = tempBackup.findIndex(product => product.id === id);
+    tempProducts[index] = product;
+    tempBackup[indexBackup] = product;
+    setProducts([...tempProducts]);
+    setBackup([...tempBackup]);
+  }
+
+  const deleteProduct = async (id) => {
+    await apiFetch(`products/${id}`, { method: "DELETE" });
+    const updatedProducts = products.filter(product => product.id !== id);
+    const updatedBackup = backup.filter(product => product.id !== id);
+    setProducts([...updatedProducts]);
+    setBackup([...updatedBackup]);
+  }
+
+  const addProductImage = async (product, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const image = await apiFetch("images", { body: formData, isFile: true });
+    const body = {
+      productId: product.id,
+      imageId: image.data.id
+    }
+    const newProductImage = await apiFetch("productImages", { body });
+    const images = product.images ? [...product.images, newProductImage.data] : [newProductImage.data];
+    const updatedProduct = {...product, images};
+    setProduct(product.id, updatedProduct);
+    return updatedProduct;
   }
 
   return (
@@ -121,7 +149,10 @@ const AdminProvider = ({ children }) => {
         addCategory,
         addSubCategory,
         updateProduct,
-        addProduct
+        addProduct,
+        setProduct,
+        deleteProduct,
+        addProductImage
       }}
     >
       { children }

@@ -49,6 +49,7 @@ function ProductList() {
             <Text
               weight={600}
               color={COLORS.gray}
+              align="start"
             >
               Precio
             </Text>
@@ -59,14 +60,6 @@ function ProductList() {
               color={COLORS.gray}
             >
               Descuento
-            </Text>
-          </td>
-          <td>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-            >
-              Porcentaje
             </Text>
           </td>
           <td>
@@ -129,7 +122,7 @@ function ProductList() {
                     justify="flex-start"
                   >
                     <Image
-                        width={55}
+                        width="55px"
                         alt={`${product.name}`}
                         src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
                     />
@@ -154,22 +147,31 @@ function ProductList() {
                   </TextDescription>
                 </th>
                 <th>
+                <FlexRow>
                   <Text
                     size={15}
+                    color={product.discount ? COLORS.taupe : COLORS.persian}
                     weight={500}
-                    color={COLORS.dim}
+                    style={{
+                      textDecoration: product.discount ? "line-through" : "none",
+                      textWrap: "nowrap"
+                    }}
                   >
                     S/. { product.price }
                   </Text>
-                </th>
-                <th>
-                  <Text
-                    size={15}
-                    weight={500}
-                    color={COLORS.dim}
-                  >
-                    S/. { product.discount ? product.discount.price : 0 }
-                  </Text>
+                  {
+                    product.discount
+                    &&
+                    <Text
+                      size={15}
+                      color={COLORS.orange}
+                      weight={500}
+                      style={{textWrap: "nowrap"}}
+                    >
+                      S/. { product.discount.price }
+                    </Text>
+                  }
+                </FlexRow>
                 </th>
                 <th>
                   <Text
