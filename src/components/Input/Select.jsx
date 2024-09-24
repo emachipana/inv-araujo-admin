@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Container, Label, Section, Main, TextError } from "./styles";
 import { onBlur, setColor } from "./handlers";
 
-function Select({ id, label, value, labelSize, fontSize, handleChange, options = [], handleBlur, error, touched, backgroundColor }) {
+function Select({ id, label, value, labelSize, fontSize, handleChange, options = [], handleBlur, error, touched, backgroundColor, ...props }) {
   const [focused, setFocused] = useState(false);
   const color = setColor(error, touched, focused);
 
@@ -13,8 +13,10 @@ function Select({ id, label, value, labelSize, fontSize, handleChange, options =
       <Section
         color={color}
         backgroundColor={backgroundColor}
+        {...props}
       >
         <select
+          {...props}
           style={{fontSize: fontSize || "1rem"}}
           id={id}
           name={id}

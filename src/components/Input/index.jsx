@@ -18,6 +18,7 @@ function Input({
         isFile={type === "file"}
         color={color}
         backgroundColor={backgroundColor}
+        disabled={disabled}
       >
         { Icon && <Icon size={25} color={color} /> }
         <input 
@@ -31,7 +32,6 @@ function Input({
           onBlur={(e) => onBlur(e, setFocused, handleBlur)}
           onFocus={() => setFocused(true)}
           css={Main}
-          {...props}
         />
       </Section>
       { touched && error && <TextError>{ error }</TextError> }
