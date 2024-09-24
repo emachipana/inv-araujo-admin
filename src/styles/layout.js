@@ -61,7 +61,7 @@ export const Section = styled.section`
 `;
 
 export const Image = styled.img`
-  width: ${({ width }) => width || 100}px;
+  width: ${({ width }) => width || "100px"};
   object-fit: cover;
   border-radius: ${({ radius }) => radius || "1rem"};
   mix-blend-mode: multiply;

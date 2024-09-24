@@ -122,7 +122,7 @@ function ProductList() {
                     justify="flex-start"
                   >
                     <Image
-                        width={55}
+                        width="55px"
                         alt={`${product.name}`}
                         src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
                     />

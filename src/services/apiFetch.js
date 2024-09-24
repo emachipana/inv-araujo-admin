@@ -1,6 +1,6 @@
 import { BASE_URI, TOKEN_NAME } from "../config";
 
-async function apiFetch(endpoint, { method, headers, body } = {}) {
+async function apiFetch(endpoint, { method, headers, body, isFile } = {}) {
   const token = localStorage.getItem(TOKEN_NAME);
 
   if(token) {
@@ -10,7 +10,7 @@ async function apiFetch(endpoint, { method, headers, body } = {}) {
     }
   }
 
-  if(body) {
+  if(body && !isFile) {
     headers = {
       "Content-Type": "application/json",
       ...headers
@@ -20,7 +20,7 @@ async function apiFetch(endpoint, { method, headers, body } = {}) {
   const config = {
     method: method || (body ? "POST" : "GET"),
     headers,
-    body: body ? JSON.stringify(body): null
+    body: isFile ? body : (body ? JSON.stringify(body) : null)
   }
 
   const response = await fetch(`${BASE_URI}/${endpoint}`, config);

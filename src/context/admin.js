@@ -115,6 +115,21 @@ const AdminProvider = ({ children }) => {
     setBackup([...updatedBackup]);
   }
 
+  const addProductImage = async (product, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const image = await apiFetch("images", { body: formData, isFile: true });
+    const body = {
+      productId: product.id,
+      imageId: image.data.id
+    }
+    const newProductImage = await apiFetch("productImages", { body });
+    const images = product.images ? [...product.images, newProductImage.data] : [newProductImage.data];
+    const updatedProduct = {...product, images};
+    setProduct(product.id, updatedProduct);
+    return updatedProduct;
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -135,7 +150,8 @@ const AdminProvider = ({ children }) => {
         updateProduct,
         addProduct,
         setProduct,
-        deleteProduct
+        deleteProduct,
+        addProductImage
       }}
     >
       { children }

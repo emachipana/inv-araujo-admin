@@ -3,7 +3,7 @@ import { Title } from "../styles";
 import { useEffect, useState } from "react";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
-import { Card, Section, Wrapper } from "./styles";
+import { Card, Image, ImageCard, Section, Wrapper } from "./styles";
 import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
@@ -14,10 +14,13 @@ import DiscountModal from "./DiscountModal";
 import { useAdmin } from "../../../context/admin";
 import AlertError from "../../../components/AlertError";
 import DeleteModal from "./DeleteModal";
+import { AiTwotoneFileAdd } from "react-icons/ai";
+import ImageModal from "./ImageModal";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [imageModal, setImageModal] = useState(false);
   const [product, setProduct] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
@@ -205,7 +208,34 @@ function Product() {
                   </Wrapper>
                 </Card>
                 <Card>
-                  
+                  <FlexColumn>
+                    <Text
+                      weight={700}
+                      size={17}
+                    >
+                      Imagenes
+                    </Text>
+                    <Wrapper justify="center" isButtons>
+                      <ImageCard
+                        onClick={() => setImageModal(!imageModal)}
+                      >
+                        <AiTwotoneFileAdd 
+                          size={70}
+                          color={COLORS.dim}
+                        />
+                      </ImageCard>
+                      {
+                        product?.images.map((image, index) => (
+                          <ImageCard key={index}>
+                            <Image
+                              src={image.image.url}
+                              alt={`${product.name}-${index + 1}`}
+                            />
+                          </ImageCard>
+                        ))
+                      }
+                    </Wrapper>
+                  </FlexColumn>
                 </Card>
               </Section>
               <DiscountModal
@@ -218,6 +248,12 @@ function Product() {
                 id={product.id}
                 isActive={deleteModal}
                 setIsActive={setDeleteModal}
+              />
+              <ImageModal 
+                product={product}
+                isActive={imageModal}
+                setIsActive={setImageModal}
+                setProduct={setProduct}
               />
             </>
         }
