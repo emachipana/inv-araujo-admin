@@ -11,10 +11,10 @@ import { Spinner } from "reactstrap";
 import Product from "../../../components/Product";
 import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
-import ProductList from "../../../components/ProducList";
 import AlertError from "../../../components/AlertError";
 import Modal from "../../../components/Modal";
 import ProductForm from "../../../components/ProductForm";
+import List from "./List";
 
 function Products() {
   const [createModal, setCreateModal] = useState(false);
@@ -77,7 +77,7 @@ function Products() {
                     product={product}
                   />
                 ))
-              : <ProductList />
+              : <List />
             )
         }
       </Section>
