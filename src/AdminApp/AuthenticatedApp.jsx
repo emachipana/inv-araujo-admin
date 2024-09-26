@@ -7,6 +7,7 @@ import Products from "../pages/admin/Products";
 import { AdminProvider } from "../context/admin";
 import Product from "../pages/admin/Product";
 import EditProduct from "../pages/admin/Product/Edit";
+import InvitroOrders from "../pages/admin/InvitroOrders";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +27,7 @@ function AuthenticatedApp() {
           <Route path="/productos" element={<Products />} />
           <Route path="/productos/:id" element={<Product />} />
           <Route path="/productos/:id/edit" element={<EditProduct />} />
+          <Route path="/invitro" element={<InvitroOrders />} />
         </Routes>
       </Section>
     </AdminProvider>

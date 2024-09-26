@@ -105,6 +105,13 @@ const AdminProvider = ({ children }) => {
     return newProduct.data;
   }
 
+  const addVitro = async (body) => {
+    const newVitro = await apiFetch("vitroOrders", { body });
+    setVitroOrders(vitros => [...vitros, newVitro.data]);
+    setVitroOrdersBack(vitros => [...vitros, newVitro.data]);
+    return newVitro.data;
+  }
+
   const setProduct = (id, product) => {
     const tempProducts = products;
     const tempBackup = backup;
@@ -218,7 +225,8 @@ const AdminProvider = ({ children }) => {
         deleteVariety,
         addTuber,
         addVariety,
-        updateVariety
+        updateVariety,
+        addVitro
       }}
     >
       { children }
