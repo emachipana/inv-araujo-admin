@@ -32,6 +32,7 @@ export const Section = styled.section`
   border-radius: 0.5rem;
   background-color: ${({ backgroundColor }) => backgroundColor || "transparent"};
   overflow: hidden;
+  opacity: ${({ disabled }) => disabled ? ".6" : 1};
 `;
 
 export const Main = css`
@@ -47,6 +48,10 @@ export const Main = css`
 
   &::placeholder {
     color: ${COLORS.taupe};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
   }
 `;
 

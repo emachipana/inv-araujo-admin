@@ -11,7 +11,7 @@ import AddCategory from "./AddCategory";
 import AddSubCategory from "./AddSubCategory";
 
 function EditCategories() {
-  const { categories } = useAdmin();
+  const { categories, addCategory, updateCategory, deleteCategory, updateSubCategory, deleteSubCategory } = useAdmin();
   const [currentAction, setCurrentAction] = useState("categories");
 
   return (
@@ -54,6 +54,8 @@ function EditCategories() {
                     id={category.id}
                     subCategories={category.subCategories || []}
                     key={index}
+                    forCategory={{updateCategory, deleteCategory}}
+                    forSubCategory={{updateSubCategory, deleteSubCategory}}
                   >
                     { category.name }
                   </Category>
@@ -61,7 +63,11 @@ function EditCategories() {
               }
             </>
           : (currentAction === "addCategory"
-              ? <AddCategory setCurrentAction={setCurrentAction} />
+              ? <AddCategory 
+                  setCurrentAction={setCurrentAction}
+                  to="categories"
+                  addCategory={addCategory}
+                />
               : <AddSubCategory setCurrentAction={setCurrentAction} />
             )
         }

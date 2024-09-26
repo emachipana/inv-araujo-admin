@@ -74,7 +74,7 @@ export const TextDescription = styled.p`
   font-size: ${({ size }) => size || "14px"};
   color: ${({ color }) => color || COLORS.taupe};
   line-height: ${({ height }) => height || "14px"};
-  width: 150px;
+  width: ${({ width }) => width || 150}px;
   text-align: start;
 `;
 

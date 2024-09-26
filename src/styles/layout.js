@@ -58,6 +58,7 @@ export const Section = styled.section`
   justify-content: flex-start;
   gap: 1.5rem;
   padding-bottom: 3rem;
+  overflow: auto;
 `;
 
 export const Image = styled.img`

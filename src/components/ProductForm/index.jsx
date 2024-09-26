@@ -38,15 +38,15 @@ function ProductForm({ initialValues = {
     }
   }
 
-  let options = [];
-  categories.forEach(category => {
-    options.push(category);
-    category.subCategories?.forEach(
-      subCategory => (
-        options.push({...subCategory, name: `(${category.name}) ${subCategory.name}`}))
-    )
-  });
-  options = options.map(option => ({ id: option.id, content: option.name }));
+  const options = categories.reduce((result, category) => {
+    result.push({id: category.id, content: category.name});
+    const subCategories = category.subCategories?.map(subCategory => ({
+      id: subCategory.id,
+      content: `(${category.name}) ${subCategory.name}`
+    }));
+    result.push(...subCategories);
+    return result;
+  }, []);
 
   return (
     <Formik

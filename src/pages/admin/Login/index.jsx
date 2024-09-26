@@ -31,7 +31,6 @@ function Login() {
       setError(null)
     }catch(error) {
       console.error(error);
-
       setError(error.message);
       setIsLoading(false);
     }

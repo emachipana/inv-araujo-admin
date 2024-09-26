@@ -24,7 +24,7 @@ function AddSubCategory({ setCurrentAction }) {
     <Formik
       initialValues={values}
       validate={(values) => validate(values, "subCategory")}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addSubCategory, setCurrentAction, setError)}
+      onSubmit={(values) => onSubmit(values, setIsLoading, addSubCategory, setCurrentAction, setError, "categories")}
     >
       {({
         values,
