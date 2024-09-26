@@ -44,7 +44,7 @@ function ProductForm({ initialValues = {
       id: subCategory.id,
       content: `(${category.name}) ${subCategory.name}`
     }));
-    result.push(...subCategories);
+    if(subCategories) result.push(...subCategories);
     return result;
   }, []);
 
