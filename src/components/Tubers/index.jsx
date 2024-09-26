@@ -64,7 +64,7 @@ function Tubers() {
           align="flex-start"
           isActive={editModal}
           setIsActive={setEditModal}
-          size="lg"
+          size="md"
           padding="1rem"
         >
           <EditTubers />

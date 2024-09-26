@@ -21,6 +21,7 @@ export const Container = styled.div`
 `;
 
 export const Section = styled.section`
+  width: 100%;
   background-color: rgba(0, 170, 149, .8);
   height: 52%;
   border-radius: 0.5rem;

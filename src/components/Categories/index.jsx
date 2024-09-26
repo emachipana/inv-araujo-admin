@@ -64,7 +64,7 @@ function Categories() {
         isActive={editModal}
         setIsActive={setEditModal}
         size="lg"
-        padding={"1rem"}
+        padding="1rem"
       >
         <EditCategories />
       </Modal>
