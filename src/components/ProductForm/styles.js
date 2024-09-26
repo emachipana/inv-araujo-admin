@@ -9,13 +9,15 @@ export const Title = styled.h3`
 `;
 
 export const Group = styled.div`
-  width: 100%;
+  width: ${({ width }) => width || 100}%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   gap: 1rem;
+  align-self: flex-start;
 
   @media screen and (max-width: 400px) {
+    width: 100%;
     flex-wrap: wrap;
   }
 `;
