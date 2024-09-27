@@ -144,7 +144,7 @@ function List() {
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { `${order.firstName} ${order.lastName}` }
+                    { `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }
                   </TextDescription>
                 </th>
                 <th>
