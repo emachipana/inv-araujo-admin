@@ -22,10 +22,10 @@ function VitroForm({ initialValues = {
   advance: "",
   initDate: "",
   finishDate: ""
-}, isToCreate, vitroId }) {
-  const [docType, setDocType] = useState("");
+}, isToCreate, vitroId, initialDocType = "" }) {
+  const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addVitro, updatedVitro } = useAdmin();
+  const { setError, addVitro, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -33,10 +33,11 @@ function VitroForm({ initialValues = {
       const body = {
         ...values,
         advance: values.advance || 0,
-        docType: (values.docType * 1) === 1 ? "DNI" : "RUC"
+        docType: (values.docType * 1) === 1 ? "DNI" : "RUC",
+        status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO")
       }
       setIsLoading(true);
-      const vitroOrder = isToCreate ? await addVitro(body) : await updatedVitro(vitroId, body);
+      const vitroOrder = isToCreate ? await addVitro(body) : await updateVitro(vitroId, body);
       setIsLoading(false);
       navigate(`/admin/invitro/${vitroOrder.id}`);
     }catch(error) {
@@ -189,6 +190,45 @@ function VitroForm({ initialValues = {
               handleChange={handleChange}
             />
           </Group>
+          {
+            !isToCreate
+            &&
+            <Group>
+              <Input
+                id="advance"
+                label="Adelanto"
+                placeholder="S/. 0.0"
+                error={errors.advance}
+                touched={touched.advance}
+                value={values.advance}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+              />
+              <Select
+                id="status"
+                label="Estado"
+                error={errors.status}
+                touched={touched.status}
+                value={values.status}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                options={[
+                  {
+                    id: 1,
+                    content: "PENDIENTE"
+                  },
+                  {
+                    id: 2,
+                    content: "ENTREGADO"
+                  },
+                  {
+                    id: 3,
+                    content: "CANCELADO"
+                  },
+                ]}
+              />
+            </Group>
+          }
           <Button
             type="submit"
             iconSize={18}
