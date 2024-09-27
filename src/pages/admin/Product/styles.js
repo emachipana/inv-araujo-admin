@@ -16,7 +16,7 @@ export const Section = styled.section`
 `;
 
 export const Card = styled.div`
-  width: ${({ position }) => position === "first" ? 42 : 58}%;
+  width: ${({ position, width }) => width ? width : (position === "first" ? 42 : 58)}%;
   background-color: white;
   border-radius: 1rem;
   box-shadow: ${shadowSm};

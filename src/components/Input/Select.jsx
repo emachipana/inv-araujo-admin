@@ -31,6 +31,7 @@ function Select({ id, label, value, labelSize, fontSize, handleChange, options =
               <option 
                 value={item.id}
                 key={index}
+                disabled={item.disabled}
               >
                 { item.content }
               </option>

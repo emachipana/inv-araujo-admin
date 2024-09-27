@@ -10,5 +10,5 @@ export const Container = styled.div`
   text-transform: uppercase;
   color: white;
   font-size: ${({ size }) => size || 12}px;
-  font-weight: 700;
+  font-weight: 800;
 `;

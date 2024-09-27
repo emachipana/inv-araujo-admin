@@ -193,6 +193,54 @@ const AdminProvider = ({ children }) => {
     setTubers([...tempTubers]);
   }
 
+  const deleteVitro  = async (id) => {
+    await apiFetch(`vitroOrders/${id}`, { method: "DELETE" });
+    const updatedOrders = vitroOrders.filter(order => order.id !== id);
+    const updatedBackup = vitroOrdersBack.filter(order => order.id !== id);
+    setVitroOrders([...updatedOrders]);
+    setVitroOrdersBack([...updatedBackup]);
+  }
+
+  const updateVitro = async (id, body) => {
+    const updatedVitro = await apiFetch(`vitroOrders/${id}`, { body, method: "PUT" });
+    setVitro(id, updatedVitro.data);
+    return updatedVitro.data;
+  }
+
+  const setVitro = (id, order) => {
+    const tempOrders = vitroOrders;
+    const tempBackup = vitroOrdersBack;
+    const index = tempOrders.findIndex(order => order.id === id);
+    const indexBack = tempBackup.findIndex(order => order.id === id);
+    tempOrders[index] = order;
+    tempBackup[indexBack] = order;
+    setVitroOrders([...tempOrders]);
+    setVitroOrdersBack([...tempBackup]);
+  }
+
+  const addItem = async (body) => {
+    const { vitroOrderId } = body;
+    await apiFetch("orderVarieties", { body });
+    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
+    setVitro(vitroOrder.data.id, vitroOrder.data);
+    return vitroOrder.data;
+  }
+
+  const editItem = async (id, body) => {
+    const { vitroOrderId } = body;
+    await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
+    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
+    setVitro(vitroOrder.data.id, vitroOrder.data);
+    return vitroOrder.data;
+  }
+
+  const deleteItem = async (id, vitroOrderId) => {
+    await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
+    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
+    setVitro(vitroOrder.data.id, vitroOrder.data);
+    return vitroOrder.data;
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -226,7 +274,12 @@ const AdminProvider = ({ children }) => {
         addTuber,
         addVariety,
         updateVariety,
-        addVitro
+        addVitro,
+        deleteVitro,
+        addItem,
+        editItem,
+        deleteItem,
+        updateVitro
       }}
     >
       { children }

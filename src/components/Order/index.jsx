@@ -19,7 +19,7 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
         <Text
           size="16.8px"
         >
-          { clientName }
+          { clientName.toLowerCase() }
         </Text>
         <FlexRow>
           <FaCalendarAlt 

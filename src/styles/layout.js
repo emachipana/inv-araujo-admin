@@ -24,6 +24,7 @@ export const FlexRow = styled.div`
 `;
 
 export const FlexColumn = styled.div`
+  width: ${({ width }) => width || "auto"};
   display: flex;
   flex-direction: column;
   align-items: ${({ align }) => align || "flex-start"};
