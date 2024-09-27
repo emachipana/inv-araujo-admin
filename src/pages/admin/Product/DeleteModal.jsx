@@ -8,17 +8,17 @@ import Button from "../../../components/Button";
 import { FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 
-function DeleteModal({ id, isActive, setIsActive }) {
+function DeleteModal({ id, isActive, setIsActive, handleDelete, navTo, title }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, deleteProduct } = useAdmin();
+  const { setError } = useAdmin();
   const navigate = useNavigate();
 
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await deleteProduct(id);
+      await handleDelete(id);
       setIsLoading(false);
-      navigate("/admin/productos");
+      navigate(`/admin/${navTo}`);
     }catch(error) {
       setIsLoading(false);
       console.error(error);
@@ -31,7 +31,7 @@ function DeleteModal({ id, isActive, setIsActive }) {
       isActive={isActive}
       setIsActive={setIsActive}
     >
-      <Title>¿Eliminar producto?</Title>
+      <Title>{ title }</Title>
       <FlexRow
         width="100%"
         gap={1}

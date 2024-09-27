@@ -25,7 +25,7 @@ function Product() {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { error, setError } = useAdmin();
+  const { error, setError, deleteProduct } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -248,6 +248,9 @@ function Product() {
                 id={product.id}
                 isActive={deleteModal}
                 setIsActive={setDeleteModal}
+                handleDelete={deleteProduct}
+                navTo="productos"
+                title="¿Eliminar producto?"
               />
               <ImageModal 
                 product={product}
