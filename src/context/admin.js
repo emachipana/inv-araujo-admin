@@ -11,6 +11,7 @@ const AdminProvider = ({ children }) => {
   const [tubers, setTubers] = useState([]);
   const [vitroOrders, setVitroOrders] = useState([]);
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -20,12 +21,14 @@ const AdminProvider = ({ children }) => {
         const products = await apiFetch("products");
         const tubers = await apiFetch("tubers");
         const vitroOrders = await apiFetch("vitroOrders");
+        const orders = await apiFetch("orders");
         setVitroOrders(vitroOrders);
         setVitroOrdersBack(vitroOrders);
         setTubers(tubers);
         setCategories(categories);
         setProducts(products)
         setBackup(products);
+        setOrders(orders);
         setIsLoading(false);
       }catch(error) {
         setError(error.message);
@@ -241,6 +244,26 @@ const AdminProvider = ({ children }) => {
     return vitroOrder.data;
   }
 
+  const addOrder = async (values) => {
+    const now = new Date();
+    const clientBody = {
+      ...values,
+      documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
+      email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+    }
+    const newClient = await apiFetch("clients", { body: clientBody });
+
+    const orderBody = {
+      clientId: newClient.data.id,
+      shipType: (values.shipType * 1) === 1 ? "EXPRESS" : "NORMAL",
+      payType: (values.payType * 1) === 1 ? "DEPOSITO" : "TARJETA",
+      destination: newClient.data.city
+    }
+    const newOrder = await apiFetch("orders", { body: orderBody });
+    setOrders(orders => [...orders, newOrder.data]);
+    return newOrder.data;
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -252,6 +275,7 @@ const AdminProvider = ({ children }) => {
         tubers,
         vitroOrders,
         vitroOrdersBack,
+        orders,
         setTubers,
         setVitroOrders,
         setCategories,
@@ -279,7 +303,8 @@ const AdminProvider = ({ children }) => {
         addItem,
         editItem,
         deleteItem,
-        updateVitro
+        updateVitro,
+        addOrder
       }}
     >
       { children }
