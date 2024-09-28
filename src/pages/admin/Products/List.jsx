@@ -26,8 +26,8 @@ function List() {
     >
       <thead>
         <tr>
-          <td></td>
-          <td>
+          <th></th>
+          <th>
             <Text
               align="start"
               weight={600}
@@ -35,8 +35,8 @@ function List() {
             >
               Nombre
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               align="start"
               weight={600}
@@ -44,8 +44,8 @@ function List() {
             >
               Descripción
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
@@ -53,50 +53,50 @@ function List() {
             >
               Precio
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
             >
               Descuento
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
             >
               Stock
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
             >
               Categoría
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
             >
               Marca
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             <Text
               weight={600}
               color={COLORS.gray}
             >
               Estado
             </Text>
-          </td>
-          <td>
+          </th>
+          <th>
             
-          </td>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -106,7 +106,7 @@ function List() {
 
             return (
               <tr key={index} onClick={() => navigate(`${product.id}`)}>
-                <th>
+                <td>
                   <Text
                     size={15}
                     weight={500}
@@ -114,8 +114,8 @@ function List() {
                   >
                   { index + 1 }
                   </Text>
-                </th>
-                <th>
+                </td>
+                <td>
                   <FlexRow
                     gap={0.2}
                     width="180px"
@@ -135,8 +135,8 @@ function List() {
                       { product.name }
                     </TextDescription>
                   </FlexRow>
-                </th>
-                <th>
+                </td>
+                <td>
                   <TextDescription
                     lines={3}
                     height="18px"
@@ -145,8 +145,8 @@ function List() {
                   >
                     { product.description }
                   </TextDescription>
-                </th>
-                <th>
+                </td>
+                <td>
                 <FlexRow>
                   <Text
                     size={15}
@@ -172,8 +172,8 @@ function List() {
                     </Text>
                   }
                 </FlexRow>
-                </th>
-                <th>
+                </td>
+                <td>
                   <Text
                     size={15}
                     weight={500}
@@ -181,8 +181,8 @@ function List() {
                   >
                     { product.discount ? `-${product.discount.percentage}` : 0 }%
                   </Text>
-                </th>
-                <th>
+                </td>
+                <td>
                   <Text
                     size={15}
                     weight={500}
@@ -190,8 +190,8 @@ function List() {
                   >
                     { product.stock }
                   </Text>
-                </th>
-                <th>
+                </td>
+                <td>
                   <Text
                     size={15}
                     weight={500}
@@ -199,8 +199,8 @@ function List() {
                   >
                     { product.category.name }
                   </Text>
-                </th>
-                <th>
+                </td>
+                <td>
                   <Text
                     size={15}
                     weight={500}
@@ -208,20 +208,20 @@ function List() {
                   >
                     { product.brand }
                   </Text>
-                </th>
-                <th>
+                </td>
+                <td>
                   <Badge color={product.active ? "primary" : "danger"}>
                     { product.active ? "activo" : "inactivo" }
                   </Badge>
-                </th>
-                <th>
+                </td>
+                <td>
                   <FaEdit
                     onClick={(event) => handleClick(event, product.id)}
                     size={20}
                     style={{cursor: "pointer"}}
                     color={COLORS.dim}
                   />
-                </th>
+                </td>
               </tr>
             );
           })

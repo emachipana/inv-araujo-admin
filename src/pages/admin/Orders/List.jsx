@@ -1,8 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { useNavigate } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import { Table } from "reactstrap";
 import { Container } from "../Products/styles";
+import { useAdmin } from "../../../context/admin";
+import { useNavigate } from "react-router-dom";
 import { Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { TextDescription } from "../../../components/Product/styles";
@@ -10,7 +10,7 @@ import Badge from "../../../components/Badge";
 import { FaEdit } from "react-icons/fa";
 
 function List() {
-  const { vitroOrders } = useAdmin();
+  const { orders } = useAdmin();
   const navigate = useNavigate();
 
   const handleClick = (event, id) => {
@@ -26,6 +26,7 @@ function List() {
     >
       <thead>
         <tr>
+
           <th></th>
           <th>
             <Text
@@ -73,7 +74,7 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Adelanto
+              Envío
             </Text>
           </th>
           <th>
@@ -81,7 +82,7 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Pendiente
+              Pago
             </Text>
           </th>
           <th>
@@ -90,7 +91,7 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Entrega
+              Max. entrega
             </Text>
           </th>
           <th>
@@ -107,16 +108,16 @@ function List() {
       </thead>
       <tbody>
         {
-          vitroOrders.map((order, index) => {
-            const parsedDate = new Date(order.finishDate);
+          orders.map((order, index) => {
+            const parsedDate = new Date(order.maxShipDate);
             const options = {
               day: "numeric",
               month: "short",
               year: "numeric"
             }
-
+            
             return (
-              <tr
+              <tr 
                 key={index}
                 onClick={() => navigate(`${order.id}`)}
               >
@@ -138,7 +139,7 @@ function List() {
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }
+                    { `${order.client.firstName.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }
                   </TextDescription>
                 </td>
                 <td>
@@ -147,7 +148,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.phone }
+                    { order.client.phone }
                   </Text>
                 </td>
                 <td>
@@ -156,7 +157,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.document }
+                    { order.client.document }
                   </Text>
                 </td>
                 <td>
@@ -182,8 +183,9 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{textTransform: "capitalize"}}
                   >
-                    S/. { order.advance }
+                    { order.shippingType.toLowerCase() }
                   </Text>
                 </td>
                 <td>
@@ -191,8 +193,9 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{textTransform: "capitalize"}}
                   >
-                    S/. { order.pending }
+                    { order.payType.toLowerCase() }
                   </Text>
                 </td>
                 <td>
