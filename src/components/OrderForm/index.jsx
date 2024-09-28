@@ -5,44 +5,39 @@ import { Formik } from "formik";
 import { validate } from "./validate";
 import { Form } from "../../styles/layout";
 import { Group, Title } from "../ProductForm/styles";
-import Input from "../Input";
 import Select from "../Input/Select";
+import Input from "../Input";
+import { onDocChange, onDocTypeChange } from "../VitroForm/handlers";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import { onDocChange, onDocTypeChange } from "./handlers";
 
-function VitroForm({ initialValues = {
-  docType: "",
+function OrderForm({ initialValues = {
+  documentType: "",
   document: "",
   firstName: "",
   lastName: "",
+  email: "",
   phone: "",
-  destination: "",
-  advance: "",
-  initDate: "",
-  finishDate: ""
-}, isToCreate, vitroId, initialDocType = "" }) {
+  city: "",
+  date: "",
+  shipType: "",
+  payType: ""
+}, isToCreate, orderId, initialDocType = "" }) {
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addVitro, updateVitro } = useAdmin();
+  const { setError, addOrder, updateOrder } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
-      const body = {
-        ...values,
-        advance: values.advance || 0,
-        docType: (values.docType * 1) === 1 ? "DNI" : "RUC",
-        status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO")
-      }
       setIsLoading(true);
-      const vitroOrder = isToCreate ? await addVitro(body) : await updateVitro(vitroId, body);
+      const order = isToCreate ? await addOrder(values) : await updateOrder(orderId, values);
       setIsLoading(false);
-      navigate(`/admin/invitro/${vitroOrder.id}`);
+      navigate(`/admin/pedidos/${order.id}`);
     }catch(error) {
-      setIsLoading(false);
       console.error(error);
+      setIsLoading(false);
       setError(error.message);
     }
   }
@@ -67,13 +62,13 @@ function VitroForm({ initialValues = {
           <Title>{ isToCreate ? "Generar pedido" : "Editar pedido" }</Title>
           <Group>
             <Select 
-              id="docType"
+              id="documentType"
               label="Tipo de documento"
-              error={errors.docType}
-              touched={touched.docType}
-              value={values.docType}
+              error={errors.documentType}
+              touched={touched.documentType}
+              value={values.documentType}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "docType")}
+              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
               options={[
                 {
                   id: 1,
@@ -121,6 +116,16 @@ function VitroForm({ initialValues = {
             />
           </Group>
           <Group>
+            <Input 
+              id="email"
+              label="Correo"
+              placeholder="ejm@gmail.com"
+              error={errors.email}
+              touched={touched.email}
+              value={values.email}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
             <Input
               id="phone"
               label="Teléfono"
@@ -131,78 +136,69 @@ function VitroForm({ initialValues = {
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
-            <Input
-              id="destination"
-              label="Destino"
-              placeholder="ej. Cusco"
-              error={errors.destination}
-              touched={touched.destination}
-              value={values.destination}
+          </Group>
+          <Group>
+            <Select 
+              id="shipType"
+              label="Tipo de envío"
+              error={errors.shipType}
+              touched={touched.shipType}
+              value={values.shipType}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              options={[
+                {
+                  id: 1,
+                  content: "EXPRESS"
+                },
+                {
+                  id: 2,
+                  content: "NORMAL"
+                }
+              ]}
+            />
+            <Select 
+              id="payType"
+              label="Tipo de pago"
+              error={errors.payType}
+              touched={touched.payType}
+              value={values.payType}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={[
+                {
+                  id: 1,
+                  content: "DEPOSITO"
+                },
+                {
+                  id: 2,
+                  content: "TARJETA"
+                }
+              ]}
             />
           </Group>
           <Group>
-            <Input
-              id="initDate"
-              label="Fecha inicio"
-              type="date"
-              error={errors.initDate}
-              touched={touched.initDate}
-              value={values.initDate}
+            <Input 
+              id="city"
+              label="Ciudad"
+              placeholder="ej. Huancayo"
+              error={errors.city}
+              touched={touched.city}
+              value={values.city}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
-            <Input
-              id="finishDate"
-              label="Fecha fin"
+            <Input 
+              id="date"
+              label="Fecha pedido"
               type="date"
-              error={errors.finishDate}
-              touched={touched.finishDate}
-              value={values.finishDate}
+              error={errors.date}
+              touched={touched.date}
+              value={values.date}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
           </Group>
-          {
-            !isToCreate
-            &&
-            <Group>
-              <Input
-                id="advance"
-                label="Adelanto"
-                placeholder="S/. 0.0"
-                error={errors.advance}
-                touched={touched.advance}
-                value={values.advance}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-              />
-              <Select
-                id="status"
-                label="Estado"
-                error={errors.status}
-                touched={touched.status}
-                value={values.status}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-                options={[
-                  {
-                    id: 1,
-                    content: "PENDIENTE"
-                  },
-                  {
-                    id: 2,
-                    content: "ENTREGADO"
-                  },
-                  {
-                    id: 3,
-                    content: "CANCELADO"
-                  },
-                ]}
-              />
-            </Group>
-          }
           <Button
             type="submit"
             iconSize={18}
@@ -229,4 +225,4 @@ function VitroForm({ initialValues = {
   );
 }
 
-export default VitroForm;
+export default OrderForm;

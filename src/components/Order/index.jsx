@@ -14,7 +14,7 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
   }
 
   return (
-    <Container onClick={() => navigate(ship ? `/admin/orders/${id}` : `/admin/invitro/${id}`)}>
+    <Container onClick={() => navigate(`/admin/${ship ? "pedidos" : "invitro"}/${id}`)}>
       <Section>
         <Text
           size="16.8px"
