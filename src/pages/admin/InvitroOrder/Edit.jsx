@@ -45,7 +45,7 @@ function EditVitroOrder() {
                   status: order.status === "PENDIENTE" ? 1 : (order.status === "ENTREGADO" ? 2 : 3)
                 }}
                 vitroId={order.id}
-                initialDocType={order.documentType === "DNI" ? 1 : 2}
+                initialDocType={order.documentType}
               />
             </Container>
         }
