@@ -1,7 +1,7 @@
 import Categories from "../../../components/Categories";
 import { Title } from "../styles";
 import { Section } from "./styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import Product from "../../../components/Product";
@@ -13,8 +13,24 @@ import Filter from "../../../components/Filter";
 
 function Products() {
   const [createModal, setCreateModal] = useState(false);
-  const { products, isLoading, error, setError } = useAdmin();
+  const { products, isLoading, error, setError, loadProducts, setIsLoading, matcher } = useAdmin();
   const [type, setType] = useState(localStorage.getItem("productType") || "group");
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        if(!matcher.products) {
+          await loadProducts();
+        }
+      }catch(error) {
+        setIsLoading(false);
+        console.error(error);
+        setError(error.message);
+      }
+    }
+
+    fetch();
+  }, [ loadProducts, matcher.products, setError, setIsLoading ]);
 
   return (
     <>

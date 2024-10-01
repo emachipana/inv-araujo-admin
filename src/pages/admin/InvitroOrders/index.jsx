@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Filter from "../../../components/Filter";
 import Tubers from "../../../components/Tubers";
 import { Title } from "../styles";
@@ -14,7 +14,23 @@ import VitroForm from "../../../components/VitroForm";
 function InvitroOrders() {
   const [createModal, setCreateModal] = useState(false);
   const [type, setType] = useState(localStorage.getItem("vitroType") || "group");
-  const { error, setError, vitroOrders, isLoading } = useAdmin();
+  const { error, setError, vitroOrders, isLoading, loadVitroOrders, setIsLoading, matcher } = useAdmin();
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        if(!matcher.vitroOrders) {
+          await loadVitroOrders();
+        }
+      }catch(error) {
+        console.error(error);
+        setError(error.message);
+        setIsLoading(false);
+      }
+    }
+
+    fetch();
+  }, [ loadVitroOrders, setError, setIsLoading, matcher.vitroOrders ]);
 
   return (
     <>

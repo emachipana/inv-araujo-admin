@@ -1,10 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
 
 const AdminContext = createContext();
 
 const AdminProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [backup, setBackup] = useState([]);
@@ -13,33 +13,41 @@ const AdminProvider = ({ children }) => {
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState(null);
+  const [matcher, setMatcher] = useState({
+    products: false,
+    vitroOrder: false,
+    orders: false
+  });
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const categories = await apiFetch("categories");
-        const products = await apiFetch("products");
-        const tubers = await apiFetch("tubers");
-        const vitroOrders = await apiFetch("vitroOrders");
-        const orders = await apiFetch("orders");
-        setVitroOrders(vitroOrders);
-        setVitroOrdersBack(vitroOrders);
-        setTubers(tubers);
-        setCategories(categories);
-        setProducts(products)
-        setBackup(products);
-        setOrders(orders);
-        setIsLoading(false);
-      }catch(error) {
-        setError(error.message);
-        console.error(error);
+  const loadProducts = async () => {
+    setIsLoading(true);
+    const categories = await apiFetch("categories");
+    const products = await apiFetch("products");
+    setCategories(categories);
+    setProducts(products);
+    setBackup(products);
+    setMatcher(matcher => ({...matcher, products: true}));
+    setIsLoading(false);
+  }
 
-        setIsLoading(false);
-      }
-    }
+  const loadVitroOrders = async () => {
+    setIsLoading(true);
+    const tubers = await apiFetch("tubers");
+    const vitroOrders = await apiFetch("vitroOrders");
+    setTubers(tubers);
+    setVitroOrders(vitroOrders);        
+    setVitroOrdersBack(vitroOrders);
+    setMatcher(matcher => ({...matcher, vitroOrders: true}));
+    setIsLoading(false);
+  }
 
-    fetch();
-  }, []);
+  const loadOrders = async () => {
+    setIsLoading(true);
+    const orders = await apiFetch("orders");
+    setOrders(orders);
+    setMatcher(matcher => ({...matcher, orders: true}));
+    setIsLoading(false);
+  }
 
   const updateCategory = async (id, body) => {
     const newCategory = await apiFetch(`categories/${id}`, { body, method: "PUT" });
@@ -264,6 +272,12 @@ const AdminProvider = ({ children }) => {
     return newOrder.data;
   }
 
+  const deleteOrder = async (id) => {
+    await apiFetch(`orders/${id}`, { method: "DELETE" });
+    const updatedOrders = orders.filter(order => order.id !== id);
+    setOrders([...updatedOrders]);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -276,6 +290,7 @@ const AdminProvider = ({ children }) => {
         vitroOrders,
         vitroOrdersBack,
         orders,
+        matcher,
         setTubers,
         setVitroOrders,
         setCategories,
@@ -304,7 +319,11 @@ const AdminProvider = ({ children }) => {
         editItem,
         deleteItem,
         updateVitro,
-        addOrder
+        addOrder,
+        deleteOrder,
+        loadProducts,
+        loadOrders,
+        loadVitroOrders
       }}
     >
       { children }

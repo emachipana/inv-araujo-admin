@@ -233,7 +233,7 @@ function InvitroOrder() {
                   </Wrapper>
                 </Card>
                 <Card>
-                <FlexColumn>
+                  <FlexColumn>
                     <Text
                       weight={700}
                       size={18}
