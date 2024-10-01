@@ -9,6 +9,16 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan números";
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
+  }else if(values.price <= values.minPrice) {
+    errors.price = "El precio tiene que ser mayor";
+  }
+
+  if(!values.minPrice) {
+    errors.minPrice = "Este campo es obligatorio";
+  }else if(isNaN(values.minPrice * 1)) {
+    errors.minPrice = "Solo se aceptan números";
+  }else if(values.minPrice <= 0) {
+    errors.minPrice = "Solo se aceptan valores mayores a 0";
   }
 
   if(!values.name) {
