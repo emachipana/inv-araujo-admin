@@ -37,10 +37,13 @@ export const Wrapper = styled.section`
   align-items: flex-start;
   justify-content: ${({ justify }) => justify || "space-between"};
   gap: 1.5rem;
-  flex-wrap: wrap;
 
   @media screen and (max-width: 1340px) {
     justify-content: ${({ isButtons, justify }) => isButtons ? "center" : (justify || "space-between")};
+  }
+
+  @media screen and (max-width: 1208px) {
+    flex-wrap: wrap;
   }
 `;
 
