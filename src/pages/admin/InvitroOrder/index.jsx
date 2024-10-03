@@ -70,7 +70,7 @@ function InvitroOrder() {
     ? <Spinner color="secondary" />
     : <>
         {
-          !order.destination
+          !order.city
           ? <Title>El pedido invitro no existe</Title>
           : <>
               <Title capitalize>{ `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }</Title>
@@ -106,12 +106,13 @@ function InvitroOrder() {
                         Destino
                       </Text>
                       <Text
+                        align="start"
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                         style={{textTransform: "capitalize"}}
                       >
-                        { order.destination }
+                        { `${order.city}, ${order.department}` }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -149,7 +150,7 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        S/. { order.advance }
+                        S/. { order.totalAdvance }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -199,7 +200,11 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { capitalize(new Date(order.finishDate).toLocaleDateString("es-ES", options)) }
+                        { 
+                          !order.finishDate
+                          ? "Por asignar"
+                          : capitalize(new Date(order.finishDate).toLocaleDateString("es-ES", options))
+                        }
                       </Text>
                     </FlexColumn>
                   </Wrapper>

@@ -30,7 +30,11 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
             weight={700}
             size="15px"
           >
-            { parsedDate.toLocaleDateString("es-ES", options) }
+            { 
+              !date
+              ? "Por asignar"
+              : parsedDate.toLocaleDateString("es-ES", options)
+            }
           </Text>
         </FlexRow>
       </Section>

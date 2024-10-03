@@ -19,9 +19,7 @@ function InvitroOrders() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.vitroOrders) {
-          await loadVitroOrders();
-        }
+        if(!matcher.vitroOrders) await loadVitroOrders();
       }catch(error) {
         console.error(error);
         setError(error.message);
@@ -54,7 +52,7 @@ function InvitroOrders() {
                     key={index}
                     clientName={`${order.firstName} ${order.lastName}`}
                     date={order.finishDate}
-                    destination={order.destination}
+                    destination={order.city}
                     total={order.total}
                     status={order.status}
                   />

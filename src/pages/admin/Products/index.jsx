@@ -19,9 +19,7 @@ function Products() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.products) {
-          await loadProducts();
-        }
+        if(!matcher.products) await loadProducts();
       }catch(error) {
         setIsLoading(false);
         console.error(error);

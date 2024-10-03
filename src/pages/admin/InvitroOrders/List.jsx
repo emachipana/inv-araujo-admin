@@ -165,7 +165,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.destination }
+                    { order.city }
                   </Text>
                 </td>
                 <td>
@@ -201,7 +201,11 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { parsedDate.toLocaleDateString("ES-es", options) }
+                    { 
+                      !order.finishDate
+                      ? "Por asignar"
+                      : parsedDate.toLocaleDateString("ES-es", options)
+                    }
                   </Text>
                 </td>
                 <td>

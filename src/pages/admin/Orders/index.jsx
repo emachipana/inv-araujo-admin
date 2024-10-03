@@ -18,9 +18,7 @@ function Orders() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.orders) {
-          await loadOrders();
-        }
+        if(!matcher.orders) await loadOrders();
       }catch(error) {
         console.error(error);
         setError(error.message);

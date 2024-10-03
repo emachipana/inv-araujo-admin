@@ -1,5 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
+import depJson from "../data/departamentos.json";
+import provJson from "../data/provincias.json";
 
 const AdminContext = createContext();
 
@@ -12,12 +14,21 @@ const AdminProvider = ({ children }) => {
   const [vitroOrders, setVitroOrders] = useState([]);
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [provinces, setProvinces] = useState({});
   const [error, setError] = useState(null);
   const [matcher, setMatcher] = useState({
     products: false,
     vitroOrder: false,
-    orders: false
+    orders: false,
+    departments: false
   });
+
+  const loadDepartments = () => {
+    setDepartments(depJson);
+    setProvinces(provJson);
+    setMatcher(matcher => ({...matcher, departments: true}));
+  }
 
   const loadProducts = async () => {
     setIsLoading(true);
@@ -291,6 +302,9 @@ const AdminProvider = ({ children }) => {
         vitroOrdersBack,
         orders,
         matcher,
+        departments,
+        provinces,
+        loadDepartments,
         setTubers,
         setVitroOrders,
         setCategories,

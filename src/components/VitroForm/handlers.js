@@ -25,3 +25,9 @@ export const onDocChange = async (event, setFieldValue, setError, docType) => {
     }
   }
 }
+
+export const onDepChange = (event, setFieldValue, setCurrentDep) => {
+  const value = event.target.value;
+  setFieldValue("department", value);
+  setCurrentDep(value);
+}
