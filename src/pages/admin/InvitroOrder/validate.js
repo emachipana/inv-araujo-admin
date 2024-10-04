@@ -1,4 +1,4 @@
-export const validate = (values) => {
+export const validate = (values, variety) => {
   const errors = {};
 
   if(!values.varietyId) errors.varietyId = "Este campo es obligatorio";
@@ -9,6 +9,8 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan números";
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
+  }else if(values.price <= variety?.minPrice) {
+    errors.price = `Sebe ser mayor a S/. ${variety?.minPrice}`;
   }
 
   if(!values.quantity) {

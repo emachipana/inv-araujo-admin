@@ -189,7 +189,7 @@ function VitroForm({ initialValues = {
             <Group>
               <Input
                 id="finishDate"
-                label="Fecha fin"
+                label="Fecha entrega"
                 type="date"
                 error={errors.finishDate}
                 touched={touched.finishDate}

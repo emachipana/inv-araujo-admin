@@ -21,8 +21,17 @@ const AdminProvider = ({ children }) => {
     products: false,
     vitroOrder: false,
     orders: false,
-    departments: false
+    departments: false,
+    tubers: false
   });
+
+  const loadTubers = async () => {
+    setIsLoading(true);
+    const tubers = await apiFetch("tubers");
+    setTubers(tubers);
+    setMatcher(matcher => ({...matcher, tubers: true}));
+    setIsLoading(false);
+  }
 
   const loadDepartments = () => {
     setDepartments(depJson);
@@ -48,7 +57,7 @@ const AdminProvider = ({ children }) => {
     setTubers(tubers);
     setVitroOrders(vitroOrders);        
     setVitroOrdersBack(vitroOrders);
-    setMatcher(matcher => ({...matcher, vitroOrders: true}));
+    setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
     setIsLoading(false);
   }
 
@@ -337,7 +346,8 @@ const AdminProvider = ({ children }) => {
         deleteOrder,
         loadProducts,
         loadOrders,
-        loadVitroOrders
+        loadVitroOrders,
+        loadTubers
       }}
     >
       { children }

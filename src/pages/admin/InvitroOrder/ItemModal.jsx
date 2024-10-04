@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../../../components/Modal";
 import { Form } from "../../../styles/layout";
 import { Formik } from "formik";
@@ -12,6 +12,7 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
 
 function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem }) {
+  const [currentVariety, setCurrentVariety] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { setError, tubers, addItem, editItem } = useAdmin();
 
@@ -30,6 +31,10 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
       quantity: item.quantity
     }
   }
+
+  useEffect(() => {
+    setCurrentVariety(item.variety);
+  }, [ item ]);
 
   const onSubmit = async (values) => {
     try {
@@ -66,6 +71,17 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
     setIsActive(isActive);
   }
 
+  const onVarietyChange = (e, setFieldValue) => {
+    const value = e.target.value;
+    let variety;
+    tubers.forEach(tub => {
+      variety = tub.varieties.find(vart => vart.id === (value * 1)) 
+    });
+    setCurrentVariety(variety);
+    setFieldValue("varietyId", value);
+    setFieldValue("price", variety.price);
+  }
+
   return (
     <Modal
       isActive={isActive}
@@ -73,7 +89,7 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
     >
       <Formik
         initialValues={initialValues}
-        validate={validate}
+        validate={(values) => validate(values, currentVariety)}
         onSubmit={onSubmit}
       >
         {({
@@ -83,7 +99,8 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
           errors,
           handleBlur,
           handleChange,
-          handleSubmit
+          handleSubmit,
+          setFieldValue
         }) => (
           <Form onSubmit={handleSubmit}>
             <Title>{ item ? "Editar variedad" : "Agregar variedad" }</Title>
@@ -93,7 +110,7 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
               error={errors.varietyId}
               touched={touched.varietyId}
               handleBlur={handleBlur}
-              handleChange={handleChange}
+              handleChange={(e) => onVarietyChange(e, setFieldValue)}
               options={options}
               value={values.varietyId}
               disabled={item}
