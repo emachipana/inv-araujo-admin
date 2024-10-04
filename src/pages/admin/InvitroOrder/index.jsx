@@ -5,7 +5,7 @@ import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import AlertError from "../../../components/AlertError";
 import Badge from "../../../components/Badge";
@@ -16,10 +16,14 @@ import DeleteModal from "../Product/DeleteModal";
 import { Variety } from "./styles";
 import { PiPlantFill } from "react-icons/pi";
 import ItemModal from "./ItemModal";
+import NewCategory from "../../../components/Category/New";
+import { FaMoneyBillWheat } from "react-icons/fa6";
+import AdvancesModal from "./AdvancesModal";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [advanceModal, setAdvanceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
@@ -76,6 +80,13 @@ function InvitroOrder() {
           ? <Title>El pedido invitro no existe</Title>
           : <>
               <Title capitalize>{ `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }</Title>
+              <NewCategory
+                Icon={FaMoneyBillWheat}
+                style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                onClick={() => setAdvanceModal(!advanceModal)}
+              >
+                Adelantos
+              </NewCategory>
               <Section>
                 <Card>
                   <Wrapper>
@@ -370,6 +381,13 @@ function InvitroOrder() {
                 item={item}
                 setItem={setItem}
                 setVitroOrder={setOrder}
+              />
+              <AdvancesModal 
+                isActive={advanceModal}
+                setIsActive={setAdvanceModal}
+                advances={order.advances}
+                setVitroOrder={setOrder}
+                vitroId={order.id}
               />
             </>
         }

@@ -23,3 +23,19 @@ export const validate = (values, variety) => {
 
   return errors;
 }
+
+export const advanceValidate = (values) => {
+  const errors = {};
+
+  if(!values.date) errors.date = "Este campo es obligatorio";
+
+  if(!values.amount) {
+    errors.amount = "Este campo es obligatorio";
+  }else if(isNaN(values.amount * 1)) {
+    errors.amount = "Solo se aceptan números";
+  }else if(values.amount <= 0) {
+    errors.amount = "Solo se aceptan valores mayores a 0";
+  }
+
+  return errors;
+}

@@ -8,6 +8,7 @@ export const Section = styled.section`
   align-items: flex-start;
   justify-content: space-between;
   gap: 2rem;
+  flex-wrap: ${({ wrap }) => wrap ? "wrap" : ""};
 
   @media screen and (max-width: 960px) {
     justify-content: center;
