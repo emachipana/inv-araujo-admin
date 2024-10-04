@@ -10,7 +10,8 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
   const options = {
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
+    timeZone: "UTC"
   }
 
   return (

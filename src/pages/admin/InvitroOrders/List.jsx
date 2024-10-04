@@ -112,7 +112,8 @@ function List() {
             const options = {
               day: "numeric",
               month: "short",
-              year: "numeric"
+              year: "numeric",
+              timeZone: "UTC"
             }
 
             return (

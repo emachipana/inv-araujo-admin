@@ -48,7 +48,8 @@ function InvitroOrder() {
     day: "numeric",
     weekday: "long",
     month: "short",
-    year: "numeric"
+    year: "numeric",
+    timeZone: "UTC"
   }
 
   const handleEdit = (item) => {
