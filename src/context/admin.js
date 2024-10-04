@@ -252,24 +252,18 @@ const AdminProvider = ({ children }) => {
   const addItem = async (body) => {
     const { vitroOrderId } = body;
     await apiFetch("orderVarieties", { body });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const editItem = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const deleteItem = async (id, vitroOrderId) => {
     await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const addOrder = async (values) => {
