@@ -3,7 +3,7 @@ import { Title } from "../styles";
 import { useEffect, useState } from "react";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
-import { Card, Image, ImageCard, Section, Wrapper } from "./styles";
+import { Card, ImageCard as AddCard, Section, Wrapper } from "./styles";
 import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
@@ -16,6 +16,7 @@ import AlertError from "../../../components/AlertError";
 import DeleteModal from "./DeleteModal";
 import { AiTwotoneFileAdd } from "react-icons/ai";
 import ImageModal from "./ImageModal";
+import ImageCard from "./ImageCard";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
@@ -251,23 +252,23 @@ function Product() {
                     >
                       Imagenes
                     </Text>
-                    <Wrapper justify="center" isButtons>
-                      <ImageCard
+                    <Wrapper wrap="true">
+                      <AddCard
                         onClick={() => setImageModal(!imageModal)}
                       >
                         <AiTwotoneFileAdd 
                           size={70}
                           color={COLORS.dim}
                         />
-                      </ImageCard>
+                      </AddCard>
                       {
                         product?.images.map((image, index) => (
-                          <ImageCard key={index}>
-                            <Image
-                              src={image.image.url}
-                              alt={`${product.name}-${index + 1}`}
-                            />
-                          </ImageCard>
+                          <ImageCard
+                            key={index}
+                            image={image}
+                            product={product}
+                            setProduct={setProduct}
+                          />
                         ))
                       }
                     </Wrapper>

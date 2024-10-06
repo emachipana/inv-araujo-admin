@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
 import { shadowSm } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
+import { css } from "@emotion/react";
 
 export const Section = styled.section`
   width: 100%;
@@ -38,6 +39,7 @@ export const Wrapper = styled.section`
   align-items: flex-start;
   justify-content: ${({ justify }) => justify || "space-between"};
   gap: 1.5rem;
+  flex-wrap: ${({ wrap }) => wrap ? "wrap" : ""};
 
   @media screen and (max-width: 1340px) {
     justify-content: ${({ isButtons, justify }) => isButtons ? "center" : (justify || "space-between")};
@@ -49,6 +51,7 @@ export const Wrapper = styled.section`
 `;
 
 export const ImageCard = styled.div`
+  position: relative;
   width: 200px;
   height: 270px;
   display: flex;
@@ -57,7 +60,6 @@ export const ImageCard = styled.div`
   border-radius: 1rem;
   border: 2px dashed ${COLORS.dim};
   cursor: pointer;
-  overflow: hidden;
   padding: 0.5rem;
 `;
 
@@ -74,4 +76,22 @@ export const Container = styled.div`
   border-radius: 1rem;
   box-shadow: ${shadowSm};
   margin: auto;
+`;
+
+export const Cancel = css`
+  font-size: 2.1rem;
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  cursor: pointer;
+  animation: fadeIn .3s ease-in forwards;
+
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
 `;

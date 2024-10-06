@@ -177,6 +177,14 @@ const AdminProvider = ({ children }) => {
     return updatedProduct;
   }
 
+  const deleteProductImage = async (imageId, product) => {
+    await apiFetch(`productImages/${imageId}`, { method: "DELETE" });
+    const images = product.images.filter(image => image.id !== imageId);
+    const updatedProduct = {...product, images};
+    setProduct(product.id, updatedProduct);
+    return updatedProduct;
+  }
+
   const updateTuber = async (id, body) => {
     const newTuber = await apiFetch(`tubers/${id}`, { body, method: "PUT" });
     const tempTubers = tubers;
@@ -367,7 +375,8 @@ const AdminProvider = ({ children }) => {
         loadTubers,
         addAdvance,
         editAdvance,
-        deleteAdvance
+        deleteAdvance,
+        deleteProductImage
       }}
     >
       { children }
