@@ -18,6 +18,7 @@ function ImageCard({ image, product, setProduct }) {
       setProduct(updatedProduct);
       setIsDeleting(false);
     }catch(error) {
+      setIsDeleting(false);
       setError(error.message);
       console.error(error);
     }
