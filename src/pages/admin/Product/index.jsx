@@ -53,7 +53,7 @@ function Product() {
           : <>
               <Title>{ product.name }</Title>
               <Section>
-                <Card position="first">
+                <Card>
                   <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text
@@ -68,6 +68,20 @@ function Product() {
                         style={{textTransform: "capitalize"}}
                       >
                         { product.brand }
+                      </Text>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text
+                        weight={700}
+                      >
+                        Categoría
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        { product.category.name }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -100,21 +114,21 @@ function Product() {
                       <Text
                         weight={700}
                       >
-                        Categoría
+                        Precio compra
                       </Text>
                       <Text
                         weight={600}
                         size={15}
-                        color={COLORS.dim}
+                        color={COLORS.orange}
                       >
-                        { product.category.name }
+                        S/. { product.purchasePrice }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text
                         weight={700}
                       >
-                        Precio
+                        Precio venta
                       </Text>
                       <FlexRow>
                         <Text
@@ -137,6 +151,28 @@ function Product() {
                           </Text>
                         }
                       </FlexRow>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text
+                        weight={700}
+                      >
+                        Ganancia
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.blue}
+                      >
+                        S/.
+                        {" "} 
+                        { 
+                          (
+                            product.discount
+                            ? product.discount.price 
+                            : product.price
+                          ) - product.purchasePrice 
+                        }
+                      </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text

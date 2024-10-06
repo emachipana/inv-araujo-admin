@@ -132,7 +132,7 @@ function List() {
                 </td>
                 <td>
                   <TextDescription
-                    width={200}
+                    width={190}
                     lines={1}
                     height="18px"
                     size={15}
@@ -174,6 +174,7 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
                     S/. { order.total }
                   </Text>
@@ -183,8 +184,9 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
-                    S/. { order.advance }
+                    S/. { order.totalAdvance }
                   </Text>
                 </td>
                 <td>
@@ -192,6 +194,7 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
                     S/. { order.pending }
                   </Text>
@@ -201,6 +204,7 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
                     { 
                       !order.finishDate
