@@ -74,15 +74,7 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Envío
-            </Text>
-          </th>
-          <th>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-            >
-              Pago
+              Fecha pedido
             </Text>
           </th>
           <th>
@@ -109,11 +101,13 @@ function List() {
       <tbody>
         {
           orders.map((order, index) => {
-            const parsedDate = new Date(order.maxShipDate);
+            const parsedShipDate = new Date(order.maxShipDate);
+            const parsedDate = new Date(order.date);
             const options = {
               day: "numeric",
               month: "short",
-              year: "numeric"
+              year: "numeric",
+              timeZone: "UTC"
             }
             
             return (
@@ -139,7 +133,7 @@ function List() {
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { `${order.client.firstName.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }
+                    { `${order.client.firstName?.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }
                   </TextDescription>
                 </td>
                 <td>
@@ -166,7 +160,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.destination }
+                    { order.city }
                   </Text>
                 </td>
                 <td>
@@ -185,26 +179,16 @@ function List() {
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { order.shippingType.toLowerCase() }
-                  </Text>
-                </td>
-                <td>
-                  <Text
-                    size={15}
-                    weight={500}
-                    color={COLORS.dim}
-                    style={{textTransform: "capitalize"}}
-                  >
-                    { order.payType.toLowerCase() }
-                  </Text>
-                </td>
-                <td>
-                  <Text
-                    size={15}
-                    weight={500}
-                    color={COLORS.dim}
-                  >
                     { parsedDate.toLocaleDateString("ES-es", options) }
+                  </Text>
+                </td>
+                <td>
+                  <Text
+                    size={15}
+                    weight={500}
+                    color={COLORS.dim}
+                  >
+                    { parsedShipDate.toLocaleDateString("ES-es", options) }
                   </Text>
                 </td>
                 <td>

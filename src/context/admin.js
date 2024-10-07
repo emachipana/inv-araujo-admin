@@ -285,10 +285,11 @@ const AdminProvider = ({ children }) => {
 
     const orderBody = {
       clientId: newClient.data.id,
-      shipType: (values.shipType * 1) === 1 ? "EXPRESS" : "NORMAL",
-      payType: (values.payType * 1) === 1 ? "DEPOSITO" : "TARJETA",
-      destination: newClient.data.city
+      date: values.date,
+      department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
+      city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo
     }
+    
     const newOrder = await apiFetch("orders", { body: orderBody });
     setOrders(orders => [...orders, newOrder.data]);
     return newOrder.data;

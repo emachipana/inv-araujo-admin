@@ -50,9 +50,10 @@ function Orders() {
                     id={order.id}
                     key={index}
                     date={order.date}
-                    ship={order.shippingType}
-                    destination={order.destination}
+                    total={order.total}
+                    destination={order.city}
                     status={order.status}
+                    isOrder
                   />
                 ))
               : <List />
