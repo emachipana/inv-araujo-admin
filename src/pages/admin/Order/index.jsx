@@ -14,13 +14,15 @@ import { FaEdit, FaFileInvoice, FaTrashAlt, FaEye, FaShoppingCart } from "react-
 import AlertError from "../../../components/AlertError";
 import DeleteModal from "../Product/DeleteModal";
 import { Variety as Container } from "../InvitroOrder/styles";
+import ItemModal from "./ItemModal";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
+  const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder } = useAdmin();
+  const { error, setError, deleteOrder, matcher, loadProducts } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -28,6 +30,7 @@ function Order() {
     const fetch = async () => {
       try {
         const order = await apiFetch(`orders/${id}`);
+        if(!matcher.products) await loadProducts();
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
@@ -38,7 +41,7 @@ function Order() {
     }
 
     fetch();
-  }, [id, setError]);
+  }, [id, setError, loadProducts, matcher.products]);
 
   const options = {
     day: "numeric",
@@ -361,7 +364,15 @@ function Order() {
                   </FlexColumn>
                 </Card>
               </Section>
-              <DeleteModal 
+              <ItemModal 
+                isActive={itemModal}
+                setIsActive={setItemModal}
+                item={item}
+                setItem={setItem}
+                order={order}
+                setOrder={setOrder}
+              />
+              <DeleteModal
                 handleDelete={deleteOrder}
                 id={order.id}
                 isActive={deleteModal}
