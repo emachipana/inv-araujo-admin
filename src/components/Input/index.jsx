@@ -19,6 +19,7 @@ function Input({
         color={color}
         backgroundColor={backgroundColor}
         disabled={disabled}
+        {...props}
       >
         { Icon && <Icon size={25} color={color} /> }
         <input 

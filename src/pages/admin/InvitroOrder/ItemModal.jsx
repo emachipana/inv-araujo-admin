@@ -66,9 +66,9 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
     return result;
   }, []);
 
-  const onClose = (isActive) => {
+  const onClose = () => {
     if(item) setItem("");
-    setIsActive(isActive);
+    setIsActive(false);
   }
 
   const onVarietyChange = (e, setFieldValue) => {
