@@ -41,7 +41,7 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan números";
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
-  }else if(values.price <= values.purchasePrice) {
+  }else if((values.price * 1) <= (values.purchasePrice * 1)) {
     errors.price = "El precio de venta debe ser mayor al precio de compra";
   }
 
