@@ -328,40 +328,48 @@ function InvitroOrder() {
                                 </Text>
                               </FlexColumn>
                             </Wrapper>
-                            <FlexRow gap={1}>
-                              <Button
-                                style={{padding: "0.3rem 0.6rem"}}
-                                iconSize={15}
-                                fontSize={14}
-                                Icon={FaEdit}
-                                color="warning"
-                                onClick={() => handleEdit(item)}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                style={{padding: "0.3rem 0.6rem"}}
-                                iconSize={14}
-                                fontSize={14}
-                                Icon={FaTrashAlt}
-                                color="danger"
-                                onClick={() => handleDelete(item.id)}
-                              >
-                                Eliminar
-                              </Button>
-                            </FlexRow>
+                            {
+                              order.status === "PENDIENTE"
+                              &&
+                              <FlexRow gap={1}>
+                                <Button
+                                  style={{padding: "0.3rem 0.6rem"}}
+                                  iconSize={15}
+                                  fontSize={14}
+                                  Icon={FaEdit}
+                                  color="warning"
+                                  onClick={() => handleEdit(item)}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  style={{padding: "0.3rem 0.6rem"}}
+                                  iconSize={14}
+                                  fontSize={14}
+                                  Icon={FaTrashAlt}
+                                  color="danger"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  Eliminar
+                                </Button>
+                              </FlexRow>
+                            }
                           </Variety>
                         ))
                       }
-                      <Button
-                        style={{marginTop: "1rem"}}
-                        fontSize={16}
-                        iconSize={18}
-                        Icon={PiPlantFill}
-                        onClick={() => setItemModal(!itemModal)}
-                      >
-                        Agregar variedad
-                      </Button>
+                      {
+                        order.status === "PENDIENTE"
+                        &&
+                        <Button
+                          style={{marginTop: "1rem"}}
+                          fontSize={16}
+                          iconSize={18}
+                          Icon={PiPlantFill}
+                          onClick={() => setItemModal(!itemModal)}
+                        >
+                          Agregar variedad
+                        </Button>
+                      }
                     </FlexColumn>
                   </FlexColumn>
                 </Card>

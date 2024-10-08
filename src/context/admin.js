@@ -276,8 +276,13 @@ const AdminProvider = ({ children }) => {
 
   const addOrder = async (values) => {
     const now = new Date();
+    const department = departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo;
+    const city = provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo;
+
     const clientBody = {
       ...values,
+      department,
+      city,
       documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
       email: values.email ? values.email : `${now.getTime()}@inversiones.com`
     }
@@ -286,8 +291,8 @@ const AdminProvider = ({ children }) => {
     const orderBody = {
       clientId: newClient.data.id,
       date: values.date,
-      department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
-      city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo
+      department,
+      city
     }
     
     const newOrder = await apiFetch("orders", { body: orderBody });

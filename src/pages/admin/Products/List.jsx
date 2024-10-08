@@ -137,7 +137,7 @@ function List() {
                       src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
                     />
                     <TextDescription
-                      width={120}
+                      width={80}
                       lines={1}
                       height="18px"
                       size={15}
@@ -149,10 +149,10 @@ function List() {
                 </td>
                 <td>
                   <TextDescription
-                    width={140}
-                    lines={3}
-                    height="18px"
-                    size={15}
+                    width={150}
+                    lines={2}
+                    height="16px"
+                    size="14px"
                     color={COLORS.dim}
                   >
                     { product.description }
