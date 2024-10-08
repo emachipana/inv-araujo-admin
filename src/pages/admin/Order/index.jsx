@@ -22,7 +22,7 @@ function Order() {
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, matcher, loadProducts } = useAdmin();
+  const { error, setError, deleteOrder, matcher, loadProducts, deleteOrderItem } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -42,6 +42,16 @@ function Order() {
 
     fetch();
   }, [id, setError, loadProducts, matcher.products]);
+
+  const handleDelete = async (itemId) => {
+    try {
+      const updatedOrder = await deleteOrderItem(itemId, id);
+      setOrder(updatedOrder);
+    }catch(error) {
+      console.error(error);
+      setError(error.message);
+    }
+  }
 
   const options = {
     day: "numeric",
@@ -337,7 +347,7 @@ function Order() {
                                     fontSize={14}
                                     Icon={FaTrashAlt}
                                     color="danger"
-                                    
+                                    onClick={() => handleDelete(item.id)}
                                   >
                                     Eliminar
                                   </Button>

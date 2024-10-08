@@ -270,12 +270,6 @@ const AdminProvider = ({ children }) => {
     return getVitroOrder(vitroOrderId);
   }
 
-  const addOrderItem = async (body) => {
-    const { orderId } = body;
-    await apiFetch("orderProducts", { body });
-    return getOrder(orderId);
-  }
-
   const editItem = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
@@ -348,6 +342,19 @@ const AdminProvider = ({ children }) => {
     return order.data;
   }
 
+  const addOrderItem = async (body) => {
+    const { orderId } = body;
+    await apiFetch("orderProducts", { body });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
+  }
+
+  const deleteOrderItem = async (id, orderId) => {
+    await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -402,7 +409,8 @@ const AdminProvider = ({ children }) => {
         editAdvance,
         deleteAdvance,
         deleteProductImage,
-        addOrderItem
+        addOrderItem,
+        deleteOrderItem
       }}
     >
       { children }

@@ -32,6 +32,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, initialValues = { p
 
   const onClose = () => {
     setValues({productId: "", quantity: 1});
+    setSearch("");
     setIsActive(false);
   }
 
