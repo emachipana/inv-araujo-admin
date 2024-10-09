@@ -20,7 +20,7 @@ function Order() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
-  const [item, setItem] = useState("");
+  const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
   const { error, setError, deleteOrder, matcher, loadProducts, deleteOrderItem } = useAdmin();
   const { id } = useParams();
@@ -51,6 +51,11 @@ function Order() {
       console.error(error);
       setError(error.message);
     }
+  }
+
+  const handleEdit = async (item) => {
+    setItem(item);
+    setItemModal(true);
   }
 
   const options = {
@@ -337,7 +342,7 @@ function Order() {
                                     fontSize={14}
                                     Icon={FaEdit}
                                     color="warning"
-                                    
+                                    onClick={() => handleEdit(item)}
                                   >
                                     Editar
                                   </Button>
@@ -381,6 +386,7 @@ function Order() {
                 setItem={setItem}
                 order={order}
                 setOrder={setOrder}
+                isToEdit={!!item}
               />
               <DeleteModal
                 handleDelete={deleteOrder}

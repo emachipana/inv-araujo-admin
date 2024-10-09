@@ -15,7 +15,7 @@ export const Products = styled.div`
 
 export const List = styled.section`
   width: 100%;
-  height: 300px;
+  height: ${({ height }) => height || "300px"};
   display: flex;
   flex-direction: column;
   align-items: center;

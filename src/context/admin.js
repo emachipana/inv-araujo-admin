@@ -355,6 +355,13 @@ const AdminProvider = ({ children }) => {
     return getOrder(orderId);
   }
 
+  const editOrderItem = async (id, body) => {
+    const { orderId } = body;
+    await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -410,7 +417,8 @@ const AdminProvider = ({ children }) => {
         deleteAdvance,
         deleteProductImage,
         addOrderItem,
-        deleteOrderItem
+        deleteOrderItem,
+        editOrderItem
       }}
     >
       { children }

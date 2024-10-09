@@ -5,8 +5,8 @@ import { Input as Radio } from "reactstrap";
 import { COLORS } from "../../../styles/colors";
 import Control from "../../../components/Control";
 
-function Product({images = [], id, values, name, price, stock, discount, setValues}) {
-  const [quantity, setQuantity] = useState(1);
+function Product({images = [], id, values, name, price, stock, discount, setValues, isToEdit = false, initialQuantity = 1}) {
+  const [quantity, setQuantity] = useState(initialQuantity);
 
   const handleChangeQuantity = (quantity) => {
     if(id !== values.productId) return;
@@ -22,13 +22,17 @@ function Product({images = [], id, values, name, price, stock, discount, setValu
     <Fragment>
       <Container>
         <FlexRow>
-          <Radio
-            type="radio"
-            id={id}
-            name="products"
-            defaultChecked={values.productId === id}
-            onChange={handleRadioChange}
-          />
+          {
+            !isToEdit
+            &&
+            <Radio
+              type="radio"
+              id={id}
+              name="products"
+              defaultChecked={values.productId === id}
+              onChange={handleRadioChange}
+            />
+          }
           <ProductSection htmlFor={id}>
             <Image
               width="80px"
@@ -75,7 +79,11 @@ function Product({images = [], id, values, name, price, stock, discount, setValu
           disabled={id !== values.productId}
         />
       </Container>
-      <Line />
+      {
+        !isToEdit
+        &&
+        <Line />
+      }
     </Fragment>
   );
 }
