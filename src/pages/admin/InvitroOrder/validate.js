@@ -1,4 +1,4 @@
-export const validate = (values) => {
+export const validate = (values, variety) => {
   const errors = {};
 
   if(!values.varietyId) errors.varietyId = "Este campo es obligatorio";
@@ -9,6 +9,8 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan números";
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
+  }else if(values.price <= variety?.minPrice) {
+    errors.price = `Sebe ser mayor a S/. ${variety?.minPrice}`;
   }
 
   if(!values.quantity) {
@@ -17,6 +19,22 @@ export const validate = (values) => {
     errors.quantity = "Solo se aceptan números";
   }else if(values.quantity <= 0) {
     errors.quantity = "Solo se aceptan valores mayores a 0";
+  }
+
+  return errors;
+}
+
+export const advanceValidate = (values) => {
+  const errors = {};
+
+  if(!values.date) errors.date = "Este campo es obligatorio";
+
+  if(!values.amount) {
+    errors.amount = "Este campo es obligatorio";
+  }else if(isNaN(values.amount * 1)) {
+    errors.amount = "Solo se aceptan números";
+  }else if(values.amount <= 0) {
+    errors.amount = "Solo se aceptan valores mayores a 0";
   }
 
   return errors;

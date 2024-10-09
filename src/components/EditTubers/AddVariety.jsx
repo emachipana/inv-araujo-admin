@@ -22,7 +22,8 @@ function AddVariety({ setCurrentAction, id, tuberId, setEdit }) {
     id,
     tuberId,
     name: "",
-    price: ""  
+    price: "",
+    minPrice: ""
   }
 
   if(id) {
@@ -31,7 +32,8 @@ function AddVariety({ setCurrentAction, id, tuberId, setEdit }) {
     initialValues = {
       ...initialValues,
       name: variety.name,
-      price: variety.price
+      price: variety.price,
+      minPrice: variety.minPrice
     }
   }
 
@@ -82,12 +84,24 @@ function AddVariety({ setCurrentAction, id, tuberId, setEdit }) {
             fontSize={15}
             labelSize={16}
             id="price"
-            label="Precio"
+            label="Precio público"
             handleBlur={handleBlur}
             handleChange={handleChange}
             error={errors.price}
             value={values.price}
             touched={touched.price}
+            placeholder="S/. 0.0"
+          />
+          <Input 
+            fontSize={15}
+            labelSize={16}
+            id="minPrice"
+            label="Precio mínimo"
+            handleBlur={handleBlur}
+            handleChange={handleChange}
+            error={errors.minPrice}
+            value={values.minPrice}
+            touched={touched.minPrice}
             placeholder="S/. 0.0"
           />
           <Button

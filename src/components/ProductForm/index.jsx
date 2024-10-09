@@ -18,6 +18,7 @@ function ProductForm({ initialValues = {
   brand: "",
   categoryId: "",
   price: "",
+  purchasePrice: "",
   stock: "",
   isActive: true
 }, isToCreate, productId }) {
@@ -85,6 +86,16 @@ function ProductForm({ initialValues = {
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
+          <Select
+            id="categoryId"
+            label="Categoría"
+            error={errors.categoryId}
+            touched={touched.categoryId}
+            handleBlur={handleBlur}
+            handleChange={handleChange}
+            options={options}
+            value={values.categoryId}
+          />
           <Group>
             <Input 
               id="brand"
@@ -96,21 +107,21 @@ function ProductForm({ initialValues = {
               handleChange={handleChange}
               handleBlur={handleBlur}
             />
-            <Select
-              id="categoryId"
-              label="Categoría"
-              error={errors.categoryId}
-              touched={touched.categoryId}
-              handleBlur={handleBlur}
+            <Input 
+              id="purchasePrice"
+              label="Precio compra"
+              placeholder="S/. 0.0"
+              error={errors.purchasePrice}
+              touched={touched.purchasePrice}
+              value={values.purchasePrice}
               handleChange={handleChange}
-              options={options}
-              value={values.categoryId}
+              handleBlur={handleBlur}
             />
           </Group>
           <Group>
             <Input 
               id="price"
-              label="Precio"
+              label="Precio venta"
               placeholder="S/. 0.0"
               error={errors.price}
               touched={touched.price}

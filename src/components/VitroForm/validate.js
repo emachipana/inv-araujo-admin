@@ -20,17 +20,9 @@ export const validate = (values, docType) => {
   }
   
   if(!values.firstName) errors.firstName = "Este campo es obligatorio";
-  if(!values.destination) errors.destination = "Este campo es obligatorio";
+  if(!values.department) errors.department = "Este campo es obligatorio";
+  if(!values.city) errors.city = "Este campo es obligatorio";
   if(!values.initDate) errors.initDate = "Este campo es obligatorio";
-  if(!values.finishDate) errors.finishDate = "Este campo es obligatorio";
-
-  if(values.advance) {
-    if(isNaN(values.advance)) {
-      errors.advance = "Solo se aceptan números";
-    }else if(values.advance < 0) {
-      errors.advance = "Solo se aceptan valores positivos";
-    }
-  }
 
   return errors;
 }

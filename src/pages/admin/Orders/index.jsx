@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdmin } from "../../../context/admin";
 import { Title } from "../styles";
 import Filter from "../../../components/Filter";
@@ -13,7 +13,21 @@ import OrderForm from "../../../components/OrderForm";
 function Orders() {
   const [createModal, setCreateModal] = useState(false);
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
-  const { error, setError, orders, isLoading } = useAdmin();
+  const { error, setError, orders, isLoading, setIsLoading, matcher, loadOrders } = useAdmin();
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        if(!matcher.orders) await loadOrders();
+      }catch(error) {
+        console.error(error);
+        setError(error.message);
+        setIsLoading(false);
+      }
+    }
+
+    fetch();
+  }, [ loadOrders, setError, setIsLoading, matcher.orders ]);
 
   return (
     <>
@@ -36,9 +50,10 @@ function Orders() {
                     id={order.id}
                     key={index}
                     date={order.date}
-                    ship={order.shippingType}
-                    destination={order.destination}
+                    total={order.total}
+                    destination={order.city}
                     status={order.status}
+                    isOrder
                   />
                 ))
               : <List />

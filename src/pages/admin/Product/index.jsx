@@ -3,7 +3,7 @@ import { Title } from "../styles";
 import { useEffect, useState } from "react";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
-import { Card, Image, ImageCard, Section, Wrapper } from "./styles";
+import { Card, ImageCard as AddCard, Section, Wrapper } from "./styles";
 import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
@@ -16,6 +16,7 @@ import AlertError from "../../../components/AlertError";
 import DeleteModal from "./DeleteModal";
 import { AiTwotoneFileAdd } from "react-icons/ai";
 import ImageModal from "./ImageModal";
+import ImageCard from "./ImageCard";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
@@ -53,7 +54,7 @@ function Product() {
           : <>
               <Title>{ product.name }</Title>
               <Section>
-                <Card position="first">
+                <Card>
                   <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text
@@ -68,6 +69,20 @@ function Product() {
                         style={{textTransform: "capitalize"}}
                       >
                         { product.brand }
+                      </Text>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text
+                        weight={700}
+                      >
+                        Categoría
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        { product.category.name }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -100,21 +115,21 @@ function Product() {
                       <Text
                         weight={700}
                       >
-                        Categoría
+                        Precio compra
                       </Text>
                       <Text
                         weight={600}
                         size={15}
-                        color={COLORS.dim}
+                        color={COLORS.orange}
                       >
-                        { product.category.name }
+                        S/. { product.purchasePrice }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text
                         weight={700}
                       >
-                        Precio
+                        Precio venta
                       </Text>
                       <FlexRow>
                         <Text
@@ -137,6 +152,28 @@ function Product() {
                           </Text>
                         }
                       </FlexRow>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text
+                        weight={700}
+                      >
+                        Ganancia
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.blue}
+                      >
+                        S/.
+                        {" "} 
+                        { 
+                          (
+                            product.discount
+                            ? product.discount.price 
+                            : product.price
+                          ) - product.purchasePrice 
+                        }
+                      </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text
@@ -215,23 +252,23 @@ function Product() {
                     >
                       Imagenes
                     </Text>
-                    <Wrapper justify="center" isButtons>
-                      <ImageCard
+                    <Wrapper wrap="true">
+                      <AddCard
                         onClick={() => setImageModal(!imageModal)}
                       >
                         <AiTwotoneFileAdd 
                           size={70}
                           color={COLORS.dim}
                         />
-                      </ImageCard>
+                      </AddCard>
                       {
                         product?.images.map((image, index) => (
-                          <ImageCard key={index}>
-                            <Image
-                              src={image.image.url}
-                              alt={`${product.name}-${index + 1}`}
-                            />
-                          </ImageCard>
+                          <ImageCard
+                            key={index}
+                            image={image}
+                            product={product}
+                            setProduct={setProduct}
+                          />
                         ))
                       }
                     </Wrapper>

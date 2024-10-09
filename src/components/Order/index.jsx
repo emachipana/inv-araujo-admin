@@ -4,17 +4,18 @@ import Badge from "../Badge";
 import { Container, Section, Text } from "./styles";
 import { FaCalendarAlt } from "react-icons/fa";
 
-function Order({ id, clientName, date, destination, total, ship, status }) {
+function Order({ id, clientName, date, destination, total, status, isOrder = false }) {
   const navigate = useNavigate();
   const parsedDate = new Date(date);
   const options = {
     day: "numeric",
     month: "long",
-    year: "numeric"
+    year: "numeric",
+    timeZone: "UTC"
   }
 
   return (
-    <Container onClick={() => navigate(`/admin/${ship ? "pedidos" : "invitro"}/${id}`)}>
+    <Container onClick={() => navigate(`/admin/${isOrder ? "pedidos" : "invitro"}/${id}`)}>
       <Section>
         <Text
           size="16.8px"
@@ -30,7 +31,11 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
             weight={700}
             size="15px"
           >
-            { parsedDate.toLocaleDateString("es-ES", options) }
+            { 
+              !date
+              ? "Por asignar"
+              : parsedDate.toLocaleDateString("es-ES", options)
+            }
           </Text>
         </FlexRow>
       </Section>
@@ -59,18 +64,12 @@ function Order({ id, clientName, date, destination, total, ship, status }) {
           <Text
             weight={700}
           >
-            {
-              ship ? "Envío" : "Total"
-            }
+            Total
           </Text>
           <Text
             weight={600}
           >
-            { 
-              !ship
-              ? `S/. ${total}`
-              : ship
-            }
+            S/. { total }
           </Text>
         </FlexColumn>
         <FlexColumn

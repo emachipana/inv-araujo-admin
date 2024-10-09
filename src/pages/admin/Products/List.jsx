@@ -50,8 +50,19 @@ function List() {
               weight={600}
               color={COLORS.gray}
               align="start"
+              style={{whiteSpace: "nowrap"}}
             >
-              Precio
+              Precio compra
+            </Text>
+          </th>
+          <th>
+            <Text
+              weight={600}
+              color={COLORS.gray}
+              align="start"
+              style={{whiteSpace: "nowrap"}}
+            >
+              Precio venta
             </Text>
           </th>
           <th>
@@ -118,15 +129,15 @@ function List() {
                 <td>
                   <FlexRow
                     gap={0.2}
-                    width="180px"
                     justify="flex-start"
                   >
                     <Image
-                        width="55px"
-                        alt={`${product.name}`}
-                        src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
+                      width="48px"
+                      alt={`${product.name}`}
+                      src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}                            
                     />
                     <TextDescription
+                      width={80}
                       lines={1}
                       height="18px"
                       size={15}
@@ -138,13 +149,23 @@ function List() {
                 </td>
                 <td>
                   <TextDescription
-                    lines={3}
-                    height="18px"
-                    size={15}
+                    width={150}
+                    lines={2}
+                    height="16px"
+                    size="14px"
                     color={COLORS.dim}
                   >
                     { product.description }
                   </TextDescription>
+                </td>
+                <td>
+                <Text
+                    size={15}
+                    color={COLORS.orange}
+                    weight={500}
+                  >
+                    S/. { product.purchasePrice }
+                  </Text>
                 </td>
                 <td>
                 <FlexRow>

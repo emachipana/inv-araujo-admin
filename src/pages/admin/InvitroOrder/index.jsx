@@ -5,7 +5,7 @@ import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import AlertError from "../../../components/AlertError";
 import Badge from "../../../components/Badge";
@@ -16,20 +16,25 @@ import DeleteModal from "../Product/DeleteModal";
 import { Variety } from "./styles";
 import { PiPlantFill } from "react-icons/pi";
 import ItemModal from "./ItemModal";
+import NewCategory from "../../../components/Category/New";
+import { FaMoneyBillWheat } from "react-icons/fa6";
+import AdvancesModal from "./AdvancesModal";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [advanceModal, setAdvanceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { error, setError, deleteVitro, deleteItem } = useAdmin();
+  const { error, setError, deleteVitro, deleteItem, loadTubers, matcher } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
+        if(!matcher.vitroOrders && !matcher.tubers) await loadTubers();
         const order = await apiFetch(`vitroOrders/${id}`);
         setOrder(order.data);
         setIsLoading(false);
@@ -41,13 +46,14 @@ function InvitroOrder() {
     }
 
     fetch();
-  }, [id, setError]);
+  }, [id, setError, loadTubers, matcher.tubers, matcher.vitroOrders]);
 
   const options = {
     day: "numeric",
     weekday: "long",
     month: "short",
-    year: "numeric"
+    year: "numeric",
+    timeZone: "UTC"
   }
 
   const handleEdit = (item) => {
@@ -70,10 +76,17 @@ function InvitroOrder() {
     ? <Spinner color="secondary" />
     : <>
         {
-          !order.destination
+          !order.city
           ? <Title>El pedido invitro no existe</Title>
           : <>
               <Title capitalize>{ `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }</Title>
+              <NewCategory
+                Icon={FaMoneyBillWheat}
+                style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                onClick={() => setAdvanceModal(!advanceModal)}
+              >
+                Adelantos
+              </NewCategory>
               <Section>
                 <Card>
                   <Wrapper>
@@ -106,12 +119,13 @@ function InvitroOrder() {
                         Destino
                       </Text>
                       <Text
+                        align="start"
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                         style={{textTransform: "capitalize"}}
                       >
-                        { order.destination }
+                        { `${order.city}, ${order.department}` }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -149,7 +163,7 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        S/. { order.advance }
+                        S/. { order.totalAdvance }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -199,7 +213,11 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { capitalize(new Date(order.finishDate).toLocaleDateString("es-ES", options)) }
+                        { 
+                          !order.finishDate
+                          ? "Por asignar"
+                          : capitalize(new Date(order.finishDate).toLocaleDateString("es-ES", options))
+                        }
                       </Text>
                     </FlexColumn>
                   </Wrapper>
@@ -233,7 +251,7 @@ function InvitroOrder() {
                   </Wrapper>
                 </Card>
                 <Card>
-                <FlexColumn>
+                  <FlexColumn>
                     <Text
                       weight={700}
                       size={18}
@@ -310,40 +328,48 @@ function InvitroOrder() {
                                 </Text>
                               </FlexColumn>
                             </Wrapper>
-                            <FlexRow gap={1}>
-                              <Button
-                                style={{padding: "0.3rem 0.6rem"}}
-                                iconSize={15}
-                                fontSize={14}
-                                Icon={FaEdit}
-                                color="warning"
-                                onClick={() => handleEdit(item)}
-                              >
-                                Editar
-                              </Button>
-                              <Button
-                                style={{padding: "0.3rem 0.6rem"}}
-                                iconSize={14}
-                                fontSize={14}
-                                Icon={FaTrashAlt}
-                                color="danger"
-                                onClick={() => handleDelete(item.id)}
-                              >
-                                Eliminar
-                              </Button>
-                            </FlexRow>
+                            {
+                              order.status === "PENDIENTE"
+                              &&
+                              <FlexRow gap={1}>
+                                <Button
+                                  style={{padding: "0.3rem 0.6rem"}}
+                                  iconSize={15}
+                                  fontSize={14}
+                                  Icon={FaEdit}
+                                  color="warning"
+                                  onClick={() => handleEdit(item)}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  style={{padding: "0.3rem 0.6rem"}}
+                                  iconSize={14}
+                                  fontSize={14}
+                                  Icon={FaTrashAlt}
+                                  color="danger"
+                                  onClick={() => handleDelete(item.id)}
+                                >
+                                  Eliminar
+                                </Button>
+                              </FlexRow>
+                            }
                           </Variety>
                         ))
                       }
-                      <Button
-                        style={{marginTop: "1rem"}}
-                        fontSize={16}
-                        iconSize={18}
-                        Icon={PiPlantFill}
-                        onClick={() => setItemModal(!itemModal)}
-                      >
-                        Agregar variedad
-                      </Button>
+                      {
+                        order.status === "PENDIENTE"
+                        &&
+                        <Button
+                          style={{marginTop: "1rem"}}
+                          fontSize={16}
+                          iconSize={18}
+                          Icon={PiPlantFill}
+                          onClick={() => setItemModal(!itemModal)}
+                        >
+                          Agregar variedad
+                        </Button>
+                      }
                     </FlexColumn>
                   </FlexColumn>
                 </Card>
@@ -363,6 +389,13 @@ function InvitroOrder() {
                 item={item}
                 setItem={setItem}
                 setVitroOrder={setOrder}
+              />
+              <AdvancesModal 
+                isActive={advanceModal}
+                setIsActive={setAdvanceModal}
+                advances={order.advances}
+                setVitroOrder={setOrder}
+                vitroId={order.id}
               />
             </>
         }

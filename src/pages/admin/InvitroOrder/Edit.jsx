@@ -12,11 +12,12 @@ function EditVitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { setError, error } = useAdmin();
+  const { setError, error, matcher, departments, provinces, loadDepartments } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
+        if(!matcher.departments) loadDepartments();
         const order = await apiFetch(`vitroOrders/${id}`);
         setOrder(order.data);
         setIsLoading(false);
@@ -28,24 +29,29 @@ function EditVitroOrder() {
     }
 
     fetch();
-  }, [id, setError]);
+  }, [id, setError, loadDepartments, matcher.departments ]);
+
+  const departmentId = departments.find(dep => dep.nombre_ubigeo === order.department)?.id_ubigeo;
 
   return (
     isLoading
     ? <Spinner color="secondary" />
     : <>
         {
-          !order.destination
+          !order.city
           ? <Title>El pedido invitro que quieres editar no existe</Title>
           : <Container>
               <VitroForm 
                 initialValues={{
                   ...order,
                   docType: order.documentType === "DNI" ? 1 : 2,
-                  status: order.status === "PENDIENTE" ? 1 : (order.status === "ENTREGADO" ? 2 : 3)
+                  status: order.status === "PENDIENTE" ? 1 : (order.status === "ENTREGADO" ? 2 : 3),
+                  department: departmentId,
+                  city: provinces[departmentId].find(prov => prov.nombre_ubigeo === order.city)?.id_ubigeo
                 }}
                 vitroId={order.id}
                 initialDocType={order.documentType}
+                initialDep={departmentId}
               />
             </Container>
         }

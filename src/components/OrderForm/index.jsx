@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
@@ -7,7 +7,7 @@ import { Form } from "../../styles/layout";
 import { Group, Title } from "../ProductForm/styles";
 import Select from "../Input/Select";
 import Input from "../Input";
-import { onDocChange, onDocTypeChange } from "../VitroForm/handlers";
+import { onDepChange, onDocChange, onDocTypeChange } from "../VitroForm/handlers";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
@@ -19,15 +19,28 @@ function OrderForm({ initialValues = {
   lastName: "",
   email: "",
   phone: "",
+  department: "",
   city: "",
-  date: "",
-  shipType: "",
-  payType: ""
-}, isToCreate, orderId, initialDocType = "" }) {
+  date: ""
+}, isToCreate, orderId, initialDocType = "", initialDep = "" }) {
+  const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addOrder, updateOrder } = useAdmin();
+  const { setError, addOrder, updateOrder, departments, provinces, matcher, loadDepartments } = useAdmin();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetch = () => {
+      try {
+        if(!matcher.departments) loadDepartments();
+      }catch(error) {
+        setError(error.message);
+        console.error(error);
+      }
+    }
+    
+    fetch();
+  }, [ loadDepartments, matcher.departments, setError ]);
 
   const onSubmit = async (values) => {
     try {
@@ -41,6 +54,9 @@ function OrderForm({ initialValues = {
       setError(error.message);
     }
   }
+
+  const optionsDep = departments.map(department => ({id: department.id_ubigeo, content: department.nombre_ubigeo}));
+  const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
 
   return (
     <Formik
@@ -138,56 +154,29 @@ function OrderForm({ initialValues = {
             />
           </Group>
           <Group>
-            <Select 
-              id="shipType"
-              label="Tipo de envío"
-              error={errors.shipType}
-              touched={touched.shipType}
-              value={values.shipType}
+            <Select
+              id="department"
+              label="Departamento"
+              error={errors.department}
+              touched={touched.department}
+              value={values.department}
+              options={optionsDep}
               handleBlur={handleBlur}
-              handleChange={handleChange}
-              options={[
-                {
-                  id: 1,
-                  content: "EXPRESS"
-                },
-                {
-                  id: 2,
-                  content: "NORMAL"
-                }
-              ]}
+              handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
             />
-            <Select 
-              id="payType"
-              label="Tipo de pago"
-              error={errors.payType}
-              touched={touched.payType}
-              value={values.payType}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-              options={[
-                {
-                  id: 1,
-                  content: "DEPOSITO"
-                },
-                {
-                  id: 2,
-                  content: "TARJETA"
-                }
-              ]}
-            />
-          </Group>
-          <Group>
-            <Input 
+            <Select
+              disabled={!currentDep}
               id="city"
               label="Ciudad"
-              placeholder="ej. Huancayo"
+              options={optionsProv}
               error={errors.city}
               touched={touched.city}
               value={values.city}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
+          </Group>
+          <Group width={50}>
             <Input 
               id="date"
               label="Fecha pedido"

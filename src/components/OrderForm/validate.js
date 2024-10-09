@@ -2,10 +2,9 @@ export const validate = (values, docType) => {
   const errors = {};
 
   if(!values.documentType) errors.documentType = "Este campo es obligatorio";
-  if(!values.shipType) errors.shipType = "Este campo es obligatorio";
-  if(!values.payType) errors.payType = "Este campo es obligatorio";
   if(!values.firstName) errors.firstName = "Este campo es obligatorio";
   if(!values.city) errors.city = "Este campo es obligatorio";
+  if(!values.department) errors.department = "Este campo es obligatorio";
   if(!values.date) errors.date = "Este campo es obligatorio";
 
   if(!values.phone) {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
@@ -10,7 +10,7 @@ import Select from "../Input/Select";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import { onDocChange, onDocTypeChange } from "./handlers";
+import { onDepChange, onDocChange, onDocTypeChange } from "./handlers";
 
 function VitroForm({ initialValues = {
   docType: "",
@@ -18,23 +18,38 @@ function VitroForm({ initialValues = {
   firstName: "",
   lastName: "",
   phone: "",
-  destination: "",
-  advance: "",
+  department: "",
+  city: "",
   initDate: "",
   finishDate: ""
-}, isToCreate, vitroId, initialDocType = "" }) {
+}, isToCreate, vitroId, initialDocType = "", initialDep = "" }) {
+  const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addVitro, updateVitro } = useAdmin();
+  const { setError, addVitro, updateVitro, departments, provinces, matcher, loadDepartments } = useAdmin();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetch = () => {
+      try {
+        if(!matcher.departments) loadDepartments();
+      }catch(error) {
+        setError(error.message);
+        console.error(error);
+      }
+    }
+    
+    fetch();
+  }, [ loadDepartments, matcher.departments, setError ]);
 
   const onSubmit = async (values) => {
     try {
       const body = {
         ...values,
-        advance: values.advance || 0,
         docType: (values.docType * 1) === 1 ? "DNI" : "RUC",
-        status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO")
+        status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO"),
+        department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
+        city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo
       }
       setIsLoading(true);
       const vitroOrder = isToCreate ? await addVitro(body) : await updateVitro(vitroId, body);
@@ -46,6 +61,9 @@ function VitroForm({ initialValues = {
       setError(error.message);
     }
   }
+
+  const optionsDep = departments.map(department => ({id: department.id_ubigeo, content: department.nombre_ubigeo}));
+  const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
 
   return (
     <Formik
@@ -121,6 +139,29 @@ function VitroForm({ initialValues = {
             />
           </Group>
           <Group>
+            <Select
+              id="department"
+              label="Departamento"
+              error={errors.department}
+              touched={touched.department}
+              value={values.department}
+              options={optionsDep}
+              handleBlur={handleBlur}
+              handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
+            />
+            <Select
+              disabled={!currentDep}
+              id="city"
+              label="Ciudad"
+              options={optionsProv}
+              error={errors.city}
+              touched={touched.city}
+              value={values.city}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
+          </Group>
+          <Group>
             <Input
               id="phone"
               label="Teléfono"
@@ -132,34 +173,12 @@ function VitroForm({ initialValues = {
               handleChange={handleChange}
             />
             <Input
-              id="destination"
-              label="Destino"
-              placeholder="ej. Cusco"
-              error={errors.destination}
-              touched={touched.destination}
-              value={values.destination}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-          </Group>
-          <Group>
-            <Input
               id="initDate"
-              label="Fecha inicio"
+              label="Fecha pedido"
               type="date"
               error={errors.initDate}
               touched={touched.initDate}
               value={values.initDate}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-            <Input
-              id="finishDate"
-              label="Fecha fin"
-              type="date"
-              error={errors.finishDate}
-              touched={touched.finishDate}
-              value={values.finishDate}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
@@ -169,12 +188,12 @@ function VitroForm({ initialValues = {
             &&
             <Group>
               <Input
-                id="advance"
-                label="Adelanto"
-                placeholder="S/. 0.0"
-                error={errors.advance}
-                touched={touched.advance}
-                value={values.advance}
+                id="finishDate"
+                label="Fecha entrega"
+                type="date"
+                error={errors.finishDate}
+                touched={touched.finishDate}
+                value={values.finishDate}
                 handleBlur={handleBlur}
                 handleChange={handleChange}
               />

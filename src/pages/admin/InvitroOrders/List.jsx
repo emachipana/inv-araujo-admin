@@ -112,7 +112,8 @@ function List() {
             const options = {
               day: "numeric",
               month: "short",
-              year: "numeric"
+              year: "numeric",
+              timeZone: "UTC"
             }
 
             return (
@@ -131,7 +132,7 @@ function List() {
                 </td>
                 <td>
                   <TextDescription
-                    width={200}
+                    width={190}
                     lines={1}
                     height="18px"
                     size={15}
@@ -165,7 +166,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.destination }
+                    { order.city }
                   </Text>
                 </td>
                 <td>
@@ -173,6 +174,7 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
                     S/. { order.total }
                   </Text>
@@ -182,8 +184,9 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
-                    S/. { order.advance }
+                    S/. { order.totalAdvance }
                   </Text>
                 </td>
                 <td>
@@ -191,6 +194,7 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
                     S/. { order.pending }
                   </Text>
@@ -200,8 +204,13 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
+                    style={{whiteSpace: "nowrap"}}
                   >
-                    { parsedDate.toLocaleDateString("ES-es", options) }
+                    { 
+                      !order.finishDate
+                      ? "Por asignar"
+                      : parsedDate.toLocaleDateString("ES-es", options)
+                    }
                   </Text>
                 </td>
                 <td>

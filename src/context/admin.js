@@ -1,10 +1,12 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
+import depJson from "../data/departamentos.json";
+import provJson from "../data/provincias.json";
 
 const AdminContext = createContext();
 
 const AdminProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [backup, setBackup] = useState([]);
@@ -12,34 +14,60 @@ const AdminProvider = ({ children }) => {
   const [vitroOrders, setVitroOrders] = useState([]);
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [provinces, setProvinces] = useState({});
   const [error, setError] = useState(null);
+  const [matcher, setMatcher] = useState({
+    products: false,
+    vitroOrder: false,
+    orders: false,
+    departments: false,
+    tubers: false
+  });
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const categories = await apiFetch("categories");
-        const products = await apiFetch("products");
-        const tubers = await apiFetch("tubers");
-        const vitroOrders = await apiFetch("vitroOrders");
-        const orders = await apiFetch("orders");
-        setVitroOrders(vitroOrders);
-        setVitroOrdersBack(vitroOrders);
-        setTubers(tubers);
-        setCategories(categories);
-        setProducts(products)
-        setBackup(products);
-        setOrders(orders);
-        setIsLoading(false);
-      }catch(error) {
-        setError(error.message);
-        console.error(error);
+  const loadTubers = async () => {
+    setIsLoading(true);
+    const tubers = await apiFetch("tubers");
+    setTubers(tubers);
+    setMatcher(matcher => ({...matcher, tubers: true}));
+    setIsLoading(false);
+  }
 
-        setIsLoading(false);
-      }
-    }
+  const loadDepartments = () => {
+    setDepartments(depJson);
+    setProvinces(provJson);
+    setMatcher(matcher => ({...matcher, departments: true}));
+  }
 
-    fetch();
-  }, []);
+  const loadProducts = async () => {
+    setIsLoading(true);
+    const categories = await apiFetch("categories");
+    const products = await apiFetch("products");
+    setCategories(categories);
+    setProducts(products);
+    setBackup(products);
+    setMatcher(matcher => ({...matcher, products: true}));
+    setIsLoading(false);
+  }
+
+  const loadVitroOrders = async () => {
+    setIsLoading(true);
+    const tubers = await apiFetch("tubers");
+    const vitroOrders = await apiFetch("vitroOrders");
+    setTubers(tubers);
+    setVitroOrders(vitroOrders);        
+    setVitroOrdersBack(vitroOrders);
+    setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
+    setIsLoading(false);
+  }
+
+  const loadOrders = async () => {
+    setIsLoading(true);
+    const orders = await apiFetch("orders");
+    setOrders(orders);
+    setMatcher(matcher => ({...matcher, orders: true}));
+    setIsLoading(false);
+  }
 
   const updateCategory = async (id, body) => {
     const newCategory = await apiFetch(`categories/${id}`, { body, method: "PUT" });
@@ -149,6 +177,14 @@ const AdminProvider = ({ children }) => {
     return updatedProduct;
   }
 
+  const deleteProductImage = async (imageId, product) => {
+    await apiFetch(`productImages/${imageId}`, { method: "DELETE" });
+    const images = product.images.filter(image => image.id !== imageId);
+    const updatedProduct = {...product, images};
+    setProduct(product.id, updatedProduct);
+    return updatedProduct;
+  }
+
   const updateTuber = async (id, body) => {
     const newTuber = await apiFetch(`tubers/${id}`, { body, method: "PUT" });
     const tempTubers = tubers;
@@ -221,33 +257,39 @@ const AdminProvider = ({ children }) => {
     setVitroOrdersBack([...tempBackup]);
   }
 
+  const setOrder = (id, order) => {
+    const tempOrders = orders;
+    const index = tempOrders.findIndex(order => order.id === id);
+    tempOrders[index] = order;
+    setOrders([...tempOrders]);
+  }
+
   const addItem = async (body) => {
     const { vitroOrderId } = body;
     await apiFetch("orderVarieties", { body });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const editItem = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const deleteItem = async (id, vitroOrderId) => {
     await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
-    const vitroOrder = await apiFetch(`vitroOrders/${vitroOrderId}`);
-    setVitro(vitroOrder.data.id, vitroOrder.data);
-    return vitroOrder.data;
+    return getVitroOrder(vitroOrderId);
   }
 
   const addOrder = async (values) => {
     const now = new Date();
+    const department = departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo;
+    const city = provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo;
+
     const clientBody = {
       ...values,
+      department,
+      city,
       documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
       email: values.email ? values.email : `${now.getTime()}@inversiones.com`
     }
@@ -255,13 +297,69 @@ const AdminProvider = ({ children }) => {
 
     const orderBody = {
       clientId: newClient.data.id,
-      shipType: (values.shipType * 1) === 1 ? "EXPRESS" : "NORMAL",
-      payType: (values.payType * 1) === 1 ? "DEPOSITO" : "TARJETA",
-      destination: newClient.data.city
+      date: values.date,
+      department,
+      city
     }
+    
     const newOrder = await apiFetch("orders", { body: orderBody });
     setOrders(orders => [...orders, newOrder.data]);
     return newOrder.data;
+  }
+
+  const deleteOrder = async (id) => {
+    await apiFetch(`orders/${id}`, { method: "DELETE" });
+    const updatedOrders = orders.filter(order => order.id !== id);
+    setOrders([...updatedOrders]);
+  }
+
+  const addAdvance = async (body) => {
+    const { vitroOrderId } = body;
+    await apiFetch("advances", { body });
+    return getVitroOrder(vitroOrderId);
+  }
+
+  const editAdvance = async (id, body) => {
+    const { vitroOrderId } = body;
+    await apiFetch(`advances/${id}`, { body, method: "PUT" });
+    return getVitroOrder(vitroOrderId);
+  }
+
+  const deleteAdvance = async (id, vitroId) => {
+    await apiFetch(`advances/${id}`, { method: "DELETE" });
+    return getVitroOrder(vitroId);
+  }
+
+  const getVitroOrder = async (id) => {
+    const vitroOrder = await apiFetch(`vitroOrders/${id}`);
+    setVitro(vitroOrder.data.id, vitroOrder.data);
+    return vitroOrder.data;
+  }
+
+  const getOrder = async (id) => {
+    const order = await apiFetch(`orders/${id}`);
+    setOrder(order.data.id, order.data);
+    return order.data;
+  }
+
+  const addOrderItem = async (body) => {
+    const { orderId } = body;
+    await apiFetch("orderProducts", { body });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
+  }
+
+  const deleteOrderItem = async (id, orderId) => {
+    await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
+  }
+
+  const editOrderItem = async (id, body) => {
+    const { orderId } = body;
+    await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
+    setMatcher(matcher => ({...matcher, products: false}));
+    return getOrder(orderId);
   }
 
   return (
@@ -276,6 +374,10 @@ const AdminProvider = ({ children }) => {
         vitroOrders,
         vitroOrdersBack,
         orders,
+        matcher,
+        departments,
+        provinces,
+        loadDepartments,
         setTubers,
         setVitroOrders,
         setCategories,
@@ -304,7 +406,19 @@ const AdminProvider = ({ children }) => {
         editItem,
         deleteItem,
         updateVitro,
-        addOrder
+        addOrder,
+        deleteOrder,
+        loadProducts,
+        loadOrders,
+        loadVitroOrders,
+        loadTubers,
+        addAdvance,
+        editAdvance,
+        deleteAdvance,
+        deleteProductImage,
+        addOrderItem,
+        deleteOrderItem,
+        editOrderItem
       }}
     >
       { children }
