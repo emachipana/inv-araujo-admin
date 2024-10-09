@@ -170,7 +170,7 @@ function Order() {
                           size={15}
                           color={COLORS.dim}
                         >
-                          { days < 1 ? "Vencido" : days }
+                          { days === 0 ? "Entrega hoy" : (days < 0 ? "Vencido" : days) }
                           {" "}
                           { days < 1 ? "" : (days === 1 ? "día" : "días") }
                         </Text>
