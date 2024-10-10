@@ -281,30 +281,35 @@ const AdminProvider = ({ children }) => {
     return getVitroOrder(vitroOrderId);
   }
 
-  const addOrder = async (values) => {
-    const now = new Date();
-    const department = departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo;
-    const city = provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo;
-
-    const clientBody = {
-      ...values,
-      department,
-      city,
-      documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-      email: values.email ? values.email : `${now.getTime()}@inversiones.com`
-    }
+  const addOrder = async (values, clientBody) => {
     const newClient = await apiFetch("clients", { body: clientBody });
 
     const orderBody = {
       clientId: newClient.data.id,
       date: values.date,
-      department,
-      city
+      department: newClient.data.department,
+      city: newClient.data.city
     }
     
     const newOrder = await apiFetch("orders", { body: orderBody });
     setOrders(orders => [...orders, newOrder.data]);
     return newOrder.data;
+  }
+
+  const updateOrder = async (orderId, values, clientId, clientBody) => {
+    const updatedClient = await apiFetch(`clients/${clientId}`, { body: clientBody, method: "PUT" });
+
+    const orderBody = {
+      clientId: updatedClient.data.id,
+      date: values.date,
+      department: updatedClient.data.department,
+      city: updatedClient.data.city,
+      status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO"),
+    }
+
+    const updatedOrder = await apiFetch(`orders/${orderId}`, { body: orderBody, method: "PUT" });
+    setOrder(updatedOrder.data.id, updatedOrder.data);
+    return updatedOrder.data;
   }
 
   const deleteOrder = async (id) => {
@@ -418,7 +423,8 @@ const AdminProvider = ({ children }) => {
         deleteProductImage,
         addOrderItem,
         deleteOrderItem,
-        editOrderItem
+        editOrderItem,
+        updateOrder
       }}
     >
       { children }
