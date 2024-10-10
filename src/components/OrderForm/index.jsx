@@ -22,7 +22,7 @@ function OrderForm({ initialValues = {
   department: "",
   city: "",
   date: ""
-}, isToCreate, orderId, initialDocType = "", initialDep = "" }) {
+}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId }) {
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +45,19 @@ function OrderForm({ initialValues = {
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const order = isToCreate ? await addOrder(values) : await updateOrder(orderId, values);
+      const now = new Date();
+      const department = departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo;
+      const city = provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo;
+
+      const clientBody = {
+        ...values,
+        department,
+        city,
+        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
+        email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+      }
+
+      const order = isToCreate ? await addOrder(values, clientBody) : await updateOrder(orderId, values, clientId, clientBody);
       setIsLoading(false);
       navigate(`/admin/pedidos/${order.id}`);
     }catch(error) {
@@ -176,7 +188,7 @@ function OrderForm({ initialValues = {
               handleChange={handleChange}
             />
           </Group>
-          <Group width={50}>
+          <Group width={isToCreate ? 50 : ""}>
             <Input 
               id="date"
               label="Fecha pedido"
@@ -187,6 +199,33 @@ function OrderForm({ initialValues = {
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
+            {
+              !isToCreate
+              &&
+              <Select
+                id="status"
+                label="Estado"
+                error={errors.status}
+                touched={touched.status}
+                value={values.status}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                options={[
+                  {
+                    id: 1,
+                    content: "PENDIENTE"
+                  },
+                  {
+                    id: 2,
+                    content: "ENTREGADO"
+                  },
+                  {
+                    id: 3,
+                    content: "CANCELADO"
+                  },
+                ]}
+              />
+            }
           </Group>
           <Button
             type="submit"

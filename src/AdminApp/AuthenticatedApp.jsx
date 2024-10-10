@@ -12,6 +12,7 @@ import InvitroOrder from "../pages/admin/InvitroOrder";
 import EditVitroOrder from "../pages/admin/InvitroOrder/Edit";
 import Orders from "../pages/admin/Orders";
 import Order from "../pages/admin/Order";
+import EditOrder from "../pages/admin/Order/Edit";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,6 +37,7 @@ function AuthenticatedApp() {
           <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
           <Route path="/pedidos" element={<Orders />} />
           <Route path="/pedidos/:id" element={<Order />} />
+          <Route path="/pedidos/:id/edit" element={<EditOrder />} />
         </Routes>
       </Section>
     </AdminProvider>

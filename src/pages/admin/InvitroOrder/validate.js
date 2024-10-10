@@ -10,7 +10,7 @@ export const validate = (values, variety) => {
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
   }else if(values.price <= variety?.minPrice) {
-    errors.price = `Sebe ser mayor a S/. ${variety?.minPrice}`;
+    errors.price = `Debe ser mayor a S/. ${variety?.minPrice}`;
   }
 
   if(!values.quantity) {

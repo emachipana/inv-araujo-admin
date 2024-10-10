@@ -73,10 +73,8 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
 
   const onVarietyChange = (e, setFieldValue) => {
     const value = e.target.value;
-    let variety;
-    tubers.forEach(tub => {
-      variety = tub.varieties.find(vart => vart.id === (value * 1)) 
-    });
+    const tuber = tubers.find(tuber => tuber.varieties.find(va => va.id === (value * 1)));
+    const variety = tuber.varieties.find(va => va.id === (value * 1));
     setCurrentVariety(variety);
     setFieldValue("varietyId", value);
     setFieldValue("price", variety.price);
