@@ -49,7 +49,7 @@ function Orders() {
                     clientName={`${order.client.firstName} ${order.client.lastName}`}
                     id={order.id}
                     key={index}
-                    date={order.date}
+                    date={order.maxShipDate}
                     total={order.total}
                     destination={order.city}
                     status={order.status}
