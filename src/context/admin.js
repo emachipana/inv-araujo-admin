@@ -14,6 +14,8 @@ const AdminProvider = ({ children }) => {
   const [vitroOrders, setVitroOrders] = useState([]);
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [invoicesBackup, setInvoicesBackup] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [provinces, setProvinces] = useState({});
   const [error, setError] = useState(null);
@@ -22,8 +24,18 @@ const AdminProvider = ({ children }) => {
     vitroOrder: false,
     orders: false,
     departments: false,
-    tubers: false
+    tubers: false,
+    invoices: false
   });
+
+  const loadInvoices = async () => {
+    setIsLoading(true);
+    const invoices = await apiFetch("invoices");
+    setInvoices(invoices);
+    setInvoicesBackup(invoices);
+    setMatcher(matcher => ({...matcher, invoices: true}));
+    setIsLoading(false);
+  }
 
   const loadTubers = async () => {
     setIsLoading(true);
@@ -141,6 +153,13 @@ const AdminProvider = ({ children }) => {
     setVitroOrders(vitros => [...vitros, newVitro.data]);
     setVitroOrdersBack(vitros => [...vitros, newVitro.data]);
     return newVitro.data;
+  }
+
+  const addInvoice = async (body) => {
+    const newInvoice = await apiFetch("invoices", { body });
+    setInvoices(invoices => [...invoices, newInvoice.data]);
+    setInvoicesBackup(invoices => [...invoices, newInvoice.data]);
+    return newInvoice.data;
   }
 
   const setProduct = (id, product) => {
@@ -371,6 +390,8 @@ const AdminProvider = ({ children }) => {
     <AdminContext.Provider
       value={{
         categories,
+        invoices,
+        invoicesBackup,
         products,
         backup,
         error,
@@ -424,7 +445,10 @@ const AdminProvider = ({ children }) => {
         addOrderItem,
         deleteOrderItem,
         editOrderItem,
-        updateOrder
+        updateOrder,
+        loadInvoices,
+        setInvoices,
+        addInvoice
       }}
     >
       { children }

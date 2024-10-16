@@ -8,15 +8,11 @@ import { COLORS } from "../../../styles/colors";
 import { TextDescription } from "../../../components/Product/styles";
 import Badge from "../../../components/Badge";
 import { FaEdit } from "react-icons/fa";
+import { handleClick } from "../Products/handlers";
 
 function List() {
   const { orders } = useAdmin();
   const navigate = useNavigate();
-
-  const handleClick = (event, id) => {
-    event.stopPropagation();
-    navigate(`${id}/edit`);
-  }
 
   return (
     <Table
@@ -200,7 +196,7 @@ function List() {
                 </td>
                 <td>
                   <FaEdit
-                    onClick={(event) => handleClick(event, order.id)}
+                    onClick={(event) => handleClick(event, order.id, navigate)}
                     size={20}
                     style={{cursor: "pointer"}}
                     color={COLORS.dim}

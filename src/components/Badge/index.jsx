@@ -6,7 +6,8 @@ function Badge({ color, children, size }) {
     primary: COLORS.persian,
     secondary: COLORS.gray,
     danger: COLORS.red,
-    warning: COLORS.yellow
+    warning: COLORS.yellow,
+    orange: COLORS.orange
   }
 
   return (

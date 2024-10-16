@@ -7,7 +7,7 @@ import { Form } from "../../styles/layout";
 import { Group, Title } from "../ProductForm/styles";
 import Select from "../Input/Select";
 import Input from "../Input";
-import { onDepChange, onDocChange, onDocTypeChange } from "../VitroForm/handlers";
+import { formatDate, onDepChange, onDocChange, onDocTypeChange } from "../VitroForm/handlers";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
@@ -69,6 +69,8 @@ function OrderForm({ initialValues = {
 
   const optionsDep = departments.map(department => ({id: department.id_ubigeo, content: department.nombre_ubigeo}));
   const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
+  const today = new Date();
+  today.setHours(12);
 
   return (
     <Formik
@@ -193,6 +195,7 @@ function OrderForm({ initialValues = {
               id="date"
               label="Fecha pedido"
               type="date"
+              max={formatDate(today)}
               error={errors.date}
               touched={touched.date}
               value={values.date}

@@ -8,15 +8,11 @@ import Badge from "../../../components/Badge";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "../../../context/admin";
 import { FlexRow, Text, Image } from "../../../styles/layout";
+import { handleClick } from "./handlers";
 
 function List() {
   const { products } = useAdmin();
   const navigate = useNavigate();
-
-  const handleClick = (event, id) => {
-    event.stopPropagation();
-    navigate(`${id}/edit`);
-  }
 
   return (
     <Table
@@ -237,7 +233,7 @@ function List() {
                 </td>
                 <td>
                   <FaEdit
-                    onClick={(event) => handleClick(event, product.id)}
+                    onClick={(event) => handleClick(event, product.id, navigate)}
                     size={20}
                     style={{cursor: "pointer"}}
                     color={COLORS.dim}

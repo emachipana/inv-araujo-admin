@@ -10,7 +10,7 @@ import Select from "../Input/Select";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import { onDepChange, onDocChange, onDocTypeChange } from "./handlers";
+import { formatDate, onDepChange, onDocChange, onDocTypeChange } from "./handlers";
 
 function VitroForm({ initialValues = {
   docType: "",
@@ -64,6 +64,8 @@ function VitroForm({ initialValues = {
 
   const optionsDep = departments.map(department => ({id: department.id_ubigeo, content: department.nombre_ubigeo}));
   const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
+  const today = new Date();
+  today.setHours(12);
 
   return (
     <Formik
@@ -176,6 +178,7 @@ function VitroForm({ initialValues = {
               id="initDate"
               label="Fecha pedido"
               type="date"
+              max={formatDate(today)}
               error={errors.initDate}
               touched={touched.initDate}
               value={values.initDate}

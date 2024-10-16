@@ -401,7 +401,8 @@ function Order() {
         {
           error
           &&
-          <AlertError 
+          <AlertError
+            from="product"
             error={error}
             setError={setError}
           />

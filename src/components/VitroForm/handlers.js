@@ -31,3 +31,5 @@ export const onDepChange = (event, setFieldValue, setCurrentDep) => {
   setFieldValue("department", value);
   setCurrentDep(value);
 }
+
+export const formatDate = (date) => date.toISOString().split("T")[0];

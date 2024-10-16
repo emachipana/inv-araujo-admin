@@ -1,18 +1,22 @@
 /** @jsxImportSource @emotion/react */
-import { useNavigate } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import { Table } from "reactstrap";
+import { useAdmin } from "../../../context/admin";
+import { useNavigate } from "react-router-dom";
 import { Container } from "../Products/styles";
 import { Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { TextDescription } from "../../../components/Product/styles";
-import Badge from "../../../components/Badge";
 import { FaEdit } from "react-icons/fa";
 import { handleClick } from "../Products/handlers";
 
 function List() {
-  const { vitroOrders } = useAdmin();
+  const { invoices } = useAdmin();
   const navigate = useNavigate();
+
+  // formula igv
+  // total -> 10
+  // base -> (total / 1.18).toFixed(10)
+  // igv -> base * 0.18
 
   return (
     <Table
@@ -29,15 +33,7 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Cliente
-            </Text>
-          </th>
-          <th>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-            >
-              Teléfono
+              Razón social
             </Text>
           </th>
           <th>
@@ -53,7 +49,31 @@ function List() {
               weight={600}
               color={COLORS.gray}
             >
-              Destino
+              Tipo
+            </Text>
+          </th>
+          <th>
+            <Text
+              weight={600}
+              color={COLORS.gray}
+            >
+              Serie
+            </Text>
+          </th>
+          <th>
+            <Text
+              weight={600}
+              color={COLORS.gray}
+            >
+              Base
+            </Text>
+          </th>
+          <th>
+            <Text
+              weight={600}
+              color={COLORS.gray}
+            >
+              IGV
             </Text>
           </th>
           <th>
@@ -64,58 +84,19 @@ function List() {
               Total
             </Text>
           </th>
-          <th>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-            >
-              Adelanto
-            </Text>
-          </th>
-          <th>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-            >
-              Pendiente
-            </Text>
-          </th>
-          <th>
-            <Text
-              align="start"
-              weight={600}
-              color={COLORS.gray}
-            >
-              Entrega
-            </Text>
-          </th>
-          <th>
-            <Text
-              align="start"
-              weight={600}
-              color={COLORS.gray}
-            >
-              Estado
-            </Text>
-          </th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         {
-          vitroOrders.map((order, index) => {
-            const parsedDate = new Date(order.finishDate);
-            const options = {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-              timeZone: "UTC"
-            }
+          invoices.map((invoice, index) => {
+            const base = (invoice.total / 1.18).toFixed(2);
+            const igv = (parseFloat(base) * 0.18).toFixed(2);
 
             return (
               <tr
                 key={index}
-                onClick={() => navigate(`${order.id}`)}
+                onClick={() => navigate(`${invoice.id}`)}
               >
                 <td>
                   <Text
@@ -128,14 +109,14 @@ function List() {
                 </td>
                 <td>
                   <TextDescription
-                    width={190}
+                    width={220}
                     lines={1}
                     height="18px"
                     size={15}
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }
+                    { invoice.rsocial.toLowerCase() }
                   </TextDescription>
                 </td>
                 <td>
@@ -144,7 +125,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.phone }
+                    { invoice.document }
                   </Text>
                 </td>
                 <td>
@@ -153,7 +134,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.document }
+                    { invoice.invoiceType }
                   </Text>
                 </td>
                 <td>
@@ -162,7 +143,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.city }
+                    { !invoice.serie ? "No emitido" : invoice.serie }
                   </Text>
                 </td>
                 <td>
@@ -170,9 +151,8 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
-                    style={{whiteSpace: "nowrap"}}
                   >
-                    S/. { order.total }
+                    S/. { base }
                   </Text>
                 </td>
                 <td>
@@ -180,9 +160,8 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
-                    style={{whiteSpace: "nowrap"}}
                   >
-                    S/. { order.totalAdvance }
+                    S/. { igv }
                   </Text>
                 </td>
                 <td>
@@ -190,36 +169,14 @@ function List() {
                     size={15}
                     weight={500}
                     color={COLORS.dim}
-                    style={{whiteSpace: "nowrap"}}
                   >
-                    S/. { order.pending }
+                    S/. { invoice.total.toFixed(2) }
                   </Text>
-                </td>
-                <td>
-                  <Text
-                    size={15}
-                    weight={500}
-                    color={COLORS.dim}
-                    style={{whiteSpace: "nowrap"}}
-                  >
-                    { 
-                      !order.finishDate
-                      ? "Por asignar"
-                      : parsedDate.toLocaleDateString("ES-es", options)
-                    }
-                  </Text>
-                </td>
-                <td>
-                  <Badge
-                    color={order.status === "PENDIENTE" ? "warning" : (order.status === "CANCELADO" ? "danger" : "primary")}
-                  >
-                    { order.status }
-                  </Badge>
                 </td>
                 <td>
                   <FaEdit
-                    onClick={(event) => handleClick(event, order.id, navigate)}
-                    size={20}
+                    onClick={(event) => handleClick(event, invoice.id, navigate)}
+                    size={18}
                     style={{cursor: "pointer"}}
                     color={COLORS.dim}
                   />
