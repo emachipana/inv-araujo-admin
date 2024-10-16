@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import { FlexColumn, FlexRow } from "../../styles/layout";
-import Badge from "../Badge";
 import { Container, Text } from "./styles";
 import Header from "./Header";
+import { FlexColumn, FlexRow } from "../../styles/layout";
+import Badge from "../Badge";
 
-function Order({ id, clientName, date, destination, total, status, isOrder = false }) {
+function Invoice({ id, date, rsocial, type, document, total }) {
   const navigate = useNavigate();
 
   return (
-    <Container onClick={() => navigate(`/admin/${isOrder ? "pedidos" : "invitro"}/${id}`)}>
+    <Container onClick={() => navigate(`/admin/facturas/${id}`)}>
       <Header 
-        name={clientName}
         date={date}
+        name={rsocial}
       />
       <FlexRow
         style={{padding: "0 0.25rem"}}
@@ -24,12 +24,12 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
           <Text
             weight={700}
           >
-            Destino
+            Documento
           </Text>
           <Text
             weight={600}
           >
-            { destination }
+            { document }
           </Text>
         </FlexColumn>
         <FlexColumn
@@ -43,7 +43,7 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
           <Text
             weight={600}
           >
-            S/. { total }
+            S/. { total.toFixed(2) }
           </Text>
         </FlexColumn>
         <FlexColumn
@@ -52,12 +52,12 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
           <Text
             weight={700}
           >
-            Estado
+            Tipo
           </Text>
           <Badge
-            color={status === "PENDIENTE" ? "warning" : (status === "CANCELADO" ? "danger" : "primary")}
+            color="orange"
           >
-            { status }
+            { type }
           </Badge>
         </FlexColumn>
       </FlexRow>
@@ -65,4 +65,4 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
   );
 }
 
-export default Order;
+export default Invoice;

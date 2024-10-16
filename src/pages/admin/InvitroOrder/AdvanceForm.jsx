@@ -9,6 +9,7 @@ import { FlexRow, Form } from "../../../styles/layout";
 import { Group } from "../../../components/ProductForm/styles";
 import { Spinner } from "reactstrap";
 import { TiCancel } from "react-icons/ti";
+import { formatDate } from "../../../components/VitroForm/handlers";
 
 function AdvanceForm({
   initialValues = {
@@ -43,6 +44,9 @@ function AdvanceForm({
     }
   }
 
+  const today = new Date();
+  today.setHours(12);
+
   return (
     <Formik
       validate={advanceValidate}
@@ -64,6 +68,7 @@ function AdvanceForm({
               id="date"
               label="Fecha"
               type="date"
+              max={formatDate(today)}
               fontSize={15}
               labelSize={16}
               value={values.date}
