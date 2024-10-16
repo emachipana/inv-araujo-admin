@@ -14,6 +14,7 @@ import Orders from "../pages/admin/Orders";
 import Order from "../pages/admin/Order";
 import EditOrder from "../pages/admin/Order/Edit";
 import Calendar from "../pages/admin/Calendar";
+import Invoices from "../pages/admin/Invoices";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +41,7 @@ function AuthenticatedApp() {
           <Route path="/pedidos/:id" element={<Order />} />
           <Route path="/pedidos/:id/edit" element={<EditOrder />} />
           <Route path="/calendario" element={<Calendar />} />
+          <Route path="/facturas" element={<Invoices />} />
         </Routes>
       </Section>
     </AdminProvider>
