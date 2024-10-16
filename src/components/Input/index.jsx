@@ -24,6 +24,7 @@ function Input({
         { Icon && <Icon size={25} color={color} /> }
         <input 
           id={id}
+          {...props}
           style={{fontSize: fontSize || "1rem"}}
           disabled={disabled}
           placeholder={placeholder}
