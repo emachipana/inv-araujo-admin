@@ -15,6 +15,7 @@ import AlertError from "../../../components/AlertError";
 import DeleteModal from "../Product/DeleteModal";
 import { Variety as Container } from "../InvitroOrder/styles";
 import ItemModal from "./ItemModal";
+import { TextDescription } from "../../../components/Product/styles";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
@@ -265,13 +266,15 @@ function Order() {
                                       alt={item.product.name}
                                       src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}
                                     />
-                                    <Text
+                                    <TextDescription
+                                      lines={1}
+                                      align="start"
                                       weight={600}
-                                      size={14}
+                                      size="14px"
                                       color={COLORS.dim}
                                     >
                                       { item.product.name }
-                                    </Text>
+                                    </TextDescription>
                                   </FlexRow>
                                 </FlexColumn>
                                 <FlexColumn gap={0.1}>

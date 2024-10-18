@@ -8,7 +8,7 @@ function Invoice({ id, date, rsocial, type, document, total }) {
   const navigate = useNavigate();
 
   return (
-    <Container onClick={() => navigate(`/admin/facturas/${id}`)}>
+    <Container onClick={() => navigate(`/admin/comprobantes/${id}`)}>
       <Header 
         date={date}
         name={rsocial}

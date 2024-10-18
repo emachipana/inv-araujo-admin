@@ -38,7 +38,7 @@ function InvoiceForm({ initialValues = {
       setIsLoading(true);
       const invoice = isToCreate ? await addInvoice(body) : await updateInvoice(invoiceId, body)
       setIsLoading(false);
-      navigate(`/admin/facturas/${invoice.id}`);
+      navigate(`/admin/comprobantes/${invoice.id}`);
     }catch(error) {
       setIsLoading(false);
       console.error(error);
