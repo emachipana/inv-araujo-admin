@@ -70,10 +70,10 @@ export const TextDescription = styled.p`
   -webkit-line-clamp: ${({ lines }) => lines || 2};
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-weight: 500;
+  font-weight: ${({ weight }) => weight || 500};
   font-size: ${({ size }) => size || "14px"};
   color: ${({ color }) => color || COLORS.taupe};
-  line-height: ${({ height }) => height || "14px"};
+  line-height: ${({ height }) => height || "20px"};
   width: ${({ width }) => width || 150}px;
   text-align: start;
 `;
