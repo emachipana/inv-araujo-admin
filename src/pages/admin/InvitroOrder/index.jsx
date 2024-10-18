@@ -5,7 +5,7 @@ import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
+import { FlexColumn, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import AlertError from "../../../components/AlertError";
 import Badge from "../../../components/Badge";
@@ -13,12 +13,12 @@ import { capitalize } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
 import { FaEdit, FaTrashAlt, FaFileInvoice } from "react-icons/fa";
 import DeleteModal from "../Product/DeleteModal";
-import { Variety } from "./styles";
 import { PiPlantFill } from "react-icons/pi";
 import ItemModal from "./ItemModal";
 import NewCategory from "../../../components/Category/New";
 import { FaMoneyBillWheat } from "react-icons/fa6";
 import AdvancesModal from "./AdvancesModal";
+import Item from "./Item";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
@@ -28,7 +28,7 @@ function InvitroOrder() {
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { error, setError, deleteVitro, deleteItem, loadTubers, matcher } = useAdmin();
+  const { error, setError, deleteVitro, loadTubers, matcher } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -60,16 +60,6 @@ function InvitroOrder() {
     setItemModal(true);
     setItem(item);
   }
-
-  const handleDelete = async (itemId) => {
-    try {
-      const updatedVitroOrder = await deleteItem(itemId, id);
-      setOrder(updatedVitroOrder);
-    }catch(error) {
-      console.error(error);
-      setError(error.message);
-    }
-  } 
 
   return (
     isLoading
@@ -265,96 +255,14 @@ function InvitroOrder() {
                     >
                       {
                         order.items?.map((item, index) => (
-                          <Variety key={index}>
-                            <Wrapper>
-                              <FlexColumn gap={0.1}>
-                                <Text 
-                                  weight={700}
-                                  size={15}
-                                >
-                                  Variedad
-                                </Text>
-                                <Text
-                                  weight={600}
-                                  size={14}
-                                  color={COLORS.dim}
-                                >
-                                  { item.variety.name }
-                                </Text>
-                              </FlexColumn>
-                              <FlexColumn gap={0.1}>
-                                <Text 
-                                  weight={700}
-                                  size={15}
-                                >
-                                  Precio
-                                </Text>
-                                <Text
-                                  weight={600}
-                                  size={14}
-                                  color={COLORS.dim}
-                                >
-                                  S/. { item.price }
-                                </Text>
-                              </FlexColumn>
-                              <FlexColumn gap={0.1}>
-                                <Text 
-                                  weight={700}
-                                  size={15}
-                                >
-                                  Cantidad
-                                </Text>
-                                <Text
-                                  weight={600}
-                                  size={14}
-                                  color={COLORS.dim}
-                                >
-                                  { item.quantity }
-                                </Text>
-                              </FlexColumn>
-                              <FlexColumn gap={0.1}>
-                                <Text 
-                                  weight={700}
-                                  size={15}
-                                >
-                                  Subtotal
-                                </Text>
-                                <Text
-                                  weight={600}
-                                  size={14}
-                                  color={COLORS.dim}
-                                >
-                                  S/. { item.subTotal }
-                                </Text>
-                              </FlexColumn>
-                            </Wrapper>
-                            {
-                              order.status === "PENDIENTE"
-                              &&
-                              <FlexRow gap={1}>
-                                <Button
-                                  style={{padding: "0.3rem 0.6rem"}}
-                                  iconSize={15}
-                                  fontSize={14}
-                                  Icon={FaEdit}
-                                  color="warning"
-                                  onClick={() => handleEdit(item)}
-                                >
-                                  Editar
-                                </Button>
-                                <Button
-                                  style={{padding: "0.3rem 0.6rem"}}
-                                  iconSize={14}
-                                  fontSize={14}
-                                  Icon={FaTrashAlt}
-                                  color="danger"
-                                  onClick={() => handleDelete(item.id)}
-                                >
-                                  Eliminar
-                                </Button>
-                              </FlexRow>
-                            }
-                          </Variety>
+                          <Item 
+                            key={index}
+                            handleEdit={handleEdit}
+                            item={item}
+                            orderStatus={order.status}
+                            setVitro={setOrder}
+                            vitroId={id}
+                          />
                         ))
                       }
                       {
