@@ -318,6 +318,16 @@ const AdminProvider = ({ children }) => {
     return getInvoice(invoiceId);
   }
 
+  const generateDoc = async (invoiceId) => {
+    await apiFetch(`invoices/generatePDF/${invoiceId}`, { method: "POST" });
+    return getInvoice(invoiceId);
+  }
+
+  const deleteDocInvoice = async (invoiceId) => {
+    await apiFetch(`invoices/deletePDF/${invoiceId}`, { method: "DELETE" });
+    return getInvoice(invoiceId);
+  }
+
   const deleteItem = async (id, vitroOrderId) => {
     await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
     return getVitroOrder(vitroOrderId);
@@ -363,6 +373,14 @@ const AdminProvider = ({ children }) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
     const updatedOrders = orders.filter(order => order.id !== id);
     setOrders([...updatedOrders]);
+  }
+
+  const deleteInvoice = async (id) => {
+    await apiFetch(`invoices/${id}`, { method: "DELETE" });
+    const updatedInvoices = invoices.filter(invoice => invoice.id !== id);
+    const updatedBack = invoicesBackup.filter(invoice => invoice.id !== id);
+    setInvoices([...updatedInvoices]);
+    setInvoicesBackup([...updatedBack]);
   }
 
   const addAdvance = async (body) => {
@@ -469,6 +487,7 @@ const AdminProvider = ({ children }) => {
         updateVitro,
         addOrder,
         deleteOrder,
+        deleteInvoice,
         loadProducts,
         loadOrders,
         loadVitroOrders,
@@ -485,7 +504,9 @@ const AdminProvider = ({ children }) => {
         setInvoices,
         addInvoice,
         editInvoiceItem,
-        deleteInvoiceItem
+        deleteInvoiceItem,
+        generateDoc,
+        deleteDocInvoice
       }}
     >
       { children }

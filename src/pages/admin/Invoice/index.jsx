@@ -15,15 +15,19 @@ import AlertError from "../../../components/AlertError";
 import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
+import { FaEye } from "react-icons/fa6";
+import DocModal from "./DocModal";
 
 function Invoice() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [docModal, setDocModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [invoice, setInvoice] = useState({});
   const { id } = useParams("");
-  const { error, setError, deleteInvoice } = useAdmin();
+  const { error, setError, deleteInvoice, generateDoc } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +46,15 @@ function Invoice() {
     fetch();
   }, [ id, setError ]);
 
+  const options = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC"
+  }
+
+  const issueDate = new Date(invoice.issueDate);
+
   const handleEditItem = (item) => {
     setItemModal(true);
     setItem(item);
@@ -49,6 +62,26 @@ function Invoice() {
 
   const base = (invoice.total / 1.18).toFixed(2);
   const igv = (parseFloat(base) * 0.18).toFixed(2);
+
+  const handleDocClick = async () => {
+    if(invoice.isGenerated) return setDocModal(true);
+
+    try {
+      const today = new Date();
+      today.setHours(12);
+      const days = Math.ceil((issueDate - today) / (24 * 60 * 60 * 1000));
+      if(days < -2) throw new Error("Debes actualizar la fecha de emisión, máximo 2 días antes de hoy")
+
+      setIsGenerating(true);
+      const updatedInvoice = await generateDoc(invoice.id);
+      setInvoice(updatedInvoice);
+      setIsGenerating(false);
+    }catch(error) {
+      setIsGenerating(false);
+      console.error(error);
+      setError(error.message);
+    }
+  }
 
   return (
     isLoading
@@ -99,7 +132,7 @@ function Invoice() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { invoice.issueDate }
+                        { issueDate.toLocaleDateString("es-ES", options) }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -200,13 +233,26 @@ function Invoice() {
                   </Wrapper>
                   <Wrapper isButtons>
                     <Button
-                      disabled={invoice.items.length <= 0}
-                      Icon={FaFileInvoice}
+                      onClick={handleDocClick}
+                      disabled={invoice.items.length <= 0 || isGenerating}
+                      Icon={isGenerating ? null : (invoice.isGenerated ? FaEye : FaFileInvoice)}
                       fontSize={15}
                       iconSize={17}
-                      color="secondary"
+                      color={invoice.isGenerated ? "primary" : "secondary"}
                     >
-                      Emitir { invoice.invoiceType.toLowerCase() }
+                      { 
+                        invoice.isGenerated
+                        ? "Ver" 
+                        : (isGenerating
+                            ? <>
+                                <Spinner size="sm" />
+                                Emitiendo
+                              </>
+                            : "Emitir"
+                          ) 
+                      }
+                      {" "}
+                      { invoice.invoiceType.toLowerCase() }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -214,6 +260,7 @@ function Invoice() {
                       iconSize={18}
                       color="warning"
                       onClick={() => navigate("edit")}
+                      disabled={invoice.isGenerated}
                     >
                       Editar
                     </Button>
@@ -286,6 +333,13 @@ function Invoice() {
                 setInvoice={setInvoice}
                 setIsActive={setItemModal}
                 setItem={setItem}
+              />
+              <DocModal 
+                setIsActive={setDocModal}
+                isActive={docModal}
+                pdfUrl={invoice.pdfUrl}
+                invoiceId={invoice.id}
+                setInvoice={setInvoice}
               />
             </>
         }
