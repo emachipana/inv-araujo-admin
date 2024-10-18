@@ -276,6 +276,17 @@ const AdminProvider = ({ children }) => {
     setVitroOrdersBack([...tempBackup]);
   }
 
+  const setInvoice = (id, invoice) => {
+    const tempInvoices = invoices;
+    const tempBackup = invoicesBackup;
+    const index = tempInvoices.findIndex(invoice => invoice.id === id);
+    const indexBackup = tempBackup.findIndex(invoice => invoice.id === id);
+    tempInvoices[index] = invoice;
+    tempBackup[indexBackup] = invoice;
+    setInvoices([...tempInvoices]);
+    setInvoicesBackup([...tempBackup]);
+  }
+
   const setOrder = (id, order) => {
     const tempOrders = orders;
     const index = tempOrders.findIndex(order => order.id === id);
@@ -289,16 +300,33 @@ const AdminProvider = ({ children }) => {
     return getVitroOrder(vitroOrderId);
   }
 
+  const addInvoiceItem = async (body) => {
+    const { invoiceId } = body;
+    await apiFetch("invoiceItems", { body });
+    return getInvoice(invoiceId);
+  }
+ 
   const editItem = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
     return getVitroOrder(vitroOrderId);
   }
 
+  const editInvoiceItem = async (id, body) => {
+    const { invoiceId } = body;
+    await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
+    return getInvoice(invoiceId);
+  }
+
   const deleteItem = async (id, vitroOrderId) => {
     await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
     return getVitroOrder(vitroOrderId);
   }
+
+  const deleteInvoiceItem = async (id, invoiceId) => {
+    await apiFetch(`invoiceItems/${id}`, { method: "DELETE" });
+    return getInvoice(invoiceId);
+  } 
 
   const addOrder = async (values, clientBody) => {
     const newClient = await apiFetch("clients", { body: clientBody });
@@ -358,6 +386,12 @@ const AdminProvider = ({ children }) => {
     const vitroOrder = await apiFetch(`vitroOrders/${id}`);
     setVitro(vitroOrder.data.id, vitroOrder.data);
     return vitroOrder.data;
+  }
+
+  const getInvoice = async (id) => {
+    const invoice = await apiFetch(`invoices/${id}`);
+    setInvoice(invoice.data.id, invoice.data);
+    return invoice.data;
   }
 
   const getOrder = async (id) => {
@@ -429,6 +463,7 @@ const AdminProvider = ({ children }) => {
         addVitro,
         deleteVitro,
         addItem,
+        addInvoiceItem,
         editItem,
         deleteItem,
         updateVitro,
@@ -448,7 +483,9 @@ const AdminProvider = ({ children }) => {
         updateOrder,
         loadInvoices,
         setInvoices,
-        addInvoice
+        addInvoice,
+        editInvoiceItem,
+        deleteInvoiceItem
       }}
     >
       { children }
