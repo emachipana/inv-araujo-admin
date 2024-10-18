@@ -5,17 +5,16 @@ import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, FlexRow, Image, Text } from "../../../styles/layout";
+import { FlexColumn, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
 import { capitalize } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
-import { FaEdit, FaFileInvoice, FaTrashAlt, FaEye, FaShoppingCart } from "react-icons/fa";
+import { FaEdit, FaFileInvoice, FaTrashAlt, FaShoppingCart } from "react-icons/fa";
 import AlertError from "../../../components/AlertError";
 import DeleteModal from "../Product/DeleteModal";
-import { Variety as Container } from "../InvitroOrder/styles";
 import ItemModal from "./ItemModal";
-import { TextDescription } from "../../../components/Product/styles";
+import Item from "./Item";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
@@ -23,7 +22,7 @@ function Order() {
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, matcher, loadProducts, deleteOrderItem } = useAdmin();
+  const { error, setError, deleteOrder, matcher, loadProducts } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -43,16 +42,6 @@ function Order() {
 
     fetch();
   }, [id, setError, loadProducts, matcher.products]);
-
-  const handleDelete = async (itemId) => {
-    try {
-      const updatedOrder = await deleteOrderItem(itemId, id);
-      setOrder(updatedOrder);
-    }catch(error) {
-      console.error(error);
-      setError(error.message);
-    }
-  }
 
   const handleEdit = async (item) => {
     setItem(item);
@@ -247,123 +236,16 @@ function Order() {
                       gap={1}
                     >
                       {
-                        order.items?.map((item, index) => {
-                          const { images = [] } = item.product;
-
-                          return (
-                            <Container key={index}>
-                              <Wrapper>
-                                <FlexColumn gap={0.1}>
-                                  <Text 
-                                    weight={700}
-                                    size={15}
-                                  >
-                                    Producto
-                                  </Text>
-                                  <FlexRow>
-                                    <Image
-                                      width="25px"
-                                      alt={item.product.name}
-                                      src={(images && images[0]) ? images[0]?.image.url : "/img/default_product.png"}
-                                    />
-                                    <TextDescription
-                                      lines={1}
-                                      align="start"
-                                      weight={600}
-                                      size="14px"
-                                      color={COLORS.dim}
-                                    >
-                                      { item.product.name }
-                                    </TextDescription>
-                                  </FlexRow>
-                                </FlexColumn>
-                                <FlexColumn gap={0.1}>
-                                  <Text 
-                                    weight={700}
-                                    size={15}
-                                  >
-                                    Precio
-                                  </Text>
-                                  <Text
-                                    weight={600}
-                                    size={14}
-                                    color={COLORS.dim}
-                                  >
-                                    S/. { item.price }
-                                  </Text>
-                                </FlexColumn>
-                                <FlexColumn gap={0.1}>
-                                  <Text 
-                                    weight={700}
-                                    size={15}
-                                  >
-                                    Cantidad
-                                  </Text>
-                                  <Text
-                                    weight={600}
-                                    size={14}
-                                    color={COLORS.dim}
-                                  >
-                                    { item.quantity }
-                                  </Text>
-                                </FlexColumn>
-                                <FlexColumn gap={0.1}>
-                                  <Text 
-                                    weight={700}
-                                    size={15}
-                                  >
-                                    Subtotal
-                                  </Text>
-                                  <Text
-                                    weight={600}
-                                    size={14}
-                                    color={COLORS.dim}
-                                  >
-                                    S/. { item.subTotal }
-                                  </Text>
-                                </FlexColumn>
-                              </Wrapper>
-                              {
-                                order.status === "PENDIENTE"
-                                &&
-                                <Wrapper 
-                                  isButtons
-                                  justify="center"
-                                >
-                                  <Button
-                                    style={{padding: "0.3rem 0.6rem"}}
-                                    iconSize={15}
-                                    fontSize={14}
-                                    Icon={FaEye}
-                                    onClick={() => navigate(`/admin/productos/${item.product.id}`)}
-                                  >
-                                    Ver producto
-                                  </Button>
-                                  <Button
-                                    style={{padding: "0.3rem 0.6rem"}}
-                                    iconSize={15}
-                                    fontSize={14}
-                                    Icon={FaEdit}
-                                    color="warning"
-                                    onClick={() => handleEdit(item)}
-                                  >
-                                    Editar
-                                  </Button>
-                                  <Button
-                                    style={{padding: "0.3rem 0.6rem"}}
-                                    iconSize={14}
-                                    fontSize={14}
-                                    Icon={FaTrashAlt}
-                                    color="danger"
-                                    onClick={() => handleDelete(item.id)}
-                                  >
-                                    Eliminar
-                                  </Button>
-                                </Wrapper>
-                              }
-                            </Container>
-                          );
-                        })
+                        order.items?.map((item, index) => (
+                          <Item 
+                            key={index}
+                            handleEdit={handleEdit}
+                            item={item}
+                            orderId={id}
+                            orderStatus={order.status}
+                            setOrder={setOrder}
+                          />
+                        ))
                       }
                       {
                         order.status === "PENDIENTE"
