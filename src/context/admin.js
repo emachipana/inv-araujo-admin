@@ -265,6 +265,13 @@ const AdminProvider = ({ children }) => {
     return updatedVitro.data;
   }
 
+  const updateInvoice = async (id, body) => {
+    const { comment, issueDate, address } = body;
+    const updatedInvoice = await apiFetch(`invoices/${id}`, { body: { comment, issueDate, address }, method: "PUT" });
+    setInvoice(id, updatedInvoice.data);
+    return updatedInvoice.data;
+  }
+
   const setVitro = (id, order) => {
     const tempOrders = vitroOrders;
     const tempBackup = vitroOrdersBack;
@@ -485,6 +492,7 @@ const AdminProvider = ({ children }) => {
         editItem,
         deleteItem,
         updateVitro,
+        updateInvoice,
         addOrder,
         deleteOrder,
         deleteInvoice,

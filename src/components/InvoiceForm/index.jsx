@@ -21,7 +21,7 @@ function InvoiceForm({ initialValues = {
   issueDate: "",
   comment: "",
   address: ""
-}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "" }) {
+}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "", isGenerated }) {
   const [docType, setDocType] = useState(initDocType);
   const [invoiceType, setInvoiceType] = useState(initInvoiceType);
   const [isLoading, setIsLoading] = useState(false);
@@ -207,7 +207,7 @@ function InvoiceForm({ initialValues = {
             fontSize={17}
             size="full"
             style={{marginTop: "0.7rem"}}
-            disabled={!isValid || isLoading}
+            disabled={!isValid || isLoading || isGenerated}
             Icon={isLoading ? null : PiWalletFill}
           >
             {
