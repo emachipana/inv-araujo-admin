@@ -75,7 +75,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
           <Brand>{ brand }</Brand>
         </FlexRow>
         <Name>{ name }</Name>
-        <TextDescription>{ description }</TextDescription>
+        <TextDescription height="14px">{ description }</TextDescription>
         <FlexRow>
           <Text
             color={discount ? COLORS.taupe : COLORS.persian}

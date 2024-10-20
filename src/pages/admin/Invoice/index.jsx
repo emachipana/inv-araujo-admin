@@ -1,100 +1,172 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Spinner } from "reactstrap";
 import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
+import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
 import { FlexColumn, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
-import { capitalize } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
-import { FaEdit, FaFileInvoice, FaTrashAlt, FaShoppingCart } from "react-icons/fa";
-import AlertError from "../../../components/AlertError";
+import { FaEdit, FaFileInvoice, FaTrashAlt } from "react-icons/fa";
 import DeleteModal from "../Product/DeleteModal";
+import AlertError from "../../../components/AlertError";
+import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
+import { FaEye } from "react-icons/fa6";
+import DocModal from "./DocModal";
 
-function Order() {
+function Invoice() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [docModal, setDocModal] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [itemModal, setItemModal] = useState(false);
-  const [item, setItem] = useState(null);
-  const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, matcher, loadProducts } = useAdmin();
-  const { id } = useParams();
+  const [item, setItem] = useState("");
+  const [invoice, setInvoice] = useState({});
+  const { id } = useParams("");
+  const { error, setError, deleteInvoice, generateDoc } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        const order = await apiFetch(`orders/${id}`);
-        if(!matcher.products) await loadProducts();
-        setOrder(order.data);
+        const invoice = await apiFetch(`invoices/${id}`);
+        setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
         console.error(error);
-        setIsLoading(false);
         setError(error.message);
+        setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError, loadProducts, matcher.products]);
-
-  const handleEdit = async (item) => {
-    setItem(item);
-    setItemModal(true);
-  }
+  }, [ id, setError ]);
 
   const options = {
     day: "numeric",
-    weekday: "long",
     month: "short",
     year: "numeric",
     timeZone: "UTC"
   }
 
-  const date = new Date();
-  date.setHours(12);
-  const maxShipDate = new Date(order.maxShipDate);
-  const days = Math.ceil((maxShipDate - date) / (24 * 60 * 60 * 1000));
+  const issueDate = new Date(invoice.issueDate);
+
+  const handleEditItem = (item) => {
+    setItemModal(true);
+    setItem(item);
+  }
+
+  const base = (invoice.total / 1.18).toFixed(2);
+  const igv = (parseFloat(base) * 0.18).toFixed(2);
+
+  const handleDocClick = async () => {
+    if(invoice.isGenerated) return setDocModal(true);
+
+    try {
+      const today = new Date();
+      today.setHours(12);
+      const days = Math.ceil((issueDate - today) / (24 * 60 * 60 * 1000));
+      if(days < -2) throw new Error("Debes actualizar la fecha de emisión, máximo 2 días antes de hoy")
+
+      setIsGenerating(true);
+      const updatedInvoice = await generateDoc(invoice.id);
+      setInvoice(updatedInvoice);
+      setIsGenerating(false);
+    }catch(error) {
+      setIsGenerating(false);
+      console.error(error);
+      setError(error.message);
+    }
+  }
 
   return (
     isLoading
     ? <Spinner color="secondary" />
     : <>
         {
-          !order.client
-          ? <Title>El pedido no existe</Title>
+          !invoice.rsocial
+          ? <Title>El comprobante no existe</Title>
           : <>
-              <Title capitalize>{ `${order.client.firstName.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ invoice.rsocial.toLowerCase() }</Title>
               <Section>
                 <Card>
                   <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        { order.client.documentType }
+                        { invoice.documentType }
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.client.document }
+                        { invoice.document }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Teléfono
+                        Serie
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.client.phone }
+                        { 
+                          !invoice.serie
+                          ? "No emitido"
+                          : invoice.serie
+                        }
+                      </Text>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        Fecha emisión
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        { issueDate.toLocaleDateString("es-ES", options) }
+                      </Text>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        Tipo
+                      </Text>
+                      <Badge color="orange">
+                        { invoice.invoiceType }
+                      </Badge>
+                    </FlexColumn>
+                  </Wrapper>
+                  <Wrapper>
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        Monto base
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        S/. { base }
+                      </Text>
+                    </FlexColumn>
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        IGV
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        S/. { igv }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -106,101 +178,81 @@ function Order() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        S/. { order.total }
+                        S/. { invoice.total.toFixed(2) }
                       </Text>
                     </FlexColumn>
-                    <FlexColumn gap={0.3}>
-                      <Text
-                        weight={700}
-                      >
-                        Estado
-                      </Text>
-                      <Badge color={
-                        order.status === "PENDIENTE" ? "warning" : (order.status === "ENTREGADO" ? "primary" : "danger")
-                      }>
-                        { order.status }
-                      </Badge>
-                    </FlexColumn>
-                  </Wrapper>
-                  <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Destino
+                        Items
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
+                      >
+                        { invoice.items.length }
+                      </Text>
+                    </FlexColumn>
+                  </Wrapper>
+                  <Wrapper>
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        Dirección
+                      </Text>
+                      <Text
                         style={{textTransform: "capitalize"}}
-                      >
-                        { `${order.city}, ${order.department}` }
-                      </Text>
-                    </FlexColumn>
-                    <FlexColumn gap={0.3}>
-                      <Text weight={700}>
-                        Correo
-                      </Text>
-                      <Text
+                        align="start"
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.client.email }
-                      </Text>
-                    </FlexColumn>
-                    {
-                      order.status !== "ENTREGADO"
-                      &&
-                      <FlexColumn gap={0.3}>
-                        <Text weight={700}>
-                          Plazo
-                        </Text>
-                        <Text
-                          weight={600}
-                          size={15}
-                          color={COLORS.dim}
-                        >
-                          { days === 0 ? "Entrega hoy" : (days < 0 ? "Vencido" : days) }
-                          {" "}
-                          { days < 1 ? "" : (days === 1 ? "día" : "días") }
-                        </Text>
-                      </FlexColumn>
-                    }
-                  </Wrapper>
-                  <Wrapper>
-                    <FlexColumn gap={0.3}>
-                      <Text weight={700}>
-                        Fecha de pedido
-                      </Text>
-                      <Text
-                        weight={600}
-                        size={15}
-                        color={COLORS.dim}
-                      >
-                        { capitalize(new Date(order.date).toLocaleDateString("es-ES", options)) }
+                        { 
+                          !invoice.address
+                          ? "No proporcionado"
+                          : invoice.address.toLowerCase()
+                        }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Fecha de entrega
+                        Comentario
                       </Text>
                       <Text
+                        align="start"
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { capitalize(maxShipDate.toLocaleDateString("es-ES", options)) }
+                        { 
+                          !invoice.comment
+                          ? "Nulo"
+                          : invoice.comment
+                        }
                       </Text>
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper isButtons>
                     <Button
-                      Icon={FaFileInvoice}
+                      onClick={handleDocClick}
+                      disabled={invoice.items.length <= 0 || isGenerating}
+                      Icon={isGenerating ? null : (invoice.isGenerated ? FaEye : FaFileInvoice)}
                       fontSize={15}
                       iconSize={17}
-                      color="secondary"
+                      color={invoice.isGenerated ? "primary" : "secondary"}
                     >
-                      Generar factura
+                      { 
+                        invoice.isGenerated
+                        ? "Ver" 
+                        : (isGenerating
+                            ? <>
+                                <Spinner size="sm" />
+                                Emitiendo
+                              </>
+                            : "Emitir"
+                          ) 
+                      }
+                      {" "}
+                      { invoice.invoiceType.toLowerCase() }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -208,6 +260,7 @@ function Order() {
                       iconSize={18}
                       color="warning"
                       onClick={() => navigate("edit")}
+                      disabled={invoice.isGenerated}
                     >
                       Editar
                     </Button>
@@ -217,6 +270,7 @@ function Order() {
                       fontSize={15}
                       iconSize={16}
                       color="danger"
+                      disabled={invoice.isGenerated}
                     >
                       Eliminar
                     </Button>
@@ -224,11 +278,11 @@ function Order() {
                 </Card>
                 <Card>
                   <FlexColumn>
-                    <Text
+                  <Text
                       weight={700}
                       size={18}
                     >
-                      Productos
+                      Items
                     </Text>
                     <FlexColumn 
                       width="100%"
@@ -236,58 +290,63 @@ function Order() {
                       gap={1}
                     >
                       {
-                        order.items?.map((item, index) => (
-                          <Item 
+                        invoice.items?.map((item, index) => (
+                          <Item
                             key={index}
-                            handleEdit={handleEdit}
                             item={item}
-                            orderId={id}
-                            orderStatus={order.status}
-                            setOrder={setOrder}
+                            handleEdit={handleEditItem}
+                            invoiceId={id}
+                            isInvoiceGenerated={invoice.isGenerated}
+                            setInvoice={setInvoice}
                           />
                         ))
                       }
                       {
-                        order.status === "PENDIENTE"
+                        !invoice.isGenerated
                         &&
                         <Button
                           style={{marginTop: "1rem"}}
                           fontSize={16}
                           iconSize={18}
-                          Icon={FaShoppingCart}
+                          Icon={AiFillProduct}
                           onClick={() => setItemModal(!itemModal)}
                         >
-                          Agregar producto
+                          Agregar item
                         </Button>
                       }
                     </FlexColumn>
                   </FlexColumn>
                 </Card>
               </Section>
-              <ItemModal 
-                isActive={itemModal}
-                setIsActive={setItemModal}
-                item={item}
-                setItem={setItem}
-                order={order}
-                setOrder={setOrder}
-                isToEdit={!!item}
-              />
-              <DeleteModal
-                handleDelete={deleteOrder}
-                id={order.id}
+              <DeleteModal 
+                handleDelete={deleteInvoice}
+                id={invoice.id}
                 isActive={deleteModal}
-                navTo="pedidos"
+                navTo="comprobantes"
                 setIsActive={setDeleteModal}
-                title="¿Eliminar pedido?"
+                title="¿Eliminar el comprobante?"
+              />
+              <ItemModal 
+                invoiceId={id}
+                isActive={itemModal}
+                item={item}
+                setInvoice={setInvoice}
+                setIsActive={setItemModal}
+                setItem={setItem}
+              />
+              <DocModal 
+                setIsActive={setDocModal}
+                isActive={docModal}
+                pdfUrl={invoice.pdfUrl}
+                invoiceId={invoice.id}
+                setInvoice={setInvoice}
               />
             </>
         }
         {
           error
           &&
-          <AlertError
-            from="product"
+          <AlertError 
             error={error}
             setError={setError}
           />
@@ -296,4 +355,4 @@ function Order() {
   );
 }
 
-export default Order;
+export default Invoice;

@@ -175,7 +175,7 @@ function List() {
                 </td>
                 <td>
                   <FaEdit
-                    onClick={(event) => handleClick(event, invoice.id, navigate)}
+                    onClick={(event) => invoice.isGenerated ? "" : handleClick(event, invoice.id, navigate)}
                     size={18}
                     style={{cursor: "pointer"}}
                     color={COLORS.dim}

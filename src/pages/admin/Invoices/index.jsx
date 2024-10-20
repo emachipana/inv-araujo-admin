@@ -32,11 +32,11 @@ function Invoices() {
   
   return (
     <>
-      <Title>Facturas</Title>
+      <Title>Comprobantes</Title>
       <Type />
       <Filter 
         setModal={setCreateModal}
-        textButton="Nueva factura"
+        textButton="Nuevo comprobante"
         localStorageKey="invoiceType"
         setType={setType}
         type={type}
