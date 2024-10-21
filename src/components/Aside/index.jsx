@@ -70,10 +70,11 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/ofertas"
+          redirectTo="/admin/banners"
           Icon={MdDiscount}
+          isActive={pathname.includes("banners")}
         >
-          Ofertas
+          Banners
         </NavItem>
         <NavItem
           isOpen={isOpen}
