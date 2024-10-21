@@ -148,7 +148,7 @@ function Product() {
                             color={COLORS.orange}
                             weight={600}
                           >
-                            S/. { product.discount.price }
+                            S/. { product.discount.price.toFixed(1) }
                           </Text>
                         }
                       </FlexRow>
@@ -167,11 +167,11 @@ function Product() {
                         S/.
                         {" "} 
                         { 
-                          (
+                          ((
                             product.discount
                             ? product.discount.price 
                             : product.price
-                          ) - product.purchasePrice 
+                          ) - product.purchasePrice).toFixed(2)
                         }
                       </Text>
                     </FlexColumn>

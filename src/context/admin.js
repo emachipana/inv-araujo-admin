@@ -18,6 +18,7 @@ const AdminProvider = ({ children }) => {
   const [invoicesBackup, setInvoicesBackup] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [provinces, setProvinces] = useState({});
+  const [banners, setBanners] = useState([]);
   const [error, setError] = useState(null);
   const [matcher, setMatcher] = useState({
     products: false,
@@ -25,8 +26,17 @@ const AdminProvider = ({ children }) => {
     orders: false,
     departments: false,
     tubers: false,
-    invoices: false
+    invoices: false,
+    banners: false
   });
+
+  const loadBanners = async () => {
+    setIsLoading(true);
+    const banners = await apiFetch("offers");
+    setBanners(banners);
+    setMatcher(matcher => ({...matcher, banners: true}));
+    setIsLoading(false);
+  }
 
   const loadInvoices = async () => {
     setIsLoading(true);
@@ -146,6 +156,12 @@ const AdminProvider = ({ children }) => {
     setProducts(products => [...products, newProduct.data]);
     setBackup(products => [...products, newProduct.data]);
     return newProduct.data;
+  }
+
+  const addBanner = async (body) => {
+    const newBanner = await apiFetch("offers", { body });
+    setBanners(banners => [...banners, newBanner.data]);
+    return newBanner.data;
   }
 
   const addVitro = async (body) => {
@@ -272,6 +288,12 @@ const AdminProvider = ({ children }) => {
     return updatedInvoice.data;
   }
 
+  const updateBanner = async (id, body) => {
+    const updatedBanner = await apiFetch(`offers/${id}`, { body, method: "PUT" });
+    setBanner(id, updatedBanner.data);
+    return updatedBanner.data;
+  }
+
   const setVitro = (id, order) => {
     const tempOrders = vitroOrders;
     const tempBackup = vitroOrdersBack;
@@ -292,6 +314,13 @@ const AdminProvider = ({ children }) => {
     tempBackup[indexBackup] = invoice;
     setInvoices([...tempInvoices]);
     setInvoicesBackup([...tempBackup]);
+  }
+
+  const setBanner = (id, banner) => {
+    const tempBanners = banners;
+    const index = tempBanners.findIndex(banner => banner.id === id);
+    tempBanners[index] = banner;
+    setBanners([...tempBanners]);
   }
 
   const setOrder = (id, order) => {
@@ -462,6 +491,8 @@ const AdminProvider = ({ children }) => {
         matcher,
         departments,
         provinces,
+        banners,
+        loadBanners,
         loadDepartments,
         setTubers,
         setVitroOrders,
@@ -493,6 +524,7 @@ const AdminProvider = ({ children }) => {
         deleteItem,
         updateVitro,
         updateInvoice,
+        updateBanner,
         addOrder,
         deleteOrder,
         deleteInvoice,
@@ -514,7 +546,8 @@ const AdminProvider = ({ children }) => {
         editInvoiceItem,
         deleteInvoiceItem,
         generateDoc,
-        deleteDocInvoice
+        deleteDocInvoice,
+        addBanner
       }}
     >
       { children }

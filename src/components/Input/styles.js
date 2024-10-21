@@ -65,3 +65,16 @@ export const TextError = styled.p`
   background-color: ${COLORS.red};
   opacity: .8;
 `;
+
+export const CheckContainer = styled.div`
+  width: ${({ size }) => size || 20}px;
+  height: ${({ size }) => size || 20}px;
+  border: 1px solid ${({ checked }) => checked ? COLORS.persian : COLORS.platinium};
+  border-radius: 0.25rem;
+  background-color: ${({ checked }) => checked ? COLORS.persian : "transparent"};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  transition: .1s ease;
+`;
