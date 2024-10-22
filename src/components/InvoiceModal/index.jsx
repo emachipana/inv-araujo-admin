@@ -19,7 +19,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceType, setInvoiceType] = useState("");
   const [docType, setDocType] = useState("");
-  const { setError, addInvoice } = useAdmin();
+  const { setError, addInvoice, matcher, setMatcher } = useAdmin();
   const navigate = useNavigate();
 
   const initialValues = {
@@ -54,14 +54,16 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
 
       await updateOrder(id, orderBody);
 
-      await Promise.all(items.map(async (item) => {
+      for (let item of items) {
         const body = {
           invoiceId: invoice.id,
           ...item
         }
 
-        return await apiFetch("invoiceItems", { body });
-      }));
+        await apiFetch("invoiceItems", { body });
+      }
+
+      if(matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
 
       setIsLoading(false);
       navigate(`/admin/comprobantes/${invoice.id}`);

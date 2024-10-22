@@ -584,7 +584,8 @@ const AdminProvider = ({ children }) => {
         addBanner,
         deleteBanner,
         getInvoice,
-        setOrder
+        setOrder,
+        setMatcher
       }}
     >
       { children }
