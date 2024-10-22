@@ -269,6 +269,8 @@ const AdminProvider = ({ children }) => {
 
   const deleteVitro  = async (id) => {
     await apiFetch(`vitroOrders/${id}`, { method: "DELETE" });
+    const vitro = vitroOrdersBack.find(vitroO => vitroO.id === id);
+    if(!!vitro.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
     const updatedOrders = vitroOrders.filter(order => order.id !== id);
     const updatedBackup = vitroOrdersBack.filter(order => order.id !== id);
     setVitroOrders([...updatedOrders]);
@@ -407,6 +409,8 @@ const AdminProvider = ({ children }) => {
 
   const deleteOrder = async (id) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
+    const order = orders.find(orderF => orderF.id === id);
+    if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
     const updatedOrders = orders.filter(order => order.id !== id);
     setOrders([...updatedOrders]);
   }
