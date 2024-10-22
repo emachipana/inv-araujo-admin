@@ -32,7 +32,7 @@ export const Content = styled.h4`
   font-size: ${({ size }) => size || 75}px;
   line-height: ${({ height }) => height || 100}px;
   font-family: ${FONTS.secondary};
-  color: ${COLORS.white};
+  color: ${({ color }) => color || COLORS.white};
   text-transform: uppercase;
 
   .marked {

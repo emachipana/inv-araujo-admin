@@ -16,15 +16,15 @@ function BannerForm({ initialValues = {
   description: "",
   markedWord: "",
   used: false
-}, isToCreate, bannerId }) {
+}, isToCreate, bannerId, width }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addBanner, updatedBanner } = useAdmin();
+  const { setError, addBanner, updateBanner } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const banner = isToCreate ? await addBanner(values) : await updatedBanner(bannerId, values);
+      const banner = isToCreate ? await addBanner(values) : await updateBanner(bannerId, values);
       setIsLoading(false);
       navigate(`/admin/banners/${banner.id}`);
     }catch(error) {
@@ -49,7 +49,10 @@ function BannerForm({ initialValues = {
         handleBlur,
         handleSubmit
       }) => (
-        <Form onSubmit={handleSubmit}>
+        <Form 
+          onSubmit={handleSubmit}
+          width={width}
+        >
           <Title>{ isToCreate ? "Nuevo banner" : "Editar banner" }</Title>
           <Input 
             id="title"
