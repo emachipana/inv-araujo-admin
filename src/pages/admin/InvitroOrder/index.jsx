@@ -19,16 +19,19 @@ import NewCategory from "../../../components/Category/New";
 import { FaMoneyBillWheat } from "react-icons/fa6";
 import AdvancesModal from "./AdvancesModal";
 import Item from "./Item";
+import InvoiceModal from "../../../components/InvoiceModal";
+import { handleClick } from "./handlers";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
+  const [invoiceModal, setInvoiceModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [advanceModal, setAdvanceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { error, setError, deleteVitro, loadTubers, matcher } = useAdmin();
+  const { error, setError, deleteVitro, loadTubers, matcher, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -216,9 +219,15 @@ function InvitroOrder() {
                       Icon={FaFileInvoice}
                       fontSize={15}
                       iconSize={17}
-                      color="secondary"
+                      color={order.invoice ? "primary" : "secondary"}
+                      onClick={() => handleClick(order, navigate, setInvoiceModal)}
+                      disabled={order.items.length <= 0}
                     >
-                      Generar factura
+                      {
+                        order.invoice 
+                        ? "Ver comprobante"
+                        : "Comprobante"
+                      }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -304,6 +313,17 @@ function InvitroOrder() {
                 advances={order.advances}
                 setVitroOrder={setOrder}
                 vitroId={order.id}
+              />
+              <InvoiceModal 
+                address={`${order.city}, ${order.department}`}
+                document={order.document}
+                documentType={order.documentType}
+                isActive={invoiceModal}
+                rsocial={`${order.lastName} ${order.firstName}`}
+                setIsActive={setInvoiceModal}
+                items={order.items.map(item => ({ name: item.variety.name, price: item.price, quantity: item.quantity }))}
+                order={order}
+                updateOrder={updateVitro}
               />
             </>
         }
