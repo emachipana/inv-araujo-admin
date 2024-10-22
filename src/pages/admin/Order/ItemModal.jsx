@@ -7,8 +7,7 @@ import { BiSearch } from "react-icons/bi";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import Product from "./Product";
-import { filterProducts } from "./handlers";
-import apiFetch from "../../../services/apiFetch";
+import { filterProducts, onSearchChange } from "./handlers";
 import Button from "../../../components/Button";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -22,7 +21,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
 
   useEffect(() => {
     const init = () => {
-      const filteredProducts = filterProducts(order, backup);
+      const filteredProducts = filterProducts(order.items, backup);
       if(item) {
         setValues({
           productId: item.product.id,
@@ -63,28 +62,6 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
     }
   }
 
-  const onSearchChange = async (e) => {
-    try {
-      const value = e.target.value;
-      setSearch(value);
-      if(value.length >= 3) {
-        setIsLoading(true);
-        const searchedProducts = await apiFetch(`products/search?param=${value}`);
-        const filteredProducts = filterProducts(order, searchedProducts);
-        setSearchProducts(filteredProducts);
-        setIsLoading(false);
-        return;
-      }
-      setIsLoading(false);
-      const filteredProducts = filterProducts(order, backup);
-      setSearchProducts(filteredProducts);
-    }catch(error) {
-      setIsLoading(false);
-      console.error(error);
-      setError(error.message);
-    }
-  }
-
   return (
     <Modal
       size="md"
@@ -111,7 +88,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
               placeholder="Buscar un producto..."
               Icon={BiSearch}
               value={search}
-              handleChange={onSearchChange}
+              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, setError)}
               style={{width: "60%"}}
             />
           }

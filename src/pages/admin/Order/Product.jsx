@@ -5,7 +5,7 @@ import { Input as Radio } from "reactstrap";
 import { COLORS } from "../../../styles/colors";
 import Control from "../../../components/Control";
 
-function Product({images = [], id, values, name, price, stock, discount, setValues, isToEdit = false, initialQuantity = 1}) {
+function Product({images = [], id, values, name, price, stock, discount, setValues, isToEdit = false, initialQuantity = 1, isToBanner = false}) {
   const [quantity, setQuantity] = useState(initialQuantity);
 
   const handleChangeQuantity = (quantity) => {
@@ -69,15 +69,19 @@ function Product({images = [], id, values, name, price, stock, discount, setValu
             </FlexColumn>
           </ProductSection>
         </FlexRow>
-        <Control
-          size="sm"
-          fontSize={16}
-          controlSize={19}
-          number={quantity}
-          setNumber={handleChangeQuantity}
-          stock={stock}
-          disabled={id !== values.productId}
-        />
+        {
+          !isToBanner
+          &&
+          <Control
+            size="sm"
+            fontSize={16}
+            controlSize={19}
+            number={quantity}
+            setNumber={handleChangeQuantity}
+            stock={stock}
+            disabled={id !== values.productId}
+          />
+        }
       </Container>
       {
         !isToEdit

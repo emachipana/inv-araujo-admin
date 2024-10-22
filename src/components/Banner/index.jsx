@@ -5,34 +5,12 @@ import CheckBox from "../Input/CheckBox";
 import { Content, Section, Title } from "./styles";
 import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
+import { handleChecked, parsedTitle } from "./handlers";
 
-function Banner({ id, title, description, markedWord, isUsed}) {
+function Banner({ id, title, description, markedWord, isUsed, products}) {
   const [checked, setChecked] = useState(isUsed);
   const { setError, updateBanner } = useAdmin();
   const navigate = useNavigate();
-
-  const parsedTitle = {
-    __html: title.replaceAll(new RegExp(markedWord, 'gi'), `<span class='marked'>${markedWord}</span>`)
-  }
-
-  const handleChecked = async (e) => {
-    e.stopPropagation();
-
-    try {
-      setChecked(!checked);
-      const body = {
-        title,
-        description,
-        markedWord,
-        used: !checked
-      }
-
-      await updateBanner(id, body);
-    }catch(error) {
-      console.error(error);
-      setError(error.message);
-    }
-  }
 
   return (
     <Section onClick={() => navigate(`${id}`)}>
@@ -42,7 +20,7 @@ function Banner({ id, title, description, markedWord, isUsed}) {
           style={{marginTop: "-0.5rem"}}
           size={30}
           height={35}
-          dangerouslySetInnerHTML={parsedTitle}
+          dangerouslySetInnerHTML={parsedTitle(title, markedWord)}
         />
       </FlexColumn>
       <FlexColumn gap={0.1}>
@@ -61,7 +39,16 @@ function Banner({ id, title, description, markedWord, isUsed}) {
         size={18}
         checked={checked}
         label={checked ? "Usando" : "Usar"}
-        onChange={handleChecked}
+        onChange={
+          (e) => handleChecked(
+            e,
+            checked,
+            { id, title, description, markedWord, used: isUsed, products },
+            setChecked,
+            updateBanner,
+            setError
+          )
+        }
       />
     </Section>
   );
