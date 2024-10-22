@@ -18,6 +18,7 @@ import Invoices from "../pages/admin/Invoices";
 import Invoice from "../pages/admin/Invoice";
 import EditInvoice from "../pages/admin/Invoice/Edit";
 import Banners from "../pages/admin/Banners";
+import Banner from "../pages/admin/Banner";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,6 +49,7 @@ function AuthenticatedApp() {
           <Route path="/comprobantes/:id" element={<Invoice />} />
           <Route path="/comprobantes/:id/edit" element={<EditInvoice />} />
           <Route path="/banners" element={<Banners />} />
+          <Route path="/banners/:id" element={<Banner />} />
           <Route path="*" element={<h1>No existe la pagina</h1>} />
         </Routes>
       </Section>

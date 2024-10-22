@@ -411,6 +411,12 @@ const AdminProvider = ({ children }) => {
     setOrders([...updatedOrders]);
   }
 
+  const deleteBanner = async (id) => {
+    await apiFetch(`offers/${id}`, { method: "DELETE" });
+    const updatedBanners = banners.filter(banner => banner.id !== id);
+    setBanners([...updatedBanners]);
+  }
+
   const deleteInvoice = async (id) => {
     await apiFetch(`invoices/${id}`, { method: "DELETE" });
     const updatedInvoices = invoices.filter(invoice => invoice.id !== id);
@@ -454,6 +460,12 @@ const AdminProvider = ({ children }) => {
     return order.data;
   }
 
+  const getBanner = async (id) => {
+    const banner = await apiFetch(`offers/${id}`);
+    setBanner(banner.data.id, banner.data);
+    return banner.data;
+  }
+
   const addOrderItem = async (body) => {
     const { orderId } = body;
     await apiFetch("orderProducts", { body });
@@ -461,10 +473,30 @@ const AdminProvider = ({ children }) => {
     return getOrder(orderId);
   }
 
+  const addBannerItem = async (body) => {
+    const { offerId } = body;
+    await apiFetch("offerProducts", { body });
+    return getBanner(offerId);
+  }
+
   const deleteOrderItem = async (id, orderId) => {
     await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
     setMatcher(matcher => ({...matcher, products: false}));
     return getOrder(orderId);
+  }
+
+  const deleteBannerItem = async (id, banner) => {
+    await apiFetch(`offerProducts/${id}`, { method: "DELETE" });
+    if(banner.products.length <= 1 && banner.used) {
+      const body = {
+        ...banner,
+        used: !banner.used
+      }
+
+      return updateBanner(banner.id, body);
+    }
+
+    return getBanner(banner.id);
   }
 
   const editOrderItem = async (id, body) => {
@@ -537,7 +569,9 @@ const AdminProvider = ({ children }) => {
         deleteAdvance,
         deleteProductImage,
         addOrderItem,
+        addBannerItem,
         deleteOrderItem,
+        deleteBannerItem,
         editOrderItem,
         updateOrder,
         loadInvoices,
@@ -547,7 +581,8 @@ const AdminProvider = ({ children }) => {
         deleteInvoiceItem,
         generateDoc,
         deleteDocInvoice,
-        addBanner
+        addBanner,
+        deleteBanner
       }}
     >
       { children }
