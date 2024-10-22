@@ -60,6 +60,7 @@ export const Section = styled.section`
   gap: 1.5rem;
   padding-bottom: 3rem;
   overflow: auto;
+  position: relative;
 `;
 
 export const Image = styled.img`
