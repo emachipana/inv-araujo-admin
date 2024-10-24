@@ -21,6 +21,7 @@ const AdminProvider = ({ children }) => {
   const [banners, setBanners] = useState([]);
   const [clients, setClients] = useState([]);
   const [clientsBackup, setClientsBackup] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState(null);
   const [matcher, setMatcher] = useState({
     products: false,
@@ -30,8 +31,17 @@ const AdminProvider = ({ children }) => {
     tubers: false,
     invoices: false,
     banners: false,
-    clients: false
+    clients: false,
+    expenses: false
   });
+
+  const loadExpenses = async () => {
+    setIsLoading(true);
+    const expenses = await apiFetch("profits");
+    setExpenses(expenses);
+    setMatcher(matcher => ({...matcher, expenses: true}));
+    setIsLoading(false);
+  }
 
   const loadClients = async () => {
     setIsLoading(true);
@@ -411,6 +421,7 @@ const AdminProvider = ({ children }) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
     const order = orders.find(orderF => orderF.id === id);
     if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
+    setMatcher(matcher => ({...matcher, expenses: false}));
     const updatedOrders = orders.filter(order => order.id !== id);
     setOrders([...updatedOrders]);
   }
@@ -432,17 +443,20 @@ const AdminProvider = ({ children }) => {
   const addAdvance = async (body) => {
     const { vitroOrderId } = body;
     await apiFetch("advances", { body });
+    setMatcher(matcher => ({...matcher, expenses: false}));
     return getVitroOrder(vitroOrderId);
   }
 
   const editAdvance = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`advances/${id}`, { body, method: "PUT" });
+    setMatcher(matcher => ({...matcher, expenses: false}));
     return getVitroOrder(vitroOrderId);
   }
 
   const deleteAdvance = async (id, vitroId) => {
     await apiFetch(`advances/${id}`, { method: "DELETE" });
+    setMatcher(matcher => ({...matcher, expenses: false}));
     return getVitroOrder(vitroId);
   }
 
@@ -473,7 +487,7 @@ const AdminProvider = ({ children }) => {
   const addOrderItem = async (body) => {
     const { orderId } = body;
     await apiFetch("orderProducts", { body });
-    setMatcher(matcher => ({...matcher, products: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
     return getOrder(orderId);
   }
 
@@ -485,7 +499,7 @@ const AdminProvider = ({ children }) => {
 
   const deleteOrderItem = async (id, orderId) => {
     await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
-    setMatcher(matcher => ({...matcher, products: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
     return getOrder(orderId);
   }
 
@@ -506,7 +520,7 @@ const AdminProvider = ({ children }) => {
   const editOrderItem = async (id, body) => {
     const { orderId } = body;
     await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
-    setMatcher(matcher => ({...matcher, products: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
     return getOrder(orderId);
   }
 
@@ -514,6 +528,7 @@ const AdminProvider = ({ children }) => {
     <AdminContext.Provider
       value={{
         categories,
+        expenses,
         invoices,
         invoicesBackup,
         products,
@@ -593,7 +608,8 @@ const AdminProvider = ({ children }) => {
         setOrder,
         setMatcher,
         loadClients,
-        addClient
+        addClient,
+        loadExpenses
       }}
     >
       { children }
