@@ -77,7 +77,7 @@ function Order() {
           !order.client
           ? <Title>El pedido no existe</Title>
           : <>
-              <Title capitalize>{ `${order.client.firstName?.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
               <Section>
                 <Card>
                   <Wrapper>
@@ -296,12 +296,12 @@ function Order() {
                 title="¿Eliminar pedido?"
               />
               <InvoiceModal 
-                address={`${order.client.city}, ${order.client.department}`}
+                address={`${order.city}, ${order.department}`}
                 document={order.client.document}
                 documentType={order.client.documentType}
                 isActive={invoiceModal}
                 order={order}
-                rsocial={`${order.client.lastName} ${order.client.firstName}`}
+                rsocial={order.client.rsocial}
                 setIsActive={setInvoiceModal}
                 updateOrder={updateOrder}
                 items={order.items.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}

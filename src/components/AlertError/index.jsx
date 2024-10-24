@@ -9,6 +9,8 @@ function AlertError({ setError, error, from = null }) {
   const parser = () => {
     if(error.includes("Bad credentials")) return "Credenciales incorrectas";
 
+    if(error.includes("Duplicate entry")) return "Correo o documento de identidad en uso";
+
     if(error.includes("delete or update a parent row") && from === "categories") return "La categoria tiene productos asociados";
 
     if(error.includes("delete or update a parent row") && from === "product") return "El producto esta asociado a registros";

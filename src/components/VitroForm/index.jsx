@@ -10,13 +10,12 @@ import Select from "../Input/Select";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import { formatDate, onDepChange, onDocChange, onDocTypeChange } from "./handlers";
+import { formatDate, onDepChange, onDocChange, onDocTypeChange, onSearchChange } from "./handlers";
 import Category from "../Category";
 import { COLORS } from "../../styles/colors";
 import { List, Products } from "../../pages/admin/Order/styles";
 import { BiSearch } from "react-icons/bi";
 import Client from "./Client";
-import apiFetch from "../../services/apiFetch";
 
 function VitroForm({ initialValues = {
   documentType: "",
@@ -72,7 +71,7 @@ function VitroForm({ initialValues = {
       }
       
       setIsLoading(true);
-      if(currentAction === "Nuevo cliente" && !isToCreate) {
+      if(currentAction === "Nuevo cliente" && isToCreate) {
         const now = new Date();
         const clientBody = {
           ...values,
@@ -97,28 +96,6 @@ function VitroForm({ initialValues = {
     }catch(error) {
       setIsLoading(false);
       console.error(error);
-      setError(error.message);
-    }
-  }
-
-  const onSearchChange = async (e) => {
-    try {
-      if(isGetting) return;
-      const value = e.target.value;
-      setSearch(value);
-
-      if(value.length >= 3) {
-        setIsGetting(true);
-        const clients = await apiFetch(`clients/search?param=${value}`);
-        setSearchClients(clients);
-        setIsGetting(false);
-        return;
-      }
-
-      setSearchClients(clientsBackup);
-    }catch(error) {
-      console.error(error);
-      setIsGetting(false);
       setError(error.message);
     }
   }
@@ -285,7 +262,7 @@ function VitroForm({ initialValues = {
 										Icon={BiSearch}
 										value={search}
 										style={{width: "60%"}}
-                    handleChange={onSearchChange}
+                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup)}
 									/>
 									<List 
                     height="150px"

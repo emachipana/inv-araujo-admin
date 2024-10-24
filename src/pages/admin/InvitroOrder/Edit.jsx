@@ -65,7 +65,7 @@ function EditVitroOrder() {
                   </FlexRow>
                   <Button
                     fontSize={14.5}
-                    style={{padding: ".3rem .5rem"}}
+                    style={{padding: ".3rem .5rem", alignSelf: "center"}}
                     color={order.status === "PENDIENTE" ? "primary" : "warning"}
                     onClick={() => updateStatus(order, updateVitro, setIsUpdating, setError, navigate, "invitro")}
                   >
@@ -85,12 +85,12 @@ function EditVitroOrder() {
                   initialValues={{
                     ...order.client,
                     ...order,
-                    documentType: order.documentType === "DNI" ? 1 : 2,
+                    documentType: order.client.documentType === "DNI" ? 1 : 2,
                     department: departmentId,
                     city: provinces[departmentId].find(prov => prov.nombre_ubigeo === order.city)?.id_ubigeo
                   }}
                   vitroId={order.id}
-                  initialDocType={order.documentType}
+                  initialDocType={order.client.documentType}
                   initialDep={departmentId}
                   clientId={order.client.id}
                 />

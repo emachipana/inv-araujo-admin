@@ -46,7 +46,7 @@ function Orders() {
           : (type === "group"
               ? orders.map((order, index) => (
                   <Order 
-                    clientName={`${order.client.firstName} ${order.client.lastName}`}
+                    clientName={order.client.rsocial}
                     id={order.id}
                     key={index}
                     date={order.maxShipDate}

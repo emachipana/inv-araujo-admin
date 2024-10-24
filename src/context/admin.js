@@ -395,34 +395,15 @@ const AdminProvider = ({ children }) => {
     return getInvoice(invoiceId);
   } 
 
-  const addOrder = async (values, clientBody) => {
-    const newClient = await apiFetch("clients", { body: clientBody });
-
-    const orderBody = {
-      clientId: newClient.data.id,
-      date: values.date,
-      department: newClient.data.department,
-      city: newClient.data.city
-    }
-    
-    const newOrder = await apiFetch("orders", { body: orderBody });
+  const addOrder = async (body) => {
+    const newOrder = await apiFetch("orders", { body });
     setOrders(orders => [...orders, newOrder.data]);
     return newOrder.data;
   }
 
-  const updateOrder = async (orderId, values, clientId, clientBody) => {
-    const updatedClient = await apiFetch(`clients/${clientId}`, { body: clientBody, method: "PUT" });
-
-    const orderBody = {
-      clientId: updatedClient.data.id,
-      date: values.date,
-      department: updatedClient.data.department,
-      city: updatedClient.data.city,
-      status: (values.status * 1) === 1 ? "PENDIENTE" : ((values.status * 1) === 2 ? "ENTREGADO" : "CANCELADO"),
-    }
-
-    const updatedOrder = await apiFetch(`orders/${orderId}`, { body: orderBody, method: "PUT" });
-    setOrder(updatedOrder.data.id, updatedOrder.data);
+  const updateOrder = async (id, body) => {
+    const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
+    setOrder(id, updatedOrder.data);
     return updatedOrder.data;
   }
 

@@ -1,3 +1,4 @@
+import apiFetch from "../../services/apiFetch";
 import { getDoc } from "../../services/getByDocument";
 
 export const onDocTypeChange = (event, setFieldValue, setDocType, fieldDoc) => {
@@ -32,3 +33,25 @@ export const onDepChange = (event, setFieldValue, setCurrentDep) => {
 }
 
 export const formatDate = (date) => date.toISOString().split("T")[0];
+
+export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup) => {
+  try {
+    if(isGetting) return;
+    const value = e.target.value;
+    setSearch(value);
+
+    if(value.length >= 3) {
+      setIsGetting(true);
+      const clients = await apiFetch(`clients/search?param=${value}`);
+      setSearchClients(clients);
+      setIsGetting(false);
+      return;
+    }
+
+    setSearchClients(clientsBackup);
+  }catch(error) {
+    console.error(error);
+    setIsGetting(false);
+    setError(error.message);
+  }
+}

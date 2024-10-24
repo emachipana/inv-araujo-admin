@@ -27,7 +27,7 @@ export const Form = styled.form`
 export const Section = styled.div`
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-evenly;
   align-items: flex-start;
   gap: 3rem;
   flex-wrap: wrap;

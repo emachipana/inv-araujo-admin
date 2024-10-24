@@ -31,5 +31,7 @@ export const validate = (values, docType, action) => {
   if(!values.city) errors.city = "Este campo es obligatorio";
   if(!values.initDate) errors.initDate = "Este campo es obligatorio";
 
+  console.log(errors);
+
   return errors;
 }
