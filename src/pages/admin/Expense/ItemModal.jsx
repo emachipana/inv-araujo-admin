@@ -1,40 +1,38 @@
 import { useState } from "react";
-import { useAdmin } from "../../../context/admin";
 import Modal from "../../../components/Modal";
+import { useAdmin } from "../../../context/admin";
 import { Formik } from "formik";
-import { validate } from "./validate";
+import { validate } from "../Invoice/validate";
 import { Form } from "../../../styles/layout";
 import { Group, Title } from "../../../components/ProductForm/styles";
 import Input from "../../../components/Input";
+import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import Button from "../../../components/Button";
 
-function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem }) {
+function ItemModal({ isActive, setIsActive, profitId, item, setExpense, setItem }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addInvoiceItem, editInvoiceItem } = useAdmin();
+  const { setError, addExpenseItem, editExpenseItem } = useAdmin();
 
   let initialValues = {
-    invoiceId,
+    profitId,
     name: "",
     price: "",
     quantity: ""
-  };
+  }
 
-  if(item) {
-    initialValues = {
-      ...initialValues,
-      name: item.name,
-      price: item.price,
-      quantity: item.quantity
-    }
+  if(item) initialValues = {
+    ...initialValues,
+    name: item.name,
+    price: item.price,
+    quantity: item.quantity
   }
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const updatedInvoice = item ? await editInvoiceItem(item.id, values) : await addInvoiceItem(values);
-      setInvoice(updatedInvoice);
+      const updatedExpense = item ? await editExpenseItem(item.id, values) : await addExpenseItem(values);
+      setExpense(updatedExpense);
       setIsLoading(false);
       onClose();
     }catch(error) {
@@ -69,8 +67,8 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
           handleSubmit
         }) => (
           <Form onSubmit={handleSubmit}>
-            <Title>{ item ? "Editar item" : "Agregar item" }</Title>
-            <Input 
+            <Title>{ item ? "Editar gasto" : "Registrar gasto" }</Title>
+            <Input
               id="name"
               label="Nombre"
               placeholder="Nombre del item"
@@ -116,10 +114,10 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
                 ? <>
                     <Spinner size="sm" />
                     {
-                      !item ? "Agregando..." : "Editando..."
+                      !item ? "Registrando..." : "Editando..."
                     }
                   </>
-                : !item ? "Agregar" : "Editar"
+                : !item ? "Registrar" : "Editar"
               }
             </Button>
           </Form>

@@ -1,24 +1,23 @@
 import { useState } from "react";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import Button from "../../../components/Button";
-import { TextDescription } from "../../../components/Product/styles";
-import { COLORS } from "../../../styles/colors";
-import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { useAdmin } from "../../../context/admin";
 import { Variety } from "../InvitroOrder/styles";
 import { Wrapper } from "../Product/styles";
-import { useAdmin } from "../../../context/admin";
+import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import Button from "../../../components/Button";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { TextDescription } from "../../../components/Product/styles";
+import { COLORS } from "../../../styles/colors";
 
-function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
+function Item({ item, handleEdit, profitId, setExpense }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteInvoiceItem } = useAdmin();
-  const { id, name, price, quantity, subTotal } = item;
+  const { setError, deleteExpenseItem } = useAdmin();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedInvoice = await deleteInvoiceItem(id, invoiceId);
-      setInvoice(updatedInvoice);
+      const updatedExpense = await deleteExpenseItem(item.id, profitId);
+      setExpense(updatedExpense);
       setIsDeleting(false);
     }catch(error) {
       setIsDeleting(false);
@@ -44,7 +43,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
             size="14px"
             color={COLORS.dim}
           >
-            { name }
+            { item.name }
           </TextDescription>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -59,7 +58,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
             size={14}
             color={COLORS.dim}
           >
-            S/. { price.toFixed(2) }
+            S/. { item.price.toFixed(1) }
           </Text>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -74,7 +73,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
             size={14}
             color={COLORS.dim}
           >
-            { quantity }
+            { item.quantity }
           </Text>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -89,44 +88,40 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
             size={14}
             color={COLORS.dim}
           >
-            S/. { subTotal.toFixed(2) }
+            S/. { item.subTotal.toFixed(1) }
           </Text>
         </FlexColumn>
       </Wrapper>
-      {
-        !isInvoiceGenerated
-        &&
-        <FlexRow gap={1}>
-          <Button
-            style={{padding: "0.3rem 0.6rem"}}
-            iconSize={15}
-            fontSize={14}
-            Icon={FaEdit}
-            color="warning"
-            onClick={() => handleEdit(item)}
-          >
-            Editar
-          </Button>
-          <Button
-            style={{padding: "0.3rem 0.6rem"}}
-            iconSize={14}
-            fontSize={14}
-            Icon={isDeleting ? null : FaTrashAlt}
-            color="danger"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {
-              isDeleting
-              ? <>
-                  <Spinner size="sm" />
-                  Eliminado...
-                </>
-              : "Eliminar"
-            }
-          </Button>
-        </FlexRow>
-      }
+      <FlexRow gap={1}>
+        <Button
+          style={{padding: "0.3rem 0.6rem"}}
+          iconSize={15}
+          fontSize={14}
+          Icon={FaEdit}
+          color="warning"
+          onClick={() => handleEdit(item)}
+        >
+          Editar
+        </Button>
+        <Button
+          style={{padding: "0.3rem 0.6rem"}}
+          iconSize={14}
+          fontSize={14}
+          Icon={isDeleting ? null : FaTrashAlt}
+          color="danger"
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
+          {
+            isDeleting
+            ? <>
+                <Spinner size="sm" />
+                Eliminado...
+              </>
+            : "Eliminar"
+          }
+        </Button>
+      </FlexRow>
     </Variety>
   );
 }
