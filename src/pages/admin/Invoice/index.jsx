@@ -278,7 +278,7 @@ function Invoice() {
                 </Card>
                 <Card>
                   <FlexColumn>
-                  <Text
+                    <Text
                       weight={700}
                       size={18}
                     >

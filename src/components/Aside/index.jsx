@@ -81,6 +81,7 @@ function Aside({ isOpen, setIsOpen }) {
           setIsOpen={setIsOpen}
           redirectTo="/admin/gastos"
           Icon={FaMoneyBillTransfer}
+          isActive={pathname.includes("gastos")}
         >
           Gastos
         </NavItem>

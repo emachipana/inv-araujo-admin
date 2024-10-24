@@ -22,6 +22,7 @@ import Banner from "../pages/admin/Banner";
 import EditBanner from "../pages/admin/Banner/Edit";
 import NotFound from "../pages/admin/NotFound";
 import Expenses from "../pages/admin/Expenses";
+import Expense from "../pages/admin/Expense";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -55,6 +56,7 @@ function AuthenticatedApp() {
           <Route path="/banners/:id" element={<Banner />} />
           <Route path="/banners/:id/edit" element={<EditBanner />} />
           <Route path="/gastos" element={<Expenses />} />
+          <Route path="/gastos/:id" element={<Expense />} />
           <Route path="*" element={<NotFound navTo="/admin" />} />
         </Routes>
       </Section>

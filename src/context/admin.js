@@ -336,6 +336,13 @@ const AdminProvider = ({ children }) => {
     setVitroOrdersBack([...tempBackup]);
   }
 
+  const setExpense = (id, expense) => {
+    const tempExpenses = expenses;
+    const index = tempExpenses.findIndex(expense => expense.id === id);
+    tempExpenses[index] = expense;
+    setExpenses([...tempExpenses]);
+  }
+
   const setInvoice = (id, invoice) => {
     const tempInvoices = invoices;
     const tempBackup = invoicesBackup;
@@ -367,6 +374,12 @@ const AdminProvider = ({ children }) => {
     return getVitroOrder(vitroOrderId);
   }
 
+  const addExpenseItem = async (body) => {
+    const { profitId } = body;
+    await apiFetch("expenses", { body });
+    return getExpense(profitId);
+  }
+
   const addInvoiceItem = async (body) => {
     const { invoiceId } = body;
     await apiFetch("invoiceItems", { body });
@@ -377,6 +390,12 @@ const AdminProvider = ({ children }) => {
     const { vitroOrderId } = body;
     await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
     return getVitroOrder(vitroOrderId);
+  }
+
+  const editExpenseItem = async (id, body) => {
+    const { profitId } = body;
+    await apiFetch(`expenses/${id}`, { body, method: "PUT" });
+    return getExpense(profitId);
   }
 
   const editInvoiceItem = async (id, body) => {
@@ -398,6 +417,11 @@ const AdminProvider = ({ children }) => {
   const deleteItem = async (id, vitroOrderId) => {
     await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
     return getVitroOrder(vitroOrderId);
+  }
+
+  const deleteExpenseItem = async (id, profitId) => {
+    await apiFetch(`expenses/${id}`, { method: "DELETE" });
+    return getExpense(profitId);
   }
 
   const deleteInvoiceItem = async (id, invoiceId) => {
@@ -464,6 +488,12 @@ const AdminProvider = ({ children }) => {
     const vitroOrder = await apiFetch(`vitroOrders/${id}`);
     setVitro(vitroOrder.data.id, vitroOrder.data);
     return vitroOrder.data;
+  }
+
+  const getExpense = async (id) => {
+    const expense = await apiFetch(`profits/${id}`);
+    setExpense(expense.data.id, expense.data);
+    return expense.data;
   }
 
   const getInvoice = async (id) => {
@@ -572,8 +602,11 @@ const AdminProvider = ({ children }) => {
         addVitro,
         deleteVitro,
         addItem,
+        deleteExpenseItem,
+        addExpenseItem,
         addInvoiceItem,
         editItem,
+        editExpenseItem,
         deleteItem,
         updateVitro,
         updateInvoice,
