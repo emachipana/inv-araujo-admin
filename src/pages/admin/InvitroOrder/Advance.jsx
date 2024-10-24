@@ -8,9 +8,11 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { COLORS } from "../../../styles/colors";
 import AdvanceForm from "./AdvanceForm";
 import { useAdmin } from "../../../context/admin";
+import { Spinner } from "reactstrap";
 
 function Advance({ id, date, amount, setOrder, vitroId }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { setError, deleteAdvance } = useAdmin();
 
   const options = {
@@ -25,8 +27,10 @@ function Advance({ id, date, amount, setOrder, vitroId }) {
 
   const handleDelete = async () => {
     try {
+      setIsDeleting(true);
       const updatedVitro = await deleteAdvance(id, vitroId);
       setOrder(updatedVitro);
+      setIsDeleting(false);
     }catch(error) {
       console.error(error);
       setError(error.message);
@@ -96,11 +100,19 @@ function Advance({ id, date, amount, setOrder, vitroId }) {
                 style={{padding: "0.3rem 0.6rem"}}
                 iconSize={14}
                 fontSize={14}
-                Icon={FaTrashAlt}
+                Icon={isDeleting ? null : FaTrashAlt}
                 color="danger"
                 onClick={handleDelete}
+                disabled={isDeleting}
               >
-                Eliminar
+                {
+                  isDeleting
+                  ? <>
+                      <Spinner size="sm" />
+                      Eliminado...
+                    </>
+                  : "Eliminar"
+                }
               </Button>
             </FlexRow>
           </>
