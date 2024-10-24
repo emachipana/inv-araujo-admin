@@ -19,16 +19,19 @@ import NewCategory from "../../../components/Category/New";
 import { FaMoneyBillWheat } from "react-icons/fa6";
 import AdvancesModal from "./AdvancesModal";
 import Item from "./Item";
+import InvoiceModal from "../../../components/InvoiceModal";
+import { handleClick } from "./handlers";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
+  const [invoiceModal, setInvoiceModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [advanceModal, setAdvanceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { error, setError, deleteVitro, loadTubers, matcher } = useAdmin();
+  const { error, setError, deleteVitro, loadTubers, matcher, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function InvitroOrder() {
           !order.city
           ? <Title>El pedido invitro no existe</Title>
           : <>
-              <Title capitalize>{ `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
               <NewCategory
                 Icon={FaMoneyBillWheat}
                 style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
@@ -82,14 +85,14 @@ function InvitroOrder() {
                   <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        { order.documentType }
+                        { order.client.documentType }
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.document }
+                        { order.client.document }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -101,7 +104,7 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.phone }
+                        { order.client.phone }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -216,9 +219,15 @@ function InvitroOrder() {
                       Icon={FaFileInvoice}
                       fontSize={15}
                       iconSize={17}
-                      color="secondary"
+                      color={order.invoice ? "primary" : "secondary"}
+                      onClick={() => handleClick(order, navigate, setInvoiceModal)}
+                      disabled={order.items.length <= 0}
                     >
-                      Generar factura
+                      {
+                        order.invoice 
+                        ? "Ver comprobante"
+                        : "Comprobante"
+                      }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -304,6 +313,17 @@ function InvitroOrder() {
                 advances={order.advances}
                 setVitroOrder={setOrder}
                 vitroId={order.id}
+              />
+              <InvoiceModal 
+                address={`${order.city}, ${order.department}`}
+                document={order.client.document}
+                documentType={order.client.documentType}
+                isActive={invoiceModal}
+                rsocial={order.client.rsocial}
+                setIsActive={setInvoiceModal}
+                items={order.items.map(item => ({ name: item.variety.name, price: item.price, quantity: item.quantity }))}
+                order={order}
+                updateOrder={updateVitro}
               />
             </>
         }

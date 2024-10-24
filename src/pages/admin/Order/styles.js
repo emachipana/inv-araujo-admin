@@ -20,7 +20,7 @@ export const List = styled.section`
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 1.5rem;
+  gap: ${({ gap }) => gap || "1.5rem"};
   overflow-y: scroll;
   padding: 1rem;
 `;

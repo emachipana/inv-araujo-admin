@@ -2,37 +2,52 @@ import { useEffect, useState } from "react";
 import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
 import { Formik } from "formik";
-import { validate } from "./validate";
-import { Form } from "../../styles/layout";
+import { FlexRow, Form, Text } from "../../styles/layout";
 import { Group, Title } from "../ProductForm/styles";
 import Select from "../Input/Select";
 import Input from "../Input";
-import { formatDate, onDepChange, onDocChange, onDocTypeChange } from "../VitroForm/handlers";
+import { formatDate, onDepChange, onDocChange, onDocTypeChange, onSearchChange } from "../VitroForm/handlers";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
+import Category from "../Category";
+import Client from "../VitroForm/Client";
+import { List, Products } from "../../pages/admin/Order/styles";
+import { BiSearch } from "react-icons/bi";
+import { COLORS } from "../../styles/colors";
+import { validate } from "../VitroForm/validate";
 
 function OrderForm({ initialValues = {
   documentType: "",
   document: "",
-  firstName: "",
-  lastName: "",
+  rsocial: "",
   email: "",
   phone: "",
   department: "",
   city: "",
-  date: ""
-}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId }) {
+  initDate: "",
+  status: ""
+}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId = "" }) {
+  const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addOrder, updateOrder, departments, provinces, matcher, loadDepartments } = useAdmin();
+  const [isGetting, setIsGetting] = useState(false);
+  const [search, setSearch] = useState("");
+  const [searchClients, setSearchClients] = useState([]);
+  const [clientSelected, setClientSelected] = useState(clientId);
+  const { setError, addOrder, updateOrder, departments, 
+    provinces, matcher, loadDepartments,
+    loadClients, addClient, clientsBackup } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetch = () => {
+    const fetch = async () => {
       try {
-        if(!matcher.departments) loadDepartments();
+        if(!matcher.departments) await loadDepartments();
+        if(!matcher.clients) await loadClients();
+        
+        setSearchClients(clientsBackup);
       }catch(error) {
         setError(error.message);
         console.error(error);
@@ -40,24 +55,41 @@ function OrderForm({ initialValues = {
     }
     
     fetch();
-  }, [ loadDepartments, matcher.departments, setError ]);
+  }, [ loadDepartments, matcher, setError, loadClients, clientsBackup ]);
 
   const onSubmit = async (values) => {
     try {
-      setIsLoading(true);
-      const now = new Date();
-      const department = departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo;
-      const city = provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo;
+      if(currentAction === "Cliente registrado" && !clientSelected) return;
 
-      const clientBody = {
-        ...values,
-        department,
-        city,
-        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-        email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+      let orderBody = {
+        clientId: clientSelected,
+        department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
+        city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
+        date: values.initDate
       }
 
-      const order = isToCreate ? await addOrder(values, clientBody) : await updateOrder(orderId, values, clientId, clientBody);
+      setIsLoading(true);
+      if(currentAction === "Nuevo cliente" && isToCreate) {
+        const now = new Date();
+
+        const clientBody = {
+          ...values,
+          department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
+          city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
+          documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
+          email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+        }
+
+        const newCliet = await addClient(clientBody);
+        orderBody = {
+          ...orderBody,
+          clientId: newCliet.id
+        }
+      }
+
+      if(!isToCreate) orderBody = {...orderBody, status: initialValues.status};
+
+      const order = isToCreate ? await addOrder(orderBody) : await updateOrder(orderId, orderBody);
       setIsLoading(false);
       navigate(`/admin/pedidos/${order.id}`);
     }catch(error) {
@@ -76,7 +108,7 @@ function OrderForm({ initialValues = {
     <Formik
       initialValues={initialValues}
       onSubmit={onSubmit}
-      validate={(values) => validate(values, docType)}
+      validate={(values) => validate(values, docType, currentAction)}
     >
       {({
         values,
@@ -90,145 +122,223 @@ function OrderForm({ initialValues = {
       }) => (
         <Form onSubmit={handleSubmit}>
           <Title>{ isToCreate ? "Generar pedido" : "Editar pedido" }</Title>
-          <Group>
-            <Select 
-              id="documentType"
-              label="Tipo de documento"
-              error={errors.documentType}
-              touched={touched.documentType}
-              value={values.documentType}
-              handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
-              options={[
+          {
+            isToCreate
+            &&
+            <FlexRow gap={1}>
+              <Category
+                currentCategory={currentAction}
+                name="Nuevo cliente"
+                setCurrentCategory={setCurrentAction}
+              />
+              <Category
+                currentCategory={currentAction}
+                name="Cliente registrado"
+                setCurrentCategory={setCurrentAction}
+              />
+            </FlexRow>
+          }
+          <Text
+            align="start"
+            style={{alignSelf: "flex-start", marginBottom: "-0.8rem"}}
+            size={18.5}
+            weight={700}
+            color={COLORS.dim}
+          >
+            Cliente
+          </Text>
+          {
+            currentAction === "Nuevo cliente"
+            ? <>
+                <Group>
+                  <Select
+                    disabled={!isToCreate}
+                    id="documentType"
+                    labelSize={17}
+                    label="Tipo de documento"
+                    error={errors.documentType}
+                    touched={touched.documentType}
+                    value={values.documentType}
+                    handleBlur={handleBlur}
+                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+                    options={[
+                      {
+                        id: 1,
+                        content: "DNI"
+                      },
+                      {
+                        id: 2,
+                        content: "RUC"
+                      }
+                    ]}
+                  />
+                  <Input
+                    disabled={!docType || !isToCreate}
+                    labelSize={17}
+                    id="document"
+                    label="Documento"
+                    placeholder={docType || "Documento"}
+                    error={errors.document}
+                    touched={touched.document}
+                    value={values.document}
+                    handleBlur={handleBlur}
+                    handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+                  />
+                </Group>
+                <Input
+                  labelSize={17}
+                  disabled={!isToCreate}
+                  id="rsocial"
+                  label="Razón Social"
+                  placeholder="ej. Araujo Estrada Yurfa"
+                  error={errors.rsocial}
+                  touched={touched.rsocial}
+                  value={values.rsocial}
+                  handleBlur={handleBlur}
+                  handleChange={handleChange}
+                />
+                <Group>
+                  <Input
+                    labelSize={17}
+                    id="email"
+                    label="Correo"
+                    placeholder="@gmail.com"
+                    error={errors.email}
+                    touched={touched.email}
+                    value={values.email}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                    disabled={!isToCreate}
+                  />
+                  <Input
+                    disabled={!isToCreate}
+                    labelSize={17}
+                    id="phone"
+                    label="Teléfono"
+                    placeholder="ej. 990849369"
+                    error={errors.phone}
+                    touched={touched.phone}
+                    value={values.phone}
+                    handleBlur={handleBlur}
+                    handleChange={handleChange}
+                  />
+                </Group>
                 {
-                  id: 1,
-                  content: "DNI"
-                },
-                {
-                  id: 2,
-                  content: "RUC"
+                  isToCreate
+                  &&
+                  <Group>
+                    <Select
+                      labelSize={17}
+                      id="department"
+                      label="Departamento"
+                      error={errors.department}
+                      touched={touched.department}
+                      value={values.department}
+                      options={optionsDep}
+                      handleBlur={handleBlur}
+                      handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
+                    />
+                    <Select
+                      labelSize={17}
+                      disabled={!currentDep}
+                      id="city"
+                      label="Ciudad"
+                      options={optionsProv}
+                      error={errors.city}
+                      touched={touched.city}
+                      value={values.city}
+                      handleBlur={handleBlur}
+                      handleChange={handleChange}
+                    />
+                  </Group>
                 }
-              ]}
-            />
-            <Input
-              disabled={!docType}
-              id="document"
-              label="Documento"
-              placeholder={docType || "Documento"}
-              error={errors.document}
-              touched={touched.document}
-              value={values.document}
-              handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
-            />
-          </Group>
-          <Group>
+              </>
+            : <>
+                <Products>
+									<Input
+										id="search"
+										placeholder="Buscar cliente..."
+										Icon={BiSearch}
+										value={search}
+										style={{width: "60%"}}
+                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup)}
+									/>
+									<List
+                    height="150px"
+                    gap="1rem"
+                  >
+										{
+											isGetting
+											? <Spinner color="secondary" />
+											: searchClients.map((client, index) => (
+													<Client
+                            id={client.id}
+                            rsocial={client.rsocial}
+                            document={client.document}
+                            department={client.department}
+                            city={client.city}
+														clientSelected={clientSelected}
+														setClientSelected={setClientSelected}
+														key={index}
+                            setFieldValue={setFieldValue}
+													/>
+												))
+										}
+									</List>
+								</Products>
+              </>
+          }
+          <Text
+            align="start"
+            style={{alignSelf: "flex-start", marginBottom: "-0.8rem"}}
+            size={18.5}
+            weight={700}
+            color={COLORS.dim}
+          >
+            Pedido
+          </Text>
+          {
+            ((currentAction === "Cliente registrado") || !isToCreate)
+            &&
+            <Group>
+              <Select
+                disabled={!clientSelected}
+                labelSize={17}
+                id="department"
+                label="Departamento"
+                error={errors.department}
+                touched={touched.department}
+                value={values.department || clientSelected.department}
+                options={optionsDep}
+                handleBlur={handleBlur}
+                handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
+              />
+              <Select
+                labelSize={17}
+                disabled={!currentDep}
+                id="city"
+                label="Ciudad"
+                options={optionsProv}
+                error={errors.city}
+                touched={touched.city}
+                value={values.city}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+              />
+            </Group>
+          }
+          <Group width={isToCreate ? 48 : ""}>
             <Input 
-              id="firstName"
-              label={docType === "RUC" ? "Razón social" : "Nombres"}
-              placeholder={docType === "RUC" ? "Razón social" : "Nombres"}
-              error={errors.firstName}
-              touched={touched.firstName}
-              value={values.firstName}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-            <Input
-              disabled={docType === "RUC"}
-              id="lastName"
-              label="Apellidos"
-              placeholder="Apellidos"
-              error={errors.lastName}
-              touched={touched.lastName}
-              value={values.lastName}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-          </Group>
-          <Group>
-            <Input 
-              id="email"
-              label="Correo"
-              placeholder="ejm@gmail.com"
-              error={errors.email}
-              touched={touched.email}
-              value={values.email}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-            <Input
-              id="phone"
-              label="Teléfono"
-              placeholder="ej. 990849369"
-              error={errors.phone}
-              touched={touched.phone}
-              value={values.phone}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-          </Group>
-          <Group>
-            <Select
-              id="department"
-              label="Departamento"
-              error={errors.department}
-              touched={touched.department}
-              value={values.department}
-              options={optionsDep}
-              handleBlur={handleBlur}
-              handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
-            />
-            <Select
-              disabled={!currentDep}
-              id="city"
-              label="Ciudad"
-              options={optionsProv}
-              error={errors.city}
-              touched={touched.city}
-              value={values.city}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-          </Group>
-          <Group width={isToCreate ? 50 : ""}>
-            <Input 
-              id="date"
+              id="initDate"
               label="Fecha pedido"
               type="date"
               max={formatDate(today)}
-              error={errors.date}
-              touched={touched.date}
-              value={values.date}
+              error={errors.initDate}
+              touched={touched.initDate}
+              value={values.initDate}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
-            {
-              !isToCreate
-              &&
-              <Select
-                id="status"
-                label="Estado"
-                error={errors.status}
-                touched={touched.status}
-                value={values.status}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-                options={[
-                  {
-                    id: 1,
-                    content: "PENDIENTE"
-                  },
-                  {
-                    id: 2,
-                    content: "ENTREGADO"
-                  },
-                  {
-                    id: 3,
-                    content: "CANCELADO"
-                  },
-                ]}
-              />
-            }
           </Group>
           <Button
             type="submit"

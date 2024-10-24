@@ -20,6 +20,8 @@ import EditInvoice from "../pages/admin/Invoice/Edit";
 import Banners from "../pages/admin/Banners";
 import Banner from "../pages/admin/Banner";
 import EditBanner from "../pages/admin/Banner/Edit";
+import NotFound from "../pages/admin/NotFound";
+import Expenses from "../pages/admin/Expenses";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -52,7 +54,8 @@ function AuthenticatedApp() {
           <Route path="/banners" element={<Banners />} />
           <Route path="/banners/:id" element={<Banner />} />
           <Route path="/banners/:id/edit" element={<EditBanner />} />
-          <Route path="*" element={<h1>No existe la pagina</h1>} />
+          <Route path="/gastos" element={<Expenses />} />
+          <Route path="*" element={<NotFound navTo="/admin" />} />
         </Routes>
       </Section>
     </AdminProvider>

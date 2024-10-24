@@ -135,7 +135,7 @@ function List() {
                     color={COLORS.dim}
                     style={{textTransform: "capitalize"}}
                   >
-                    { `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }
+                    {order.client.rsocial.toLowerCase()}
                   </TextDescription>
                 </td>
                 <td>
@@ -144,7 +144,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.phone }
+                    { order.client.phone }
                   </Text>
                 </td>
                 <td>
@@ -153,7 +153,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { order.document }
+                    { order.client.document }
                   </Text>
                 </td>
                 <td>

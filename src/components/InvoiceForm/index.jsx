@@ -8,10 +8,10 @@ import { formatDate, onDocTypeChange } from "../VitroForm/handlers";
 import { validate } from "./validate";
 import Select from "../Input/Select";
 import Input from "../Input";
-import { getDoc } from "../../services/getByDocument";
 import Button from "../Button";
 import { Spinner } from "reactstrap";
 import { PiWalletFill } from "react-icons/pi";
+import { onDocChange } from "./handlers";
 
 function InvoiceForm({ initialValues = {
   invoiceType: "",
@@ -50,30 +50,6 @@ function InvoiceForm({ initialValues = {
     const value = event.target.value;
     setFieldValue("invoiceType", value);
     setInvoiceType((value * 1) === 1 ? "BOLETA" : "FACTURA");
-  }
-
-  const onDocChange = async (event, setFieldValue, setError) => {
-    const value = event.target.value;
-    setFieldValue("document", value);
-  
-    if(!isNaN(value * 1)) {
-      if(docType === "RUC" && value.length === 11) {
-        const info = await getDoc("ruc", value);
-        if(info.razonSocial) {
-          setFieldValue("rsocial", info.razonSocial);
-          setFieldValue("address", info.direccion);          
-          return;
-        }
-        setError(info.message);
-      }
-  
-      if(docType === "DNI" && value.length === 8) {
-        const info = await getDoc("dni", value);
-        if(!info.success) return setError(info.message);
-        setFieldValue("rsocial", `${info.apellidoPaterno} ${info.apellidoMaterno} ${info.nombres}`);
-        setFieldValue("address", "");
-      }
-    }
   }
 
   const today = new Date();

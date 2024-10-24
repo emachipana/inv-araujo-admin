@@ -23,3 +23,12 @@ export const Form = styled.form`
   justify-content: center;
   gap: 1rem;
 `;
+
+export const Section = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+`;

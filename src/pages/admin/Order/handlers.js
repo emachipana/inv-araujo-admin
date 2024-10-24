@@ -4,8 +4,10 @@ export const filterProducts = (items, backup) => {
   return backup.filter(product => !items.find(item => item.product.id === product.id));
 }
 
-export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearchProducts, toFind, setError) => {
+export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearchProducts, toFind, setError, isLoading) => {
   try {
+    if(isLoading) return;
+
     const value = e.target.value;
     setSearch(value);
     if(value.length >= 3) {

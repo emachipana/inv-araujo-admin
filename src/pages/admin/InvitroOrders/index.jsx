@@ -50,7 +50,7 @@ function InvitroOrders() {
                   <Order
                     id={order.id}
                     key={index}
-                    clientName={`${order.firstName} ${order.lastName}`}
+                    clientName={order.client.rsocial}
                     date={order.finishDate}
                     destination={order.city}
                     total={order.total}
@@ -62,6 +62,7 @@ function InvitroOrders() {
         }
       </Section>
       <Modal
+        align="start"
         size="md"
         isActive={createModal}
         setIsActive={setCreateModal}

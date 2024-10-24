@@ -1,3 +1,4 @@
+import apiFetch from "../../services/apiFetch";
 import { getDoc } from "../../services/getByDocument";
 
 export const onDocTypeChange = (event, setFieldValue, setDocType, fieldDoc) => {
@@ -13,15 +14,14 @@ export const onDocChange = async (event, setFieldValue, setError, docType) => {
   if(!isNaN(value * 1)) {
     if(docType === "RUC" && value.length === 11) {
       const info = await getDoc("ruc", value);
-      if(info.razonSocial) return setFieldValue("firstName", info.razonSocial);
+      if(info.razonSocial) return setFieldValue("rsocial", info.razonSocial);
       setError(info.message);
     }
 
     if(docType === "DNI" && value.length === 8) {
       const info = await getDoc("dni", value);
       if(!info.success) return setError(info.message);
-      setFieldValue("firstName", info.nombres);
-      setFieldValue("lastName", `${info.apellidoPaterno} ${info.apellidoMaterno}`);
+      setFieldValue("rsocial", `${info.apellidoPaterno} ${info.apellidoMaterno} ${info.nombres}`);
     }
   }
 }
@@ -33,3 +33,25 @@ export const onDepChange = (event, setFieldValue, setCurrentDep) => {
 }
 
 export const formatDate = (date) => date.toISOString().split("T")[0];
+
+export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup) => {
+  try {
+    if(isGetting) return;
+    const value = e.target.value;
+    setSearch(value);
+
+    if(value.length >= 3) {
+      setIsGetting(true);
+      const clients = await apiFetch(`clients/search?param=${value}`);
+      setSearchClients(clients);
+      setIsGetting(false);
+      return;
+    }
+
+    setSearchClients(clientsBackup);
+  }catch(error) {
+    console.error(error);
+    setIsGetting(false);
+    setError(error.message);
+  }
+}

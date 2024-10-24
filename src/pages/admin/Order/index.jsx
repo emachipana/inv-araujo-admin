@@ -15,14 +15,17 @@ import AlertError from "../../../components/AlertError";
 import DeleteModal from "../Product/DeleteModal";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
+import { handleClick } from "../InvitroOrder/handlers";
+import InvoiceModal from "../../../components/InvoiceModal";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [invoiceModal, setInvoiceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, matcher, loadProducts } = useAdmin();
+  const { error, setError, deleteOrder, matcher, loadProducts, setOrder: setOrderSecond } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -61,6 +64,11 @@ function Order() {
   const maxShipDate = new Date(order.maxShipDate);
   const days = Math.ceil((maxShipDate - date) / (24 * 60 * 60 * 1000));
 
+  const updateOrder = async (id, body) => {
+    const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
+    setOrderSecond(id, updatedOrder.data);
+  }
+
   return (
     isLoading
     ? <Spinner color="secondary" />
@@ -69,7 +77,7 @@ function Order() {
           !order.client
           ? <Title>El pedido no existe</Title>
           : <>
-              <Title capitalize>{ `${order.client.firstName.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
               <Section>
                 <Card>
                   <Wrapper>
@@ -194,13 +202,19 @@ function Order() {
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper isButtons>
-                    <Button
+                   <Button
                       Icon={FaFileInvoice}
                       fontSize={15}
                       iconSize={17}
-                      color="secondary"
+                      color={order.invoice ? "primary" : "secondary"}
+                      onClick={() => handleClick(order, navigate, setInvoiceModal)}
+                      disabled={order.items.length <= 0}
                     >
-                      Generar factura
+                      {
+                        order.invoice 
+                        ? "Ver comprobante"
+                        : "Comprobante"
+                      }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -280,6 +294,17 @@ function Order() {
                 navTo="pedidos"
                 setIsActive={setDeleteModal}
                 title="¿Eliminar pedido?"
+              />
+              <InvoiceModal 
+                address={`${order.city}, ${order.department}`}
+                document={order.client.document}
+                documentType={order.client.documentType}
+                isActive={invoiceModal}
+                order={order}
+                rsocial={order.client.rsocial}
+                setIsActive={setInvoiceModal}
+                updateOrder={updateOrder}
+                items={order.items.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}
               />
             </>
         }

@@ -75,7 +75,7 @@ export const Container = styled.div`
   padding: 1rem;
   border-radius: 1rem;
   box-shadow: ${shadowSm};
-  margin: auto;
+  margin: ${({ notAuto }) => notAuto ? "" : "auto"};
 `;
 
 export const Cancel = css`
