@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import { Title } from "../styles";
-import { Day, Days, Info, Main, Mini, Wrapper } from "./styles";
+import { Container, Day, Days, Info, Main, Mini, Wrapper } from "./styles";
 import { capitalize } from "../../../helpers/capitalize";
 import { COLORS } from "../../../styles/colors";
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6";
@@ -41,6 +41,8 @@ function Calendar() {
             return order.status === "PENDIENTE" && date.getMonth() === curMonth;
           }),
           ...vitroOrders.filter(order => {
+            if(!order.finishDate) return false;
+
             const date = new Date(order.finishDate);
 
             return order.status === "PENDIENTE" && date.getMonth() === curMonth;
@@ -76,12 +78,7 @@ function Calendar() {
 	return (
 		<>
 			<Title>Calendario</Title>
-			<FlexRow
-				width="100%"
-				align="flex-start"
-				justify="space-between"
-				gap={1}
-			>
+			<Container>
 				<Info>
 					<Mini>
 						<FlexRow 
@@ -317,7 +314,7 @@ function Calendar() {
             }
           </Days>
         </Main>
-			</FlexRow>
+			</Container>
       {
         error
         &&

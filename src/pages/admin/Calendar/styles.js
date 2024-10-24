@@ -80,3 +80,16 @@ export const Wrapper = styled.div`
   border-bottom-style: solid;
   gap: 0.5rem;
 `;
+
+export const Container = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  @media screen and (max-width: 1210px) {
+    flex-wrap: wrap;
+    // justify-content: center;
+  }
+`;
