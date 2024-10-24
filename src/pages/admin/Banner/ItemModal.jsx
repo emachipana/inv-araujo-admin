@@ -72,7 +72,7 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
             placeholder="Buscar un producto..."
             Icon={BiSearch}
             value={search}
-            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.products, setSearchProducts, backup, setError)}
+            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.products, setSearchProducts, backup, setError, isLoading)}
             style={{width: "60%"}}
           />
           <List>

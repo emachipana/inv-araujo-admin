@@ -13,15 +13,14 @@ export const onDocChange = async (event, setFieldValue, setError, docType) => {
   if(!isNaN(value * 1)) {
     if(docType === "RUC" && value.length === 11) {
       const info = await getDoc("ruc", value);
-      if(info.razonSocial) return setFieldValue("firstName", info.razonSocial);
+      if(info.razonSocial) return setFieldValue("rsocial", info.razonSocial);
       setError(info.message);
     }
 
     if(docType === "DNI" && value.length === 8) {
       const info = await getDoc("dni", value);
       if(!info.success) return setError(info.message);
-      setFieldValue("firstName", info.nombres);
-      setFieldValue("lastName", `${info.apellidoPaterno} ${info.apellidoMaterno}`);
+      setFieldValue("rsocial", `${info.apellidoPaterno} ${info.apellidoMaterno} ${info.nombres}`);
     }
   }
 }

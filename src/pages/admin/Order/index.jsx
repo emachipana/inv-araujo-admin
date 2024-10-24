@@ -77,7 +77,7 @@ function Order() {
           !order.client
           ? <Title>El pedido no existe</Title>
           : <>
-              <Title capitalize>{ `${order.client.firstName.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ `${order.client.firstName?.toLowerCase()} ${order.client.lastName?.toLowerCase()}` }</Title>
               <Section>
                 <Card>
                   <Wrapper>

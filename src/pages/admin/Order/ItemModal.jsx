@@ -88,7 +88,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
               placeholder="Buscar un producto..."
               Icon={BiSearch}
               value={search}
-              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, setError)}
+              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, setError, isLoading)}
               style={{width: "60%"}}
             />
           }

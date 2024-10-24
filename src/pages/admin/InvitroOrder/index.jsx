@@ -72,7 +72,7 @@ function InvitroOrder() {
           !order.city
           ? <Title>El pedido invitro no existe</Title>
           : <>
-              <Title capitalize>{ `${order.firstName.toLowerCase()} ${order.lastName?.toLowerCase()}` }</Title>
+              <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
               <NewCategory
                 Icon={FaMoneyBillWheat}
                 style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
@@ -85,14 +85,14 @@ function InvitroOrder() {
                   <Wrapper>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        { order.documentType }
+                        { order.client.documentType }
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.document }
+                        { order.client.document }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -104,7 +104,7 @@ function InvitroOrder() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.phone }
+                        { order.client.phone }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -316,10 +316,10 @@ function InvitroOrder() {
               />
               <InvoiceModal 
                 address={`${order.city}, ${order.department}`}
-                document={order.document}
-                documentType={order.documentType}
+                document={order.client.document}
+                documentType={order.client.documentType}
                 isActive={invoiceModal}
-                rsocial={`${order.lastName} ${order.firstName}`}
+                rsocial={order.client.rsocial}
                 setIsActive={setInvoiceModal}
                 items={order.items.map(item => ({ name: item.variety.name, price: item.price, quantity: item.quantity }))}
                 order={order}

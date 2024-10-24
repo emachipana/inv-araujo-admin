@@ -19,6 +19,8 @@ const AdminProvider = ({ children }) => {
   const [departments, setDepartments] = useState([]);
   const [provinces, setProvinces] = useState({});
   const [banners, setBanners] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [clientsBackup, setClientsBackup] = useState([]);
   const [error, setError] = useState(null);
   const [matcher, setMatcher] = useState({
     products: false,
@@ -27,8 +29,18 @@ const AdminProvider = ({ children }) => {
     departments: false,
     tubers: false,
     invoices: false,
-    banners: false
+    banners: false,
+    clients: false
   });
+
+  const loadClients = async () => {
+    setIsLoading(true);
+    const clients = await apiFetch("clients");
+    setClients(clients);
+    setClientsBackup(clients);
+    setMatcher(matcher => ({...matcher, clients: true}));
+    setIsLoading(false);
+  }
 
   const loadBanners = async () => {
     setIsLoading(true);
@@ -169,6 +181,13 @@ const AdminProvider = ({ children }) => {
     setVitroOrders(vitros => [...vitros, newVitro.data]);
     setVitroOrdersBack(vitros => [...vitros, newVitro.data]);
     return newVitro.data;
+  }
+
+  const addClient = async (body) => {
+    const newClient = await apiFetch("clients", { body });
+    setClients(clients => [...clients, newClient.data]);
+    setClientsBackup(clients => [...clients, newClient.data]);
+    return newClient.data;
   }
 
   const addInvoice = async (body) => {
@@ -528,6 +547,8 @@ const AdminProvider = ({ children }) => {
         departments,
         provinces,
         banners,
+        clients,
+        clientsBackup,
         loadBanners,
         loadDepartments,
         setTubers,
@@ -589,7 +610,9 @@ const AdminProvider = ({ children }) => {
         deleteBanner,
         getInvoice,
         setOrder,
-        setMatcher
+        setMatcher,
+        loadClients,
+        addClient
       }}
     >
       { children }
