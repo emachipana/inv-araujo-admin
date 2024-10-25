@@ -31,8 +31,10 @@ function Calendar() {
   useEffect(() => {
     const fetch = async () => {
       try {
+        setIsLoading(true);
         if(!matcher.orders) await loadOrders();
         if(!matcher.vitroOrders) await loadVitroOrders();
+        setIsLoading(false);
 
         const filter = [
           ...orders.filter(order => {

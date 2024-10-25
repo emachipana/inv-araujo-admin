@@ -19,7 +19,11 @@ function Invoices() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.invoices) await loadInvoices();
+        if(!matcher.invoices) {
+          setIsLoading(true);
+          await loadInvoices();
+          setIsLoading(false);
+        }
       }catch(error) {
         setIsLoading(false);
         console.error(error);

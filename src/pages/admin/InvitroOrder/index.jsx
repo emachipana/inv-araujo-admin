@@ -37,7 +37,12 @@ function InvitroOrder() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.vitroOrders && !matcher.tubers) await loadTubers();
+        if(!matcher.vitroOrders && !matcher.tubers) {
+          setIsLoading(true);
+          await loadTubers();
+          setIsLoading(false);
+        }
+
         const order = await apiFetch(`vitroOrders/${id}`);
         setOrder(order.data);
         setIsLoading(false);

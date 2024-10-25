@@ -45,8 +45,13 @@ function OrderForm({ initialValues = {
     const fetch = async () => {
       try {
         if(!matcher.departments) await loadDepartments();
-        if(!matcher.clients) await loadClients();
-        
+
+        if(!matcher.clients) {
+          setIsLoading(true);
+          await loadClients();
+          setIsLoading(false);
+        }
+
         setSearchClients(clientsBackup);
       }catch(error) {
         setError(error.message);

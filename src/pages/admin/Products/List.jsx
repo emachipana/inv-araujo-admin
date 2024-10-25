@@ -27,6 +27,7 @@ function List() {
             <Text
               align="start"
               weight={600}
+              color={COLORS.gray}
             >
               Nombre
             </Text>
@@ -35,6 +36,7 @@ function List() {
             <Text
               align="start"
               weight={600}
+              color={COLORS.gray}
             >
               Descripción
             </Text>
@@ -42,6 +44,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
               align="start"
               style={{whiteSpace: "nowrap"}}
             >
@@ -51,6 +54,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
               align="start"
               style={{whiteSpace: "nowrap"}}
             >
@@ -60,6 +64,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
             >
               Descuento
             </Text>
@@ -67,6 +72,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
             >
               Stock
             </Text>
@@ -74,6 +80,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
             >
               Categoría
             </Text>
@@ -81,6 +88,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
             >
               Marca
             </Text>
@@ -88,6 +96,7 @@ function List() {
           <th>
             <Text
               weight={600}
+              color={COLORS.gray}
             >
               Estado
             </Text>

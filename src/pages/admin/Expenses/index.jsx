@@ -12,7 +12,11 @@ function Expenses() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.expenses) await loadExpenses();
+        if(!matcher.expenses) {
+          setIsLoading(true);
+          await loadExpenses();
+          setIsLoading(false);
+        }
       }catch(error) {
         console.error(error);
         setIsLoading(false);
