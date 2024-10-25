@@ -18,7 +18,11 @@ function Orders() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.orders) await loadOrders();
+        if(!matcher.orders) {
+          setIsLoading(true);
+          await loadOrders();
+          setIsLoading(false);
+        }
       }catch(error) {
         console.error(error);
         setError(error.message);

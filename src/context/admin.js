@@ -36,45 +36,35 @@ const AdminProvider = ({ children }) => {
   });
 
   const loadExpenses = async () => {
-    setIsLoading(true);
     const expenses = await apiFetch("profits");
     setExpenses(expenses);
     setMatcher(matcher => ({...matcher, expenses: true}));
-    setIsLoading(false);
   }
 
   const loadClients = async () => {
-    setIsLoading(true);
     const clients = await apiFetch("clients");
     setClients(clients);
     setClientsBackup(clients);
     setMatcher(matcher => ({...matcher, clients: true}));
-    setIsLoading(false);
   }
 
   const loadBanners = async () => {
-    setIsLoading(true);
     const banners = await apiFetch("offers");
     setBanners(banners);
     setMatcher(matcher => ({...matcher, banners: true}));
-    setIsLoading(false);
   }
 
   const loadInvoices = async () => {
-    setIsLoading(true);
     const invoices = await apiFetch("invoices");
     setInvoices(invoices);
     setInvoicesBackup(invoices);
     setMatcher(matcher => ({...matcher, invoices: true}));
-    setIsLoading(false);
   }
 
   const loadTubers = async () => {
-    setIsLoading(true);
     const tubers = await apiFetch("tubers");
     setTubers(tubers);
     setMatcher(matcher => ({...matcher, tubers: true}));
-    setIsLoading(false);
   }
 
   const loadDepartments = () => {
@@ -84,33 +74,27 @@ const AdminProvider = ({ children }) => {
   }
 
   const loadProducts = async () => {
-    setIsLoading(true);
     const categories = await apiFetch("categories");
     const products = await apiFetch("products");
     setCategories(categories);
     setProducts(products);
     setBackup(products);
     setMatcher(matcher => ({...matcher, products: true}));
-    setIsLoading(false);
   }
 
   const loadVitroOrders = async () => {
-    setIsLoading(true);
     const tubers = await apiFetch("tubers");
     const vitroOrders = await apiFetch("vitroOrders");
     setTubers(tubers);
     setVitroOrders(vitroOrders);        
     setVitroOrdersBack(vitroOrders);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
-    setIsLoading(false);
   }
 
   const loadOrders = async () => {
-    setIsLoading(true);
     const orders = await apiFetch("orders");
     setOrders(orders);
     setMatcher(matcher => ({...matcher, orders: true}));
-    setIsLoading(false);
   }
 
   const updateCategory = async (id, body) => {
@@ -587,6 +571,7 @@ const AdminProvider = ({ children }) => {
         deleteCategory,
         deleteSubCategory,
         addCategory,
+        setIsLoading,
         addSubCategory,
         updateProduct,
         addProduct,

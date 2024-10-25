@@ -18,7 +18,11 @@ function Clients() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.clients) await loadClients();
+        if(!matcher.clients) {
+          setIsLoading(true);
+          await loadClients();
+          setIsLoading(false);
+        }
       }catch(error) {
         setError(error.message);
         console.error(error);
@@ -57,6 +61,7 @@ function Clients() {
                       <Text
                         align="start"
                         weight={600}
+                        color={COLORS.gray}
                       >
                         Nombre
                       </Text>
@@ -65,6 +70,7 @@ function Clients() {
                       <Text
                         align="start"
                         weight={600}
+                        color={COLORS.gray}
                       >
                         Documento
                       </Text>
@@ -73,6 +79,7 @@ function Clients() {
                       <Text
                         align="start"
                         weight={600}
+                        color={COLORS.gray}
                       >
                         Teléfono
                       </Text>
@@ -80,6 +87,7 @@ function Clients() {
                     <th>
                       <Text
                         weight={600}
+                        color={COLORS.gray}
                       >
                         Envío
                       </Text>
@@ -88,6 +96,7 @@ function Clients() {
                       <Text
                         align="start"
                         weight={600}
+                        color={COLORS.gray}
                       >
                         Consumo
                       </Text>
@@ -96,6 +105,7 @@ function Clients() {
                       <Text
                         align="start"
                         weight={600}
+                        color={COLORS.gray}
                         style={{whiteSpace: "nowrap"}}
                       >
                         Pedidos

@@ -33,7 +33,11 @@ function Order() {
     const fetch = async () => {
       try {
         const order = await apiFetch(`orders/${id}`);
-        if(!matcher.products) await loadProducts();
+        if(!matcher.products) {
+          setIsLoading(true);
+          await loadProducts();
+        }
+
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {

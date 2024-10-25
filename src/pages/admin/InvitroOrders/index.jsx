@@ -19,7 +19,11 @@ function InvitroOrders() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.vitroOrders) await loadVitroOrders();
+        if(!matcher.vitroOrders) {
+          setIsLoading(true);
+          await loadVitroOrders();
+          setIsLoading(false);
+        }
       }catch(error) {
         console.error(error);
         setError(error.message);

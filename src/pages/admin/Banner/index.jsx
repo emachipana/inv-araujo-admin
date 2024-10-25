@@ -32,7 +32,11 @@ function Banner() {
     const fetch = async () => {
       try {
         const banner = await apiFetch(`offers/${id}`);
-        if(!matcher.products) await loadProducts();
+        if(!matcher.products) {
+          setIsLoading(true);
+          await loadProducts();
+        }
+
         setBanner(banner.data);
         setIsUsed(banner.data.used);
         setIsLoading(false);

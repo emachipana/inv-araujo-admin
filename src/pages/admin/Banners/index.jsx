@@ -18,7 +18,11 @@ function Banners() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.banners) await loadBanners();
+        if(!matcher.banners) {
+          setIsLoading(true);
+          await loadBanners();
+          setIsLoading(false);
+        }
       }catch(error) {
         setIsLoading(false);
         console.error(error);
