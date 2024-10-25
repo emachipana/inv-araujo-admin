@@ -24,6 +24,7 @@ import NotFound from "../pages/admin/NotFound";
 import Expenses from "../pages/admin/Expenses";
 import Expense from "../pages/admin/Expense";
 import Clients from "../pages/admin/Clients";
+import Home from "../pages/admin/Home";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +40,7 @@ function AuthenticatedApp() {
       />
       <Section>
         <Routes>
-          <Route index exact path="/" element={<h1>Home page</h1>} />
+          <Route index exact path="/" element={<Home />} />
           <Route path="/productos" element={<Products />} />
           <Route path="/productos/:id" element={<Product />} />
           <Route path="/productos/:id/edit" element={<EditProduct />} />

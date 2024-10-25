@@ -6,7 +6,7 @@ import { PiPottedPlantFill } from "react-icons/pi";
 import { GiShoppingBag, GiWallet } from "react-icons/gi";
 import { FaUserGroup, FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
-import { RiMessage3Fill, RiLogoutBoxFill } from "react-icons/ri";
+import { RiLogoutBoxFill } from "react-icons/ri";
 import { useLocation } from "react-router-dom";
 
 function Aside({ isOpen, setIsOpen }) {
@@ -92,14 +92,6 @@ function Aside({ isOpen, setIsOpen }) {
           Icon={FaUserGroup}
         >
           Clientes
-        </NavItem>
-        <NavItem
-          isOpen={isOpen}
-          setIsOpen={setIsOpen}
-          redirectTo="/admin/mensajes"
-          Icon={RiMessage3Fill}
-        >
-          Mensajes
         </NavItem>
         <NavItem
           isOpen={isOpen}

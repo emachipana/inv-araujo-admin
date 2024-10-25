@@ -27,7 +27,7 @@ export const Container = css`
   th {
     text-align: center;
     vertical-align: middle;
-    min-width: 45px;
+    min-width: 40px;
   }
 `;
 

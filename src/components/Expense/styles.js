@@ -25,7 +25,8 @@ export const Card = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: ${({ gap }) => gap || "1"}rem;
   color: white;
   position: relative;
+  padding: 0.5rem;
 `;
