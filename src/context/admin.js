@@ -445,7 +445,7 @@ const AdminProvider = ({ children }) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
     const order = orders.find(orderF => orderF.id === id);
     if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
-    setMatcher(matcher => ({...matcher, expenses: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
     const updatedOrders = orders.filter(order => order.id !== id);
     setOrders([...updatedOrders]);
   }
@@ -467,20 +467,20 @@ const AdminProvider = ({ children }) => {
   const addAdvance = async (body) => {
     const { vitroOrderId } = body;
     await apiFetch("advances", { body });
-    setMatcher(matcher => ({...matcher, expenses: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
     return getVitroOrder(vitroOrderId);
   }
 
   const editAdvance = async (id, body) => {
     const { vitroOrderId } = body;
     await apiFetch(`advances/${id}`, { body, method: "PUT" });
-    setMatcher(matcher => ({...matcher, expenses: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
     return getVitroOrder(vitroOrderId);
   }
 
   const deleteAdvance = async (id, vitroId) => {
     await apiFetch(`advances/${id}`, { method: "DELETE" });
-    setMatcher(matcher => ({...matcher, expenses: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
     return getVitroOrder(vitroId);
   }
 
@@ -517,7 +517,7 @@ const AdminProvider = ({ children }) => {
   const addOrderItem = async (body) => {
     const { orderId } = body;
     await apiFetch("orderProducts", { body });
-    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
     return getOrder(orderId);
   }
 
@@ -529,7 +529,7 @@ const AdminProvider = ({ children }) => {
 
   const deleteOrderItem = async (id, orderId) => {
     await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
-    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
     return getOrder(orderId);
   }
 
@@ -550,7 +550,7 @@ const AdminProvider = ({ children }) => {
   const editOrderItem = async (id, body) => {
     const { orderId } = body;
     await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
-    setMatcher(matcher => ({...matcher, products: false, expenses: false}));
+    setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
     return getOrder(orderId);
   }
 
