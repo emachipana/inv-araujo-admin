@@ -5,11 +5,18 @@ import { HiSquares2X2 } from "react-icons/hi2";
 import { IoSearchOutline } from "react-icons/io5";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import Input from "../Input";
+import { BiSearch } from "react-icons/bi";
 
-function Filter({ setModal, textButton, localStorageKey, setType, type }) {
+function Filter({ setModal, textButton, localStorageKey, setType, type, isSearching, setIsSearching, labelSearch, setCurrentCategory, onSearchChange, searchValue }) {
   const handleClick = (type) => {
     setType(type);
     localStorage.setItem(localStorageKey, type);
+  }
+
+  const handleSearchClick = () => {
+    setIsSearching(true);
+    setCurrentCategory && setCurrentCategory("Todo");
   }
 
   return (
@@ -33,11 +40,23 @@ function Filter({ setModal, textButton, localStorageKey, setType, type }) {
             />
           </Wrapper>
         </Group>
-        <Wrapper>
-          <IoSearchOutline
-            size={25}
-          />
-        </Wrapper>
+        {
+          isSearching
+          ? <Input
+              Icon={BiSearch}
+              placeholder={labelSearch}
+              style={{maxWidth: "280px"}}
+              backgroundColor="white"
+              handleChange={onSearchChange}
+              value={searchValue}
+            />
+          : <Wrapper>
+              <IoSearchOutline
+                size={25}
+                onClick={handleSearchClick}
+              />
+            </Wrapper>
+        }
       </FlexRow>
       <Button
         onClick={() => setModal(modal => !modal)}

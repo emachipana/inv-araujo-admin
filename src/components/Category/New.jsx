@@ -1,9 +1,11 @@
 import { Text } from "../../styles/layout";
+import { Blocker } from "../Categories/styles";
 import { Container } from "./styles";
 
-function NewCategory({children, Icon, ...props}) {
+function NewCategory({children, Icon, isBlocked, ...props}) {
   return (
     <Container
+      isBlocked={isBlocked}
       isToCreate
       {...props}
     >
@@ -11,6 +13,11 @@ function NewCategory({children, Icon, ...props}) {
         { children }
       </Text>
       <Icon />
+      {
+        isBlocked
+        &&
+        <Blocker />
+      }
     </Container>
   );
 }
