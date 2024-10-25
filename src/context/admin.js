@@ -627,7 +627,8 @@ const AdminProvider = ({ children }) => {
         setMatcher,
         loadClients,
         addClient,
-        loadExpenses
+        loadExpenses,
+        setClients
       }}
     >
       { children }
