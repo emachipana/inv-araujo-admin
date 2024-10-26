@@ -148,7 +148,7 @@ function Clients() {
                     <tbody>
                       {    
                         clients?.map((client, index) => {
-                          const orders = client.vitroOrders.length + client.orders.length;
+                          const orders = (client.vitroOrders ? client.vitroOrders.length : 0) + (client.orders ? client.orders.length : 0);
 
                           return (
                             <tr key={index}>
