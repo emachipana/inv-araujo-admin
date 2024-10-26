@@ -65,6 +65,7 @@ function Orders() {
         }
       </Section>
       <Modal
+        align="start"
         size="md"
         isActive={createModal}
         setIsActive={setCreateModal}

@@ -10,7 +10,7 @@ import Modal from "../../../components/Modal";
 import ProductForm from "../../../components/ProductForm";
 import List from "./List";
 import Filter from "../../../components/Filter";
-import apiFetch from "../../../services/apiFetch";
+import { onSearchChange } from "./handlers";
 
 function Products() {
   const [currentCategory, setCurrentCategory] = useState("Todo");
@@ -39,31 +39,6 @@ function Products() {
     fetch();
   }, [ loadProducts, matcher.products, setError, setIsLoading ]);
 
-  const onSearchChange = async (e) => {
-    const value = e.target.value;
-    
-    try {
-      if(isGetting) return;
-      setSearch(value);
-
-      if(value.length >= 3) {
-        setIsGetting(true);
-        const searchedProducts = await apiFetch(`products/search?param=${value}`);
-        setProducts(searchedProducts);
-        setIsGetting(false);
-        return;
-      }
-
-      setProducts(backup);
-
-      if(value.length <= 0) setIsSearching(false);
-    }catch(error) {
-      console.error(error);
-      setIsGetting(false);
-      setError(error.message);
-    }
-  }
-
   return (
     <>
       <Title>Productos</Title>
@@ -83,7 +58,7 @@ function Products() {
         setIsSearching={setIsSearching}
         labelSearch="Buscar producto..."
         setCurrentCategory={setCurrentCategory}
-        onSearchChange={onSearchChange}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup, setError, setIsSearching)}
         searchValue={search}
       />
       <Section>
