@@ -4,7 +4,7 @@ function Profile({ user }) {
   return (
     <Container 
       alt="user-profile"
-      src={user.image || "/img/user_default.jpg"}
+      src={user.image ? user.image.url : "/img/user_default.jpg"}
     />
   );
 }

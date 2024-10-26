@@ -57,8 +57,9 @@ const AdminProvider = ({ children }) => {
 
   const loadInvoices = async () => {
     const invoices = await apiFetch("invoices");
-    setInvoices(invoices);
-    setInvoicesBackup(invoices);
+    const reversed = invoices.reverse();
+    setInvoices(reversed);
+    setInvoicesBackup(reversed);
     setMatcher(matcher => ({...matcher, invoices: true}));
   }
 
@@ -87,15 +88,17 @@ const AdminProvider = ({ children }) => {
     const tubers = await apiFetch("tubers");
     const vitroOrders = await apiFetch("vitroOrders");
     setTubers(tubers);
-    setVitroOrders(vitroOrders);        
-    setVitroOrdersBack(vitroOrders);
+    const reversed = vitroOrders.reverse();
+    setVitroOrders(reversed);        
+    setVitroOrdersBack(reversed);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
   }
 
   const loadOrders = async () => {
     const orders = await apiFetch("orders");
-    setOrders(orders);
-    setOrdersBackup(orders);
+    const reversed = orders.reverse();
+    setOrders(reversed);
+    setOrdersBackup(reversed);
     setMatcher(matcher => ({...matcher, orders: true}));
   }
 
@@ -174,15 +177,15 @@ const AdminProvider = ({ children }) => {
 
   const addVitro = async (body) => {
     const newVitro = await apiFetch("vitroOrders", { body });
-    setVitroOrders(vitros => [...vitros, newVitro.data]);
-    setVitroOrdersBack(vitros => [...vitros, newVitro.data]);
+    setVitroOrders(vitros => [newVitro.data, ...vitros]);
+    setVitroOrdersBack(vitros => [newVitro.data, ...vitros]);
     return newVitro.data;
   }
 
   const addOrder = async (body) => {
     const newOrder = await apiFetch("orders", { body });
-    setOrders(orders => [...orders, newOrder.data]);
-    setOrdersBackup(orders => [...orders, newOrder.data]);
+    setOrders(orders => [newOrder.data, ...orders]);
+    setOrdersBackup(orders => [newOrder.data, ...orders]);
     return newOrder.data;
   }
 
@@ -195,8 +198,8 @@ const AdminProvider = ({ children }) => {
 
   const addInvoice = async (body) => {
     const newInvoice = await apiFetch("invoices", { body });
-    setInvoices(invoices => [...invoices, newInvoice.data]);
-    setInvoicesBackup(invoices => [...invoices, newInvoice.data]);
+    setInvoices(invoices => [newInvoice.data, ...invoices]);
+    setInvoicesBackup(invoices => [newInvoice.data, ...invoices]);
     return newInvoice.data;
   }
 

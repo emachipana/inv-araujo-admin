@@ -41,6 +41,11 @@ const AuthProvider = ({ children }) => {
     setUser(null);
   }
 
+  const updateUser = async (id, body) => {
+    const updatedUser = await apiFetch(`users/${id}`, { body, method: "PUT" });
+    setUser(updatedUser.data);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -51,7 +56,8 @@ const AuthProvider = ({ children }) => {
         setError,
         setIsLoading,
         login,
-        logout
+        logout,
+        updateUser
       }}
     >
       { children }
