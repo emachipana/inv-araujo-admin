@@ -10,10 +10,15 @@ import Modal from "../../../components/Modal";
 import ProductForm from "../../../components/ProductForm";
 import List from "./List";
 import Filter from "../../../components/Filter";
+import { onSearchChange } from "./handlers";
 
 function Products() {
+  const [currentCategory, setCurrentCategory] = useState("Todo");
   const [createModal, setCreateModal] = useState(false);
-  const { products, isLoading, error, setError, loadProducts, setIsLoading, matcher } = useAdmin();
+  const [isSearching, setIsSearching] = useState(false);
+  const [isGetting, setIsGetting] = useState(false);
+  const [search, setSearch] = useState("");
+  const { products, isLoading, error, setError, loadProducts, setIsLoading, matcher, setProducts, backup } = useAdmin();
   const [type, setType] = useState(localStorage.getItem("productType") || "group");
 
   useEffect(() => {
@@ -37,17 +42,28 @@ function Products() {
   return (
     <>
       <Title>Productos</Title>
-      <Categories />
+      <Categories 
+        isBlocked={isSearching}
+        currentCategory={currentCategory}
+        setCurrentCategory={setCurrentCategory}
+        setIsGetting={setIsGetting}
+      />
       <Filter 
         setModal={setCreateModal}
         textButton="Nuevo producto"
         localStorageKey="productType"
         setType={setType}
         type={type}
+        isSearching={isSearching}
+        setIsSearching={setIsSearching}
+        labelSearch="Buscar producto..."
+        setCurrentCategory={setCurrentCategory}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup, setError, setIsSearching)}
+        searchValue={search}
       />
       <Section>
         {
-          isLoading
+          isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
               ? products.map((product, index) => (

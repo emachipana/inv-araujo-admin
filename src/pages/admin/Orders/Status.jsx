@@ -5,16 +5,16 @@ import { Container } from "../../../components/Categories/styles";
 import { Spinner } from "reactstrap";
 import Category from "../../../components/Category";
 
-function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
-  const { isLoading, invoicesBackup, setInvoices, setError } = useAdmin();
+function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
+  const { isLoading, ordersBackup, setOrders, setError } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(currentType === "Todo") return setInvoices(invoicesBackup);
+        if(currentStatus === "Todo") return setOrders(ordersBackup);
         setIsGetting(true);
-        const invoices = await apiFetch(`invoices?type=${currentType.toUpperCase()}`);
-        setInvoices(invoices);
+        const orders = await apiFetch(`orders?status=${currentStatus.toUpperCase()}`);
+        setOrders(orders);
         setIsGetting(false);
       }catch(error) {
         setIsGetting(false);
@@ -24,7 +24,7 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
     }
 
     fetch();
-  }, [ currentType, invoicesBackup, setError, setInvoices, setIsGetting ]);
+  }, [ currentStatus, ordersBackup, setError, setOrders, setIsGetting ]);
 
   return (
     <Container isLoading={isLoading}>
@@ -35,20 +35,20 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
             <Category
               isBlocked={isBlocked}
               name="Todo"
-              currentCategory={currentType}
-              setCurrentCategory={setCurrentType}
+              currentCategory={currentStatus}
+              setCurrentCategory={setCurrentStatus}
             />
             <Category
               isBlocked={isBlocked}
-              name="Factura"
-              currentCategory={currentType}
-              setCurrentCategory={setCurrentType}
+              name="Entregado"
+              currentCategory={currentStatus}
+              setCurrentCategory={setCurrentStatus}
             />
             <Category 
-              name="Boleta"
+              name="Pendiente"
               isBlocked={isBlocked}
-              currentCategory={currentType}
-              setCurrentCategory={setCurrentType}
+              currentCategory={currentStatus}
+              setCurrentCategory={setCurrentStatus}
             />
           </>
       }
@@ -56,4 +56,4 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
   );
 }
 
-export default Type;
+export default Status;

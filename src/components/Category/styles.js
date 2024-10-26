@@ -14,6 +14,9 @@ export const Container = styled.div`
   justify-content: center;
   gap: 0.5rem;
   color: ${({ isActive }) => isActive ? "white": COLORS.dim};
+  position: relative;
+  z-index: 2;
+  pointer-events: ${({ isBlocked }) => isBlocked ? "none" : ""};
 
   &:hover {
     background-color: ${COLORS.persian};

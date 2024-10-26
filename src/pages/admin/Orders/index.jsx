@@ -9,11 +9,18 @@ import AlertError from "../../../components/AlertError";
 import List from "./List";
 import Modal from "../../../components/Modal";
 import OrderForm from "../../../components/OrderForm";
+import Status from "./Status";
+import { onSearchChange } from "../Products/handlers";
 
 function Orders() {
+  const [currentStatus, setCurrentStatus] = useState("Todo");
   const [createModal, setCreateModal] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isGetting, setIsGetting] = useState(false);
+  const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
-  const { error, setError, orders, isLoading, setIsLoading, matcher, loadOrders } = useAdmin();
+  const { error, setError, orders, isLoading, setIsLoading, 
+    matcher, loadOrders, setOrders, ordersBackup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -36,16 +43,28 @@ function Orders() {
   return (
     <>
       <Title>Pedidos</Title>
+      <Status 
+        currentStatus={currentStatus}
+        isBlocked={isSearching}
+        setCurrentStatus={setCurrentStatus}
+        setIsGetting={setIsGetting}
+      />
       <Filter
         setModal={setCreateModal}
         textButton="Nuevo pedido"
         localStorageKey="ordersType"
         setType={setType}
         type={type}
+        isSearching={isSearching}
+        labelSearch="Buscar pedido..."
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setOrders, "orders", ordersBackup, setError, setIsSearching)}
+        searchValue={search}
+        setCurrentCategory={setCurrentStatus}
+        setIsSearching={setIsSearching}
       />
       <Section>
         {
-          isLoading
+          isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
               ? orders.map((order, index) => (
@@ -65,6 +84,7 @@ function Orders() {
         }
       </Section>
       <Modal
+        align="start"
         size="md"
         isActive={createModal}
         setIsActive={setCreateModal}

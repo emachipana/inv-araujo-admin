@@ -10,11 +10,18 @@ import { Spinner } from "reactstrap";
 import Order from "../../../components/Order";
 import List from "./List";
 import VitroForm from "../../../components/VitroForm";
+import { onSearchChange } from "../Products/handlers";
 
 function InvitroOrders() {
+  const [currentTuber, setCurrentTuber] = useState("Todo");
   const [createModal, setCreateModal] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isGetting, setIsGetting] = useState(false);
+  const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("vitroType") || "group");
-  const { error, setError, vitroOrders, isLoading, loadVitroOrders, setIsLoading, matcher } = useAdmin();
+  const { error, setError, vitroOrders, isLoading, 
+    loadVitroOrders, setIsLoading, matcher,
+    setVitroOrders, vitroOrdersBack } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -37,17 +44,28 @@ function InvitroOrders() {
   return (
     <>
       <Title>Invitro</Title>
-      <Tubers />
+      <Tubers 
+        currentTuber={currentTuber}
+        setCurrentTuber={setCurrentTuber}
+        isBlocked={isSearching}
+        setIsGetting={setIsGetting}
+      />
       <Filter 
         setModal={setCreateModal}
         textButton="Nuevo pedido"
         localStorageKey="vitroType"
         setType={setType}
         type={type}
+        isSearching={isSearching}
+        setIsSearching={setIsSearching}
+        labelSearch="Buscar pedido..."
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setVitroOrders, "vitroOrders", vitroOrdersBack, setError, setIsSearching)}
+        searchValue={search}
+        setCurrentCategory={setCurrentTuber}
       />
       <Section>
         {
-          isLoading
+          isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
               ? vitroOrders.map((order, index) => (

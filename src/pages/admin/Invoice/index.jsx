@@ -346,7 +346,8 @@ function Invoice() {
         {
           error
           &&
-          <AlertError 
+          <AlertError
+            from="invoice"
             error={error}
             setError={setError}
           />
