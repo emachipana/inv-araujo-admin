@@ -15,6 +15,8 @@ function AlertError({ setError, error, from = null }) {
 
     if(error.includes("delete or update a parent row") && from === "product") return "El producto esta asociado a registros";
 
+    if(error.includes("delete or update a parent row") && from === "invoice") return "El comprobante esta asociado a un pedido";
+
     if(error.includes("must be greater") && from === "product") return "El descuento tiene que ser menor al precio del producto";
 
     return error.replaceAll('"', "");
