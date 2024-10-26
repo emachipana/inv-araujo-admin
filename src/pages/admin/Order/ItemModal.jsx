@@ -17,10 +17,16 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { setError, backup, addOrderItem, editOrderItem } = useAdmin();
+  const { setError, backup, addOrderItem, editOrderItem, loadProducts, matcher } = useAdmin();
 
   useEffect(() => {
-    const init = () => {
+    const init = async () => {
+      if(!matcher.products) {
+        setIsLoading(true);
+        await loadProducts();
+        setIsLoading(false);
+      }
+
       const filteredProducts = filterProducts(order.items, backup);
       if(item) {
         setValues({
@@ -33,7 +39,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
     }
 
     init();
-  }, [ backup, order, item ]);
+  }, [ backup, order, item, matcher.products, loadProducts ]);
 
   const onClose = () => {
     setValues({productId: "", quantity: 1});

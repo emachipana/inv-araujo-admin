@@ -25,7 +25,7 @@ function Order() {
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, matcher, loadProducts, setOrder: setOrderSecond } = useAdmin();
+  const { error, setError, deleteOrder, setOrder: setOrderSecond } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -33,11 +33,6 @@ function Order() {
     const fetch = async () => {
       try {
         const order = await apiFetch(`orders/${id}`);
-        if(!matcher.products) {
-          setIsLoading(true);
-          await loadProducts();
-        }
-
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
@@ -48,7 +43,7 @@ function Order() {
     }
 
     fetch();
-  }, [id, setError, loadProducts, matcher.products]);
+  }, [id, setError]);
 
   const handleEdit = async (item) => {
     setItem(item);
