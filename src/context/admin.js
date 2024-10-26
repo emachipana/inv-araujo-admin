@@ -14,6 +14,7 @@ const AdminProvider = ({ children }) => {
   const [vitroOrders, setVitroOrders] = useState([]);
   const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [ordersBackup, setOrdersBackup] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [invoicesBackup, setInvoicesBackup] = useState([]);
   const [departments, setDepartments] = useState([]);
@@ -94,6 +95,7 @@ const AdminProvider = ({ children }) => {
   const loadOrders = async () => {
     const orders = await apiFetch("orders");
     setOrders(orders);
+    setOrdersBackup(orders);
     setMatcher(matcher => ({...matcher, orders: true}));
   }
 
@@ -175,6 +177,13 @@ const AdminProvider = ({ children }) => {
     setVitroOrders(vitros => [...vitros, newVitro.data]);
     setVitroOrdersBack(vitros => [...vitros, newVitro.data]);
     return newVitro.data;
+  }
+
+  const addOrder = async (body) => {
+    const newOrder = await apiFetch("orders", { body });
+    setOrders(orders => [...orders, newOrder.data]);
+    setOrdersBackup(orders => [...orders, newOrder.data]);
+    return newOrder.data;
   }
 
   const addClient = async (body) => {
@@ -290,6 +299,17 @@ const AdminProvider = ({ children }) => {
     setVitroOrdersBack([...updatedBackup]);
   }
 
+  const deleteOrder = async (id) => {
+    await apiFetch(`orders/${id}`, { method: "DELETE" });
+    const order = ordersBackup.find(orderF => orderF.id === id);
+    if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
+    const updatedOrders = orders.filter(order => order.id !== id);
+    const updatedBackup = ordersBackup.filter(order => order.id !== id); 
+    setOrders([...updatedOrders]);
+    setOrdersBackup([...updatedBackup]);
+  }
+
   const updateVitro = async (id, body) => {
     const updatedVitro = await apiFetch(`vitroOrders/${id}`, { body, method: "PUT" });
     setVitro(id, updatedVitro.data);
@@ -320,6 +340,17 @@ const AdminProvider = ({ children }) => {
     setVitroOrdersBack([...tempBackup]);
   }
 
+  const setOrder = (id, order) => {
+    const tempOrders = orders;
+    const tempBack = ordersBackup;
+    const index = tempOrders.findIndex(order => order.id === id);
+    const indexBack = tempBack.findIndex(order => order.id === id);
+    tempOrders[index] = order;
+    tempBack[indexBack] = order;
+    setOrders([...tempOrders]);
+    setOrdersBackup([...tempBack]);
+  }
+
   const setExpense = (id, expense) => {
     const tempExpenses = expenses;
     const index = tempExpenses.findIndex(expense => expense.id === id);
@@ -343,13 +374,6 @@ const AdminProvider = ({ children }) => {
     const index = tempBanners.findIndex(banner => banner.id === id);
     tempBanners[index] = banner;
     setBanners([...tempBanners]);
-  }
-
-  const setOrder = (id, order) => {
-    const tempOrders = orders;
-    const index = tempOrders.findIndex(order => order.id === id);
-    tempOrders[index] = order;
-    setOrders([...tempOrders]);
   }
 
   const addItem = async (body) => {
@@ -411,27 +435,12 @@ const AdminProvider = ({ children }) => {
   const deleteInvoiceItem = async (id, invoiceId) => {
     await apiFetch(`invoiceItems/${id}`, { method: "DELETE" });
     return getInvoice(invoiceId);
-  } 
-
-  const addOrder = async (body) => {
-    const newOrder = await apiFetch("orders", { body });
-    setOrders(orders => [...orders, newOrder.data]);
-    return newOrder.data;
   }
 
   const updateOrder = async (id, body) => {
     const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
     setOrder(id, updatedOrder.data);
     return updatedOrder.data;
-  }
-
-  const deleteOrder = async (id) => {
-    await apiFetch(`orders/${id}`, { method: "DELETE" });
-    const order = orders.find(orderF => orderF.id === id);
-    if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
-    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
-    const updatedOrders = orders.filter(order => order.id !== id);
-    setOrders([...updatedOrders]);
   }
 
   const deleteBanner = async (id) => {
@@ -541,6 +550,7 @@ const AdminProvider = ({ children }) => {
   return (
     <AdminContext.Provider
       value={{
+        ordersBackup,
         categories,
         expenses,
         invoices,
@@ -628,7 +638,8 @@ const AdminProvider = ({ children }) => {
         loadClients,
         addClient,
         loadExpenses,
-        setClients
+        setClients,
+        setOrders
       }}
     >
       { children }
