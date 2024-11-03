@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
-import { Spinner } from "reactstrap";
+import { Alert, Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
 import { FlexColumn, Text } from "../../../styles/layout";
@@ -27,7 +27,7 @@ function Invoice() {
   const [item, setItem] = useState("");
   const [invoice, setInvoice] = useState({});
   const { id } = useParams("");
-  const { error, setError, deleteInvoice, generateDoc } = useAdmin();
+  const { error, setError, deleteInvoice, generateDoc, info, setInfo } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -91,6 +91,14 @@ function Invoice() {
           !invoice.rsocial
           ? <Title>El comprobante no existe</Title>
           : <>
+              <Alert
+                style={{width: "100%"}}
+                color="primary"
+                isOpen={info}
+                toggle={() => setInfo(false)}
+              >
+                La { invoice.invoiceType.toLowerCase() } se creo con éxito
+              </Alert>
               <Title capitalize>{ invoice.rsocial.toLowerCase() }</Title>
               <Section>
                 <Card>

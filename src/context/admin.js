@@ -24,6 +24,7 @@ const AdminProvider = ({ children }) => {
   const [clientsBackup, setClientsBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [error, setError] = useState(null);
+  const [info, setInfo] = useState(false);
   const [matcher, setMatcher] = useState({
     products: false,
     vitroOrder: false,
@@ -572,6 +573,8 @@ const AdminProvider = ({ children }) => {
         banners,
         clients,
         clientsBackup,
+        info,
+        setInfo,
         loadBanners,
         loadDepartments,
         setTubers,

@@ -352,7 +352,7 @@ function Home() {
                             <td>
                               <Text
                                 size={15}
-                                color={COLORS.orange}
+                                color={COLORS.persian}
                                 style={{whiteSpace: "nowrap"}}
                               >
                                 S/. { order.total.toFixed(2) }
@@ -518,7 +518,7 @@ function Home() {
                             <td>
                               <Text
                                 size={15}
-                                color={COLORS.orange}
+                                color={COLORS.persian}
                                 style={{whiteSpace: "nowrap"}}
                               >
                                 S/. { order.total.toFixed(1) }

@@ -19,7 +19,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceType, setInvoiceType] = useState("");
   const [docType, setDocType] = useState("");
-  const { setError, addInvoice, matcher, setMatcher } = useAdmin();
+  const { setError, addInvoice, matcher, setMatcher, setInfo } = useAdmin();
   const navigate = useNavigate();
 
   const initialValues = {
@@ -67,6 +67,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
 
       setIsLoading(false);
       navigate(`/admin/comprobantes/${invoice.id}`);
+      setInfo(true);
     }catch(error) {
       console.error(error.message);
       setIsLoading(false);

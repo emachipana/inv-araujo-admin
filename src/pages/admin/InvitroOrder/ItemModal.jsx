@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Modal from "../../../components/Modal";
-import { Form } from "../../../styles/layout";
+import { Form, Text } from "../../../styles/layout";
 import { Formik } from "formik";
 import { validate } from "./validate";
 import { useAdmin } from "../../../context/admin";
@@ -10,6 +10,7 @@ import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
+import { COLORS } from "../../../styles/colors";
 
 function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem }) {
   const [currentVariety, setCurrentVariety] = useState({});
@@ -102,7 +103,19 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
         }) => (
           <Form onSubmit={handleSubmit}>
             <Title>{ item ? "Editar variedad" : "Agregar variedad" }</Title>
-            <Select 
+            {
+              vitroOrder.finishDate && !item
+              &&
+              <Text
+                size={13}
+                color={COLORS.red}
+                align="start"
+                style={{alignSelf: "flex-start"}}
+              >
+                *Debes cambiar la fecha de entrega si agregas una variedad
+              </Text>
+            }
+            <Select
               id="varietyId"
               label="Variedad"
               error={errors.varietyId}
