@@ -101,6 +101,7 @@ function Login() {
                 isLink
                 color={COLORS.blue}
                 align="start"
+                onClick={() => navigate("/admin/recuperar-contraseña")}
               >
                 Olvidé mi contraseña
               </Text>
