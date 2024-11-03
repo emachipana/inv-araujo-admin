@@ -204,7 +204,7 @@ function Clients() {
                                 <Text
                                   size={15}
                                   weight={500}
-                                  color={COLORS.orange}
+                                  color={COLORS.persian}
                                 >
                                   S/. { client.consumption }
                                 </Text>
