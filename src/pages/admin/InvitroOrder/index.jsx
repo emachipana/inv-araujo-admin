@@ -249,6 +249,7 @@ function InvitroOrder() {
                       fontSize={15}
                       iconSize={16}
                       color="danger"
+                      disabled={order.status === "ENTREGADO" || order.invoice?.isGenerated}
                     >
                       Eliminar
                     </Button>
