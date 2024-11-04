@@ -277,11 +277,12 @@ function InvitroOrder() {
                             orderStatus={order.status}
                             setVitro={setOrder}
                             vitroId={id}
+                            isInvoiceGenerated={order.invoice?.isGenerated}
                           />
                         ))
                       }
                       {
-                        order.status === "PENDIENTE"
+                        (order.status === "PENDIENTE" && !order.invoice?.isGenerated)
                         &&
                         <Button
                           style={{marginTop: "1rem"}}
