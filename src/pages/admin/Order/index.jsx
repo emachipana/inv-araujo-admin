@@ -258,11 +258,12 @@ function Order() {
                             orderId={id}
                             orderStatus={order.status}
                             setOrder={setOrder}
+                            isInvoiceGenerated={order.invoice?.isGenerated}
                           />
                         ))
                       }
                       {
-                        order.status === "PENDIENTE"
+                        (order.status === "PENDIENTE" && !order.invoice?.isGenerated )
                         &&
                         <Button
                           style={{marginTop: "1rem"}}

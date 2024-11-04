@@ -11,7 +11,7 @@ import { FaEye } from "react-icons/fa6";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 
-function Item({ item, orderId, setOrder, handleEdit, orderStatus }) {
+function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteOrderItem, setError } = useAdmin();
   const { id, product, price, quantity, subTotal } = item;
@@ -105,7 +105,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus }) {
         </FlexColumn>
       </Wrapper>
       {
-        orderStatus === "PENDIENTE"
+        (orderStatus === "PENDIENTE" && !isInvoiceGenerated)
         &&
         <Wrapper 
           isButtons

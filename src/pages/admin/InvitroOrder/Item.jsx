@@ -8,7 +8,7 @@ import Button from "../../../components/Button";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 
-function Item({ item, vitroId, setVitro, handleEdit, orderStatus }) {
+function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { setError, deleteItem } = useAdmin();
   const { id, variety, price, quantity, subTotal } = item;
@@ -91,7 +91,7 @@ function Item({ item, vitroId, setVitro, handleEdit, orderStatus }) {
         </FlexColumn>
       </Wrapper>
       {
-        orderStatus === "PENDIENTE"
+        (orderStatus === "PENDIENTE" && !isInvoiceGenerated)
         &&
         <FlexRow gap={1}>
           <Button
