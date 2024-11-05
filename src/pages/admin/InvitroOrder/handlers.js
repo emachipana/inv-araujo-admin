@@ -4,12 +4,13 @@ export const handleClick = (order, navigate, setInvoiceModal) => {
   setInvoiceModal(invoiceModal => !invoiceModal);
 }
 
-export const updateStatus = async (order, updateOrder, setIsLoading, setError, navigate, navTo) => {
+export const updateStatus = async (order, updateOrder, setIsLoading, setError, navigate, navTo, invoice) => {
   try {
     let body = {
       ...order,
       clientId: order.client.id,
-      status: "PENDIENTE"
+      status: "PENDIENTE",
+      invoiceId: invoice ? invoice.id : null 
     }
   
     if(order.status === "PENDIENTE") body = {...body, status: "ENTREGADO"};

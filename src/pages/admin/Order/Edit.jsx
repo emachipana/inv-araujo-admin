@@ -67,7 +67,7 @@ function EditOrder() {
                     fontSize={14.5}
                     style={{padding: ".3rem .5rem", alignSelf: "center"}}
                     color={order.status === "PENDIENTE" ? "primary" : "warning"}
-                    onClick={() => updateStatus(order, updateOrder, setIsUpdating, setError, navigate, "pedidos")}
+                    onClick={() => updateStatus(order, updateOrder, setIsUpdating, setError, navigate, "pedidos", order.invoice)}
                   >
                     {
                       isUpdating
@@ -94,6 +94,7 @@ function EditOrder() {
 										initialDocType={order.client.documentType}
 										initialDep={depId}
 										clientId={order.client.id}
+										invoice={order.invoice}
 									/>
 								</Container>
 						</Section>
