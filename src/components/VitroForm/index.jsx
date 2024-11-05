@@ -28,7 +28,7 @@ function VitroForm({ initialValues = {
   initDate: "",
   finishDate: "",
   status: ""
-}, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "" }) {
+}, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "", invoice = null }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
@@ -92,7 +92,7 @@ function VitroForm({ initialValues = {
         }
       }
 
-      if(!isToCreate) vitroBody = {...vitroBody, status: initialValues.status};
+      if(!isToCreate) vitroBody = {...vitroBody, status: initialValues.status, invoiceId: invoice ? invoice.id : null};
 
       const vitroOrder = isToCreate ? await addVitro(vitroBody) : await updateVitro(vitroId, vitroBody);
       setIsLoading(false);

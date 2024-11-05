@@ -67,7 +67,7 @@ function EditVitroOrder() {
                     fontSize={14.5}
                     style={{padding: ".3rem .5rem", alignSelf: "center"}}
                     color={order.status === "PENDIENTE" ? "primary" : "warning"}
-                    onClick={() => updateStatus(order, updateVitro, setIsUpdating, setError, navigate, "invitro")}
+                    onClick={() => updateStatus(order, updateVitro, setIsUpdating, setError, navigate, "invitro", order.invoice)}
                   >
                     {
                       isUpdating
@@ -93,6 +93,7 @@ function EditVitroOrder() {
                   initialDocType={order.client.documentType}
                   initialDep={departmentId}
                   clientId={order.client.id}
+                  invoice={order.invoice}
                 />
               </Container>
             </Section>

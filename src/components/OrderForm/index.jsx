@@ -27,7 +27,7 @@ function OrderForm({ initialValues = {
   city: "",
   initDate: "",
   status: ""
-}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId = "" }) {
+}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId = "", invoice = null }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
@@ -92,7 +92,7 @@ function OrderForm({ initialValues = {
         }
       }
 
-      if(!isToCreate) orderBody = {...orderBody, status: initialValues.status};
+      if(!isToCreate) orderBody = {...orderBody, status: initialValues.status, invoiceId: invoice ? invoice.id : null};
 
       const order = isToCreate ? await addOrder(orderBody) : await updateOrder(orderId, orderBody);
       setIsLoading(false);
