@@ -10,7 +10,7 @@ import AdvanceForm from "./AdvanceForm";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 
-function Advance({ id, date, amount, setOrder, vitroId }) {
+function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { setError, deleteAdvance } = useAdmin();
@@ -51,6 +51,8 @@ function Advance({ id, date, amount, setOrder, vitroId }) {
             id={id}
             setVitroOrder={setOrder}
             vitroOrderId={vitroId}
+            currentAdvance={currentAdvance}
+            total={total}
           />
         : <>
             <Wrapper>

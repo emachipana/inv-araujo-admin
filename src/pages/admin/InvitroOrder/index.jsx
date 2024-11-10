@@ -320,6 +320,8 @@ function InvitroOrder() {
                 advances={order.advances}
                 setVitroOrder={setOrder}
                 vitroId={order.id}
+                currentAdvance={order.totalAdvance}
+                total={order.total}
               />
               <InvoiceModal 
                 address={`${order.city}, ${order.department}`}
