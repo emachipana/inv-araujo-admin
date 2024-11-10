@@ -7,7 +7,7 @@ import Advance from "./Advance";
 import AdvanceForm from "./AdvanceForm";
 import { Variety } from "./styles";
 
-function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId }) {
+function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId, currentAdvance, total }) {
   const [isCreating, setIsCreating] = useState(false);
   
   return (
@@ -37,6 +37,8 @@ function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId
                 id={advance.id}
                 setOrder={setVitroOrder}
                 vitroId={vitroId}
+                currentAdvance={currentAdvance}
+                total={total}
               />
             ))
           }
@@ -48,6 +50,8 @@ function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId
                 setIsActive={setIsCreating}
                 setVitroOrder={setVitroOrder}
                 vitroOrderId={vitroId}
+                currentAdvance={currentAdvance}
+                total={total}
               />
             </Variety>
           }

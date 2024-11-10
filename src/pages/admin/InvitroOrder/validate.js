@@ -24,7 +24,7 @@ export const validate = (values, variety) => {
   return errors;
 }
 
-export const advanceValidate = (values) => {
+export const advanceValidate = (values, total, currentAdvance) => {
   const errors = {};
 
   if(!values.date) errors.date = "Este campo es obligatorio";
@@ -35,7 +35,14 @@ export const advanceValidate = (values) => {
     errors.amount = "Solo se aceptan números";
   }else if(values.amount <= 0) {
     errors.amount = "Solo se aceptan valores mayores a 0";
+  }else if(currentAdvance + parseInt(values.amount) > total) {
+    errors.amount = "El adelanto es mayor que el total";
   }
+
+  console.log("adelnto total", currentAdvance);
+  console.log("amount actual", values.amount);
+  console.log("total", total);
+  console.log(currentAdvance + values.amount);
 
   return errors;
 }

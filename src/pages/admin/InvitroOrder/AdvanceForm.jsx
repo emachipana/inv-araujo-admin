@@ -20,7 +20,8 @@ function AdvanceForm({
   setIsActive,
   id,
   setVitroOrder,
-  vitroOrderId
+  vitroOrderId,
+  total, currentAdvance
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { setError, addAdvance, editAdvance } = useAdmin();
@@ -49,7 +50,7 @@ function AdvanceForm({
 
   return (
     <Formik
-      validate={advanceValidate}
+      validate={(values) => advanceValidate(values, total, currentAdvance)}
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
