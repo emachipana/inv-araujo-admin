@@ -129,7 +129,7 @@ function Home() {
                     weight={800}
                     size={25}
                   >
-                    S/. { total.totalExpenses.toFixed(1) }
+                    S/. { total.totalExpenses?.toFixed(1) }
                   </Text>
                 </Card>
                 <Card
@@ -147,7 +147,7 @@ function Home() {
                     weight={800}
                     size={25}
                   >
-                    S/. { total.totalIncome.toFixed(1) }
+                    S/. { total.totalIncome?.toFixed(1) }
                   </Text>
                 </Card>
                 <Card
@@ -165,7 +165,7 @@ function Home() {
                     weight={800}
                     size={25}
                   >
-                    S/. { total.totalProfit.toFixed(1) }
+                    S/. { total.totalProfit?.toFixed(1) }
                   </Text>
                 </Card>
               </Group>
@@ -337,7 +337,7 @@ function Home() {
                                 style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
                                 color={COLORS.dim}
                               >
-                                { order.client.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
+                                { order.client?.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
                               </Text>
                             </td>
                             <td>
@@ -355,7 +355,7 @@ function Home() {
                                 color={COLORS.persian}
                                 style={{whiteSpace: "nowrap"}}
                               >
-                                S/. { order.total.toFixed(2) }
+                                S/. { order.total?.toFixed(2) }
                               </Text>
                             </td>
                             <td>
@@ -503,7 +503,7 @@ function Home() {
                                 style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
                                 color={COLORS.dim}
                               >
-                                { order.client.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
+                                { order.client?.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
                               </Text>
                             </td>
                             <td>
@@ -521,7 +521,7 @@ function Home() {
                                 color={COLORS.persian}
                                 style={{whiteSpace: "nowrap"}}
                               >
-                                S/. { order.total.toFixed(1) }
+                                S/. { order.total?.toFixed(1) }
                               </Text>
                             </td>
                             <td>
