@@ -1,20 +1,23 @@
-import { Route, Routes } from "react-router-dom";
 import { useAuth } from "./context/auth";
-import ClientApp from "./ClientApp";
-import AdminApp from "./AdminApp";
 import Loader from "./components/Loader";
+import { Container } from "./styles/layout";
+import AuthenticatedApp from "./AuthenticatedApp";
+import UnauthenticatedApp from "./UnauthenticatedApp";
 
 function App() {
-  const { isLoading } = useAuth();
+  const { isLoading, user } = useAuth();
 
   return (
     isLoading
     ? <Loader />
     :
-    <Routes>
-      <Route index path="/*" element={<ClientApp />} />
-      <Route path="admin/*" element={<AdminApp />} />
-    </Routes>
+    <Container>
+      {
+        user && user.role === "ADMINISTRADOR"
+        ? <AuthenticatedApp />
+        : <UnauthenticatedApp />
+      }
+    </Container>
   );
 }
 

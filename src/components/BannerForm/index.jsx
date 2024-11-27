@@ -26,7 +26,7 @@ function BannerForm({ initialValues = {
       setIsLoading(true);
       const banner = isToCreate ? await addBanner(values) : await updateBanner(bannerId, values);
       setIsLoading(false);
-      navigate(`/admin/banners/${banner.id}`);
+      navigate(`/banners/${banner.id}`);
     }catch(error) {
       console.error(error);
       setIsLoading(false);

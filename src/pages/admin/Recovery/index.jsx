@@ -149,7 +149,7 @@ function Recovery() {
                           isLink
                           color={COLORS.blue}
                           align="start"
-                          onClick={() => navigate("/admin/login")}
+                          onClick={() => navigate("/login")}
                         >
                           Iniciar sesión
                         </Text>
@@ -214,7 +214,7 @@ function Recovery() {
                 isSuccess
                 ? <Button
                     type="button"
-                    onClick={() => navigate("/admin/login")}
+                    onClick={() => navigate("/login")}
                     color="secondary"
                     fontSize={17}
                     style={{alignSelf: "center"}}

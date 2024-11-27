@@ -16,9 +16,9 @@ const AuthProvider = ({ children }) => {
         setUser(user.data);
         setIsLoading(false);
       }catch(error) {
-        setError(error.message);
-        console.error(error);
-
+        const message = error.message;
+        if(message.toLowerCase().includes("token expirado")) localStorage.removeItem(TOKEN_NAME);
+        setError(message);
         setIsLoading(false);
       }
     }

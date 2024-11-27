@@ -96,7 +96,7 @@ function OrderForm({ initialValues = {
 
       const order = isToCreate ? await addOrder(orderBody) : await updateOrder(orderId, orderBody);
       setIsLoading(false);
-      navigate(`/admin/pedidos/${order.id}`);
+      navigate(`/pedidos/${order.id}`);
     }catch(error) {
       console.error(error);
       setIsLoading(false);

@@ -20,7 +20,7 @@ function Event({ type, date, id }) {
   return (
     <FlexRow
       style={{cursor: "pointer"}}
-      onClick={() => navigate(`/admin/${type === "invitro" ? "invitro" : "pedidos"}/${id}`)}
+      onClick={() => navigate(`/${type === "invitro" ? "invitro" : "pedidos"}/${id}`)}
     >
       <Icon 
         size={28}

@@ -18,7 +18,7 @@ function DeleteModal({ id, isActive, setIsActive, handleDelete, navTo, title }) 
       setIsLoading(true);
       await handleDelete(id);
       setIsLoading(false);
-      navigate(`/admin/${navTo}`);
+      navigate(`/${navTo}`);
     }catch(error) {
       setIsLoading(false);
       console.error(error);

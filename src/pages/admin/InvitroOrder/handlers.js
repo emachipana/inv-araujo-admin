@@ -1,5 +1,5 @@
 export const handleClick = (order, navigate, setInvoiceModal) => {
-  if(order.invoice) return navigate(`/admin/comprobantes/${order.invoice.id}`);
+  if(order.invoice) return navigate(`/comprobantes/${order.invoice.id}`);
 
   setInvoiceModal(invoiceModal => !invoiceModal);
 }
@@ -18,7 +18,7 @@ export const updateStatus = async (order, updateOrder, setIsLoading, setError, n
     setIsLoading(true);
     await updateOrder(order.id, body);
     setIsLoading(false);
-    navigate(`/admin/${navTo}/${order.id}`);
+    navigate(`/${navTo}/${order.id}`);
   }catch(error) {
     console.error(error);
     setError(error.message);

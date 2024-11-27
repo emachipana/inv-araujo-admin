@@ -96,7 +96,7 @@ function VitroForm({ initialValues = {
 
       const vitroOrder = isToCreate ? await addVitro(vitroBody) : await updateVitro(vitroId, vitroBody);
       setIsLoading(false);
-      navigate(`/admin/invitro/${vitroOrder.id}`);
+      navigate(`/invitro/${vitroOrder.id}`);
     }catch(error) {
       setIsLoading(false);
       console.error(error);

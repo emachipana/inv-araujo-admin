@@ -66,7 +66,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
       if(matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
 
       setIsLoading(false);
-      navigate(`/admin/comprobantes/${invoice.id}`);
+      navigate(`/comprobantes/${invoice.id}`);
       setInfo(true);
     }catch(error) {
       console.error(error.message);

@@ -8,7 +8,7 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
   const navigate = useNavigate();
 
   return (
-    <Container onClick={() => navigate(`/admin/${isOrder ? "pedidos" : "invitro"}/${id}`)}>
+    <Container onClick={() => navigate(`/${isOrder ? "pedidos" : "invitro"}/${id}`)}>
       <Header 
         name={clientName}
         date={date}

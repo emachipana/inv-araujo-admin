@@ -116,7 +116,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             iconSize={15}
             fontSize={14}
             Icon={FaEye}
-            onClick={() => navigate(`/admin/productos/${product.id}`)}
+            onClick={() => navigate(`/productos/${product.id}`)}
           >
             Ver producto
           </Button>

@@ -16,7 +16,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
 
   const handleClick = () => {
     window.scrollTo(0, 0);
-    if(isInAdmin) return navigate(`/admin/productos/${id}`);
+    if(isInAdmin) return navigate(`/productos/${id}`);
 
     navigate(`/tienda/${category.name}/${id}`);
   }

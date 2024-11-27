@@ -20,7 +20,7 @@ function AdminNavbar({ setIsOpen }) {
 
   const handleLogout = () => {
     logout();
-    navigate("/admin/login");
+    navigate("/login");
   }
 
   return (
@@ -36,7 +36,7 @@ function AdminNavbar({ setIsOpen }) {
         gap={3.5}
       >
         <FlexRow
-          onClick={() => navigate("/admin")}
+          onClick={() => navigate("/")}
           style={{cursor: "pointer"}}
         >
           <Logo 
@@ -68,7 +68,7 @@ function AdminNavbar({ setIsOpen }) {
           rightPosition={"-1rem"}
         >
           <Header>Menú</Header>
-          <Item onClick={() => navigate("/admin/perfil")}>
+          <Item onClick={() => navigate("/perfil")}>
             <FaUser
               size={18}
               style={{marginTop: "-2px"}}
