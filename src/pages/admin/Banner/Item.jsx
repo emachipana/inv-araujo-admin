@@ -97,7 +97,7 @@ function Item({ item, setBanner, banner }) {
             iconSize={15}
             fontSize={14}
             Icon={FaEye}
-            onClick={() => navigate(`/admin/productos/${item.product.id}`)}
+            onClick={() => navigate(`/productos/${item.product.id}`)}
           >
             Ver producto
           </Button>

@@ -26,7 +26,7 @@ function Login() {
     try{
       setIsLoading(true);
       await login(values, "admin");
-      navigate("/admin");
+      navigate("/");
       setIsLoading(false);
       setError(null)
     }catch(error) {
@@ -101,7 +101,7 @@ function Login() {
                 isLink
                 color={COLORS.blue}
                 align="start"
-                onClick={() => navigate("/admin/recuperar-contraseña")}
+                onClick={() => navigate("/recuperar-contraseña")}
               >
                 Olvidé mi contraseña
               </Text>

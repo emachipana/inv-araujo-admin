@@ -18,7 +18,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin"
+          redirectTo="/"
           Icon={TiHome}
         >
           Inicio
@@ -26,7 +26,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/calendario"
+          redirectTo="/calendario"
           Icon={FaCalendarAlt}
         >
           Calendario
@@ -34,7 +34,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/invitro"
+          redirectTo="/invitro"
           Icon={PiPottedPlantFill}
           isActive={pathname.includes("invitro")}
         >
@@ -43,7 +43,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/productos"
+          redirectTo="/productos"
           Icon={GiShoppingBag}
           isActive={pathname.includes("productos")}
         >
@@ -52,7 +52,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/pedidos"
+          redirectTo="/pedidos"
           Icon={FaClipboardList}
           isActive={pathname.includes("pedidos")}
         >
@@ -61,7 +61,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/comprobantes"
+          redirectTo="/comprobantes"
           Icon={GiWallet}
           isActive={pathname.includes("comprobantes")}
         >
@@ -70,7 +70,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/banners"
+          redirectTo="/banners"
           Icon={MdDiscount}
           isActive={pathname.includes("banners")}
         >
@@ -79,7 +79,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/gastos"
+          redirectTo="/gastos"
           Icon={FaMoneyBillTransfer}
           isActive={pathname.includes("gastos")}
         >
@@ -88,7 +88,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/clientes"
+          redirectTo="/clientes"
           Icon={FaUserGroup}
         >
           Clientes
@@ -96,7 +96,7 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/admin/login"
+          redirectTo="/login"
           Icon={RiLogoutBoxFill}
           isLogout
         >

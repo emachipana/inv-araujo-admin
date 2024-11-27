@@ -1,47 +1,45 @@
 import { useState } from "react";
-import AdminNavbar from "../components/AdminNavbar";
-import { Section } from "../styles/layout";
+import { AdminProvider } from "./context/admin";
+import AdminNavbar from "./components/AdminNavbar";
+import Aside from "./components/Aside";
+import { Section } from "./styles/layout";
 import { Route, Routes } from "react-router-dom";
-import Aside from "../components/Aside";
-import Products from "../pages/admin/Products";
-import { AdminProvider } from "../context/admin";
-import Product from "../pages/admin/Product";
-import EditProduct from "../pages/admin/Product/Edit";
-import InvitroOrders from "../pages/admin/InvitroOrders";
-import InvitroOrder from "../pages/admin/InvitroOrder";
-import EditVitroOrder from "../pages/admin/InvitroOrder/Edit";
-import Orders from "../pages/admin/Orders";
-import Order from "../pages/admin/Order";
-import EditOrder from "../pages/admin/Order/Edit";
-import Calendar from "../pages/admin/Calendar";
-import Invoices from "../pages/admin/Invoices";
-import Invoice from "../pages/admin/Invoice";
-import EditInvoice from "../pages/admin/Invoice/Edit";
-import Banners from "../pages/admin/Banners";
-import Banner from "../pages/admin/Banner";
-import EditBanner from "../pages/admin/Banner/Edit";
-import NotFound from "../pages/admin/NotFound";
-import Expenses from "../pages/admin/Expenses";
-import Expense from "../pages/admin/Expense";
-import Clients from "../pages/admin/Clients";
-import Home from "../pages/admin/Home";
-import Profile from "../pages/admin/Profile";
+import Home from "./pages/admin/Home";
+import Products from "./pages/admin/Products";
+import EditProduct from "./pages/admin/Product/Edit";
+import InvitroOrders from "./pages/admin/InvitroOrders";
+import InvitroOrder from "./pages/admin/InvitroOrder";
+import EditVitroOrder from "./pages/admin/InvitroOrder/Edit";
+import Orders from "./pages/admin/Orders";
+import Product from "./pages/admin/Product";
+import Order from "./pages/admin/Order";
+import EditOrder from "./pages/admin/Order/Edit";
+import Calendar from "./pages/admin/Calendar";
+import Invoices from "./pages/admin/Invoices";
+import Invoice from "./pages/admin/Invoice";
+import EditInvoice from "./pages/admin/Invoice/Edit";
+import Banners from "./pages/admin/Banners";
+import Banner from "./pages/admin/Banner";
+import EditBanner from "./pages/admin/Banner/Edit";
+import Expenses from "./pages/admin/Expenses";
+import Expense from "./pages/admin/Expense";
+import Clients from "./pages/admin/Clients";
+import Profile from "./pages/admin/Profile";
+import NotFound from "./pages/admin/NotFound";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <AdminProvider>
-      <AdminNavbar 
-        setIsOpen={setIsOpen}
-      />
+      <AdminNavbar setIsOpen={setIsOpen} />
       <Aside 
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />
       <Section>
         <Routes>
-          <Route index exact path="/" element={<Home />} />
+          <Route index path="/" element={<Home />} />
           <Route path="/productos" element={<Products />} />
           <Route path="/productos/:id" element={<Product />} />
           <Route path="/productos/:id/edit" element={<EditProduct />} />
@@ -62,7 +60,7 @@ function AuthenticatedApp() {
           <Route path="/gastos/:id" element={<Expense />} />
           <Route path="/clientes" element={<Clients />} />
           <Route path="/perfil" element={<Profile />} />
-          <Route path="*" element={<NotFound navTo="/admin" />} />
+          <Route path="*" element={<NotFound navTo="/" />} />
         </Routes>
       </Section>
     </AdminProvider>

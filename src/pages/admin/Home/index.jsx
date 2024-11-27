@@ -329,7 +329,7 @@ function Home() {
                         return (
                           <tr 
                             key={index}
-                            onClick={() => navigate(`/admin/invitro/${order.id}`)}
+                            onClick={() => navigate(`/invitro/${order.id}`)}
                           >
                             <td>
                               <Text
@@ -392,7 +392,7 @@ function Home() {
                   style={{alignSelf: "center", marginTop: "1rem"}}
                   color="secondary"
                   fontSize={16}
-                  onClick={() => navigate("/admin/invitro")}
+                  onClick={() => navigate("/invitro")}
                 >
                   Ver todos
                 </Button>
@@ -495,7 +495,7 @@ function Home() {
                         return (
                           <tr 
                             key={index}
-                            onClick={() => navigate(`/admin/pedidos/${order.id}`)}
+                            onClick={() => navigate(`/pedidos/${order.id}`)}
                           >
                             <td>
                               <Text
@@ -558,7 +558,7 @@ function Home() {
                   style={{alignSelf: "center", marginTop: "1rem"}}
                   color="secondary"
                   fontSize={16}
-                  onClick={() => navigate("/admin/pedidos")}
+                  onClick={() => navigate("/pedidos")}
                 >
                   Ver todos
                 </Button>

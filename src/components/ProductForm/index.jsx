@@ -31,7 +31,7 @@ function ProductForm({ initialValues = {
       setIsLoading(true);
       const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
-      navigate(`/admin/productos/${product.id}`);
+      navigate(`/productos/${product.id}`);
     }catch(error) {
       console.error(error);
       setIsLoading(false);
