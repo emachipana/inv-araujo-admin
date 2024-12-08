@@ -8,10 +8,12 @@ import { Variety } from "../InvitroOrder/styles";
 import { Wrapper } from "../Product/styles";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteInvoiceItem } = useAdmin();
+  const { deleteInvoiceItem } = useAdmin();
   const { id, name, price, quantity, subTotal } = item;
 
   const handleDelete = async () => {
@@ -21,9 +23,8 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
       setInvoice(updatedInvoice);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 

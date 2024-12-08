@@ -7,10 +7,11 @@ import { capitalize } from "../../../helpers/capitalize";
 import { COLORS } from "../../../styles/colors";
 import { FaAngleRight, FaAngleLeft } from "react-icons/fa6";
 import { useAdmin } from "../../../context/admin";
-import AlertError from "../../../components/AlertError";
 import { Spinner } from "reactstrap";
 import Event from "./Event";
 import Badge from "../../../components/Badge";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Calendar() {
 	const ref = new Date();
@@ -21,7 +22,7 @@ function Calendar() {
   const lastDay = new Date(ref.getFullYear(), curMonth + 1, 0);
   const days = new Array(firstDay.getDay()).fill(undefined);
   const monthName = firstDay.toLocaleDateString("es-ES", { month: "long", timeZone: "UTC" });
-  const { error, setError, orders, vitroOrders, isLoading, setIsLoading, matcher, loadOrders, loadVitroOrders } = useAdmin();
+  const { orders, vitroOrders, isLoading, setIsLoading, matcher, loadOrders, loadVitroOrders } = useAdmin();
 
   for(let i = firstDay.getDate(); i <= lastDay.getDate(); i++) {
     days.push(i);
@@ -57,14 +58,13 @@ function Calendar() {
           type: order.maxShipDate ? "productos" : "invitro"
         })));
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ loadOrders, orders, vitroOrders, setError, setIsLoading, matcher, loadVitroOrders, curMonth ]);
+  }, [ loadOrders, orders, vitroOrders, setIsLoading, matcher, loadVitroOrders, curMonth ]);
 
 	const addMonth = () => setCurMonth(month => month + 1);
 	const restMonth = () => setCurMonth(month => month - 1);
@@ -317,14 +317,6 @@ function Calendar() {
           </Days>
         </Main>
 			</Container>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
 		</>
 	);
 }

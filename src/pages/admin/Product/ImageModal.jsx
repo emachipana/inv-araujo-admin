@@ -7,11 +7,13 @@ import { Input, Spinner } from "reactstrap";
 import Button from "../../../components/Button";
 import { AiTwotoneFileAdd } from "react-icons/ai";
 import { useAdmin } from "../../../context/admin";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ImageModal({ product, isActive, setIsActive, setProduct }) {
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  const { setError, addProductImage } = useAdmin();
+  const { addProductImage } = useAdmin();
 
   const initialValues = { file: "" };
 
@@ -47,8 +49,7 @@ function ImageModal({ product, isActive, setIsActive, setProduct }) {
       setIsActive(false);
       setPreviewImage(null);
     }catch(error) {
-      setError(error.message);
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
     }
   }

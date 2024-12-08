@@ -4,7 +4,6 @@ import { useAdmin } from "../../../context/admin";
 import { Title } from "../styles";
 import { Container, Section } from "../Products/styles";
 import { Spinner, Table } from "reactstrap";
-import AlertError from "../../../components/AlertError";
 import { Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { TextDescription } from "../../../components/Product/styles";
@@ -12,11 +11,13 @@ import { Container as Filter } from "../../../components/Filter/styles";
 import Input from "../../../components/Input";
 import { BiSearch } from "react-icons/bi";
 import apiFetch from "../../../services/apiFetch";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Clients() {
   const [search, setSearch] = useState("");
   const [isGetting, setIsGetting] = useState(false);
-  const { isLoading, setIsLoading, error, setError, matcher, loadClients, clients, setClients, clientsBackup } = useAdmin();
+  const { isLoading, setIsLoading, matcher, loadClients, clients, setClients, clientsBackup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -27,14 +28,13 @@ function Clients() {
           setIsLoading(false);
         }
       }catch(error) {
-        setError(error.message);
-        console.error(error);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ loadClients, setError, matcher.clients, setIsLoading ]);
+  }, [ loadClients, matcher.clients, setIsLoading ]);
 
   const onSearchChange = async (e) => {
     const value = e.target.value;
@@ -53,9 +53,8 @@ function Clients() {
 
       setClients(clientsBackup);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsGetting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -229,14 +228,6 @@ function Clients() {
             </>
         }
       </Section>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

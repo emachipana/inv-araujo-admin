@@ -4,9 +4,11 @@ import apiFetch from "../../../services/apiFetch";
 import { Container } from "../../../components/Categories/styles";
 import { Spinner } from "reactstrap";
 import Category from "../../../components/Category";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
-  const { isLoading, invoicesBackup, setInvoices, setError } = useAdmin();
+  const { isLoading, invoicesBackup, setInvoices } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -17,14 +19,13 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
         setInvoices(invoices);
         setIsGetting(false);
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsGetting(false);
-        console.error(error);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ currentType, invoicesBackup, setError, setInvoices, setIsGetting ]);
+  }, [ currentType, invoicesBackup, setInvoices, setIsGetting ]);
 
   return (
     <Container isLoading={isLoading}>

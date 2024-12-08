@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
-import { Alert, Spinner } from "reactstrap";
+import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
 import { FlexColumn, Text } from "../../../styles/layout";
@@ -11,12 +11,13 @@ import Badge from "../../../components/Badge";
 import Button from "../../../components/Button";
 import { FaEdit, FaFileInvoice, FaTrashAlt } from "react-icons/fa";
 import DeleteModal from "../Product/DeleteModal";
-import AlertError from "../../../components/AlertError";
 import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
 import { FaEye } from "react-icons/fa6";
 import DocModal from "./DocModal";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Invoice() {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +28,7 @@ function Invoice() {
   const [item, setItem] = useState("");
   const [invoice, setInvoice] = useState({});
   const { id } = useParams("");
-  const { error, setError, deleteInvoice, generateDoc, info, setInfo } = useAdmin();
+  const { deleteInvoice, generateDoc } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,14 +38,13 @@ function Invoice() {
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   const options = {
     day: "numeric",
@@ -77,9 +77,8 @@ function Invoice() {
       setInvoice(updatedInvoice);
       setIsGenerating(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsGenerating(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -91,14 +90,6 @@ function Invoice() {
           !invoice.rsocial
           ? <Title>El comprobante no existe</Title>
           : <>
-              <Alert
-                style={{width: "100%"}}
-                color="primary"
-                isOpen={info}
-                toggle={() => setInfo(false)}
-              >
-                La { invoice.invoiceType.toLowerCase() } se creo con éxito
-              </Alert>
               <Title capitalize>{ invoice.rsocial.toLowerCase() }</Title>
               <Section>
                 <Card>
@@ -350,15 +341,6 @@ function Invoice() {
                 setInvoice={setInvoice}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError
-            from="invoice"
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

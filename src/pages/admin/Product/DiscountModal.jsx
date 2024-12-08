@@ -11,10 +11,12 @@ import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { validate } from "./validate";
 import { FaTrashAlt } from "react-icons/fa";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, setProduct } = useAdmin();
+  const { setProduct } = useAdmin();
 
   const initialValues = {
     price: product.discount ? product.discount.price : ""
@@ -36,8 +38,7 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
       setIsLoading(false);
       setIsActive(false);
     }catch(error) {
-      console.error(error.message);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
     }
   }
@@ -52,8 +53,7 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
       setIsLoading(false);
       setIsActive(false);
     }catch(error) {
-      console.error(error.message);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
     }
   }

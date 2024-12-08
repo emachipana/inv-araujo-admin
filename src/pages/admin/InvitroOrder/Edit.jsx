@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
-import AlertError from "../../../components/AlertError";
 import { Title } from "../styles";
 import { Container } from "../Product/styles";
 import VitroForm from "../../../components/VitroForm";
@@ -12,13 +11,15 @@ import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import Button from "../../../components/Button";
 import Badge from "../../../components/Badge";
 import { updateStatus } from "./handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function EditVitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { setError, error, matcher, departments, provinces, loadDepartments, updateVitro } = useAdmin();
+  const { matcher, departments, provinces, loadDepartments, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,14 +30,13 @@ function EditVitroOrder() {
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError, loadDepartments, matcher.departments ]);
+  }, [id, loadDepartments, matcher.departments ]);
 
   const departmentId = departments.find(dep => dep.nombre_ubigeo === order.department)?.id_ubigeo;
 
@@ -67,7 +67,7 @@ function EditVitroOrder() {
                     fontSize={14.5}
                     style={{padding: ".3rem .5rem", alignSelf: "center"}}
                     color={order.status === "PENDIENTE" ? "primary" : "warning"}
-                    onClick={() => updateStatus(order, updateVitro, setIsUpdating, setError, navigate, "invitro", order.invoice)}
+                    onClick={() => updateStatus(order, updateVitro, setIsUpdating, navigate, "invitro", order.invoice)}
                   >
                     {
                       isUpdating
@@ -97,14 +97,6 @@ function EditVitroOrder() {
                 />
               </Container>
             </Section>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Container, Form, Logo, Section } from "../Login/styles";
-import { useAuth } from "../../../context/auth";
 import apiFetch from "../../../services/apiFetch";
 import { Formik } from "formik";
 import { validate } from "./validate";
@@ -8,13 +7,14 @@ import Input from "../../../components/Input";
 import { MdAlternateEmail } from "react-icons/md";
 import Button from "../../../components/Button";
 import { Spinner } from "reactstrap";
-import AlertError from "../../../components/AlertError";
 import { FlexColumn, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { useNavigate } from "react-router-dom";
 import { MdKey } from "react-icons/md";
 import { FaLock } from "react-icons/fa6";
 import { CiCircleCheck } from "react-icons/ci";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Recovery() {
   const [isCodeValid, setIsCodeValid] = useState(false);
@@ -26,7 +26,6 @@ function Recovery() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [currentAction, setCurrentAction] = useState("sendCode");
-  const { error, setError } = useAuth();
   const [isSuccess, setIsSuccess] = useState(false);
   const navigate = useNavigate();
   
@@ -60,8 +59,7 @@ function Recovery() {
         resetForm();
       }
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
     }
   }
@@ -78,8 +76,7 @@ function Recovery() {
       setIsCodeValid(validData.data.isValid);
       setIsValidating(false);
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsValidating(false);
     }
   }
@@ -243,14 +240,6 @@ function Recovery() {
         </Formik>
       </Section>
       <Section isImage />
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </Container>
   );
 }

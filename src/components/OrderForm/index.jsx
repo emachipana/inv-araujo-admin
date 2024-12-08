@@ -16,6 +16,8 @@ import { List, Products } from "../../pages/admin/Order/styles";
 import { BiSearch } from "react-icons/bi";
 import { COLORS } from "../../styles/colors";
 import { validate } from "../VitroForm/validate";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function OrderForm({ initialValues = {
   documentType: "",
@@ -36,7 +38,7 @@ function OrderForm({ initialValues = {
   const [search, setSearch] = useState("");
   const [searchClients, setSearchClients] = useState([]);
   const [clientSelected, setClientSelected] = useState(clientId);
-  const { setError, addOrder, updateOrder, departments, 
+  const { addOrder, updateOrder, departments, 
     provinces, matcher, loadDepartments,
     loadClients, addClient, clientsBackup } = useAdmin();
   const navigate = useNavigate();
@@ -54,13 +56,13 @@ function OrderForm({ initialValues = {
 
         setSearchClients(clientsBackup);
       }catch(error) {
-        setError(error.message);
-        console.error(error);
+        setIsLoading(false);
+        toast.error(errorParser(error.message));
       }
     }
     
     fetch();
-  }, [ loadDepartments, matcher, setError, loadClients, clientsBackup ]);
+  }, [ loadDepartments, matcher, loadClients, clientsBackup ]);
 
   const onSubmit = async (values) => {
     try {
@@ -98,9 +100,8 @@ function OrderForm({ initialValues = {
       setIsLoading(false);
       navigate(`/pedidos/${order.id}`);
     }catch(error) {
-      console.error(error);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 
@@ -187,7 +188,7 @@ function OrderForm({ initialValues = {
                     touched={touched.document}
                     value={values.document}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+                    handleChange={(e) => onDocChange(e, setFieldValue, docType)}
                   />
                 </Group>
                 <Input
@@ -266,7 +267,7 @@ function OrderForm({ initialValues = {
 										Icon={BiSearch}
 										value={search}
 										style={{width: "60%"}}
-                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup)}
+                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, clientsBackup)}
 									/>
 									<List
                     height="150px"

@@ -11,11 +11,13 @@ import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
 import { COLORS } from "../../../styles/colors";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem }) {
   const [currentVariety, setCurrentVariety] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, tubers, addItem, editItem } = useAdmin();
+  const { tubers, addItem, editItem } = useAdmin();
 
   let initialValues = {
     vitroOrderId: vitroOrder.id,
@@ -46,9 +48,8 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
       setIsActive(false);
       setItem("");
     }catch(error) {
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      setError(error.message);
     }
   }
 

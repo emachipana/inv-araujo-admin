@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
 import depJson from "../data/departamentos.json";
 import provJson from "../data/provincias.json";
@@ -6,7 +6,7 @@ import provJson from "../data/provincias.json";
 const AdminContext = createContext();
 
 const AdminProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [backup, setBackup] = useState([]);
@@ -23,25 +23,29 @@ const AdminProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [clientsBackup, setClientsBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [error, setError] = useState(null);
-  const [info, setInfo] = useState(false);
+  const [totalOrders, setTotalOrders] = useState({ ship: 0, pen: 0 });
+  const [totalVitroOrders, setTotalVitroOrders] = useState({ ship: 0, pen: 0 });
   const [matcher, setMatcher] = useState({
     products: false,
-    vitroOrder: false,
+    vitroOrders: false,
     orders: false,
     departments: false,
     tubers: false,
     invoices: false,
     banners: false,
     clients: false,
-    expenses: false
+    expenses: false,
+    totalOrders: false
   });
 
-  const loadExpenses = async () => {
+  const loadExpenses = useCallback(async () => {
+    if(matcher.expenses) return;
+    setIsLoading(true);
     const expenses = await apiFetch("profits");
     setExpenses(expenses);
     setMatcher(matcher => ({...matcher, expenses: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.expenses]);
 
   const loadClients = async () => {
     const clients = await apiFetch("clients");
@@ -64,6 +68,20 @@ const AdminProvider = ({ children }) => {
     setMatcher(matcher => ({...matcher, invoices: true}));
   }
 
+  const loadOnHome = async () => {
+    await loadExpenses();
+    await loadVitroOrders();
+    await loadOrders();
+    if(matcher.totalOrders) return;
+    setIsLoading(true);
+    const totalVitroOrders = await apiFetch("vitroOrders/data");
+    const totalOrders = await apiFetch("orders/data");
+    setTotalOrders(totalOrders.data);
+    setTotalVitroOrders(totalVitroOrders.data);
+    setMatcher(matcher => ({...matcher, totalOrders: true}));
+    setIsLoading(false);
+  }
+
   const loadTubers = async () => {
     const tubers = await apiFetch("tubers");
     setTubers(tubers);
@@ -76,32 +94,39 @@ const AdminProvider = ({ children }) => {
     setMatcher(matcher => ({...matcher, departments: true}));
   }
 
-  const loadProducts = async () => {
+  const loadProducts = useCallback(async () => {
+    if(matcher.products) return;
+    setIsLoading(true);
     const categories = await apiFetch("categories");
     const products = await apiFetch("products");
     setCategories(categories);
-    setProducts(products);
-    setBackup(products);
+    setProducts(products.content);
+    setBackup(products.content);
     setMatcher(matcher => ({...matcher, products: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.products]);
 
-  const loadVitroOrders = async () => {
+  const loadVitroOrders = useCallback(async () => {
+    if(matcher.vitroOrders) return;
+    setIsLoading(true);
     const tubers = await apiFetch("tubers");
-    const vitroOrders = await apiFetch("vitroOrders");
+    const vitroOrders = await apiFetch("vitroOrders?sort=DESC");
     setTubers(tubers);
-    const reversed = vitroOrders.reverse();
-    setVitroOrders(reversed);        
-    setVitroOrdersBack(reversed);
+    setVitroOrders(vitroOrders.content);        
+    setVitroOrdersBack(vitroOrders.content);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.vitroOrders]);
 
-  const loadOrders = async () => {
-    const orders = await apiFetch("orders");
-    const reversed = orders.reverse();
-    setOrders(reversed);
-    setOrdersBackup(reversed);
+  const loadOrders = useCallback(async () => {
+    if(matcher.orders) return;
+    setIsLoading(true);
+    const orders = await apiFetch("orders?sort=DESC");
+    setOrders(orders.content);
+    setOrdersBackup(orders.content);
     setMatcher(matcher => ({...matcher, orders: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.orders]);
 
   const updateCategory = async (id, body) => {
     const newCategory = await apiFetch(`categories/${id}`, { body, method: "PUT" });
@@ -561,7 +586,6 @@ const AdminProvider = ({ children }) => {
         invoicesBackup,
         products,
         backup,
-        error,
         isLoading,
         tubers,
         vitroOrders,
@@ -573,15 +597,14 @@ const AdminProvider = ({ children }) => {
         banners,
         clients,
         clientsBackup,
-        info,
-        setInfo,
+        totalOrders,
+        totalVitroOrders,
         loadBanners,
         loadDepartments,
         setTubers,
         setVitroOrders,
         setCategories,
         setProducts,
-        setError,
         updateCategory,
         updateSubCategory,
         deleteCategory,
@@ -645,7 +668,8 @@ const AdminProvider = ({ children }) => {
         addClient,
         loadExpenses,
         setClients,
-        setOrders
+        setOrders,
+        loadOnHome
       }}
     >
       { children }

@@ -1,12 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import apiFetch from "../services/apiFetch";
 import { TOKEN_NAME } from "../config";
+import toast from "react-hot-toast";
+import { errorParser } from "../helpers/errorParser";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -18,8 +19,8 @@ const AuthProvider = ({ children }) => {
       }catch(error) {
         const message = error.message;
         if(message.toLowerCase().includes("token expirado")) localStorage.removeItem(TOKEN_NAME);
-        setError(message);
         setIsLoading(false);
+        if(message) setTimeout(() => toast.error(errorParser(message)), 500);
       }
     }
 
@@ -50,10 +51,8 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        error,
         isLoading,
         setUser,
-        setError,
         setIsLoading,
         login,
         logout,

@@ -16,6 +16,8 @@ import { COLORS } from "../../styles/colors";
 import { List, Products } from "../../pages/admin/Order/styles";
 import { BiSearch } from "react-icons/bi";
 import Client from "./Client";
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
 
 function VitroForm({ initialValues = {
   documentType: "",
@@ -37,7 +39,7 @@ function VitroForm({ initialValues = {
 	const [search, setSearch] = useState("");
 	const [searchClients, setSearchClients] = useState([]);
 	const [clientSelected, setClientSelected] = useState(clientId);
-  const { setError, addVitro, updateVitro, departments, 
+  const { addVitro, updateVitro, departments, 
     provinces, matcher, loadDepartments,
     clientsBackup, addClient, loadClients } = useAdmin();
   const navigate = useNavigate();
@@ -54,13 +56,13 @@ function VitroForm({ initialValues = {
 
         setSearchClients(clientsBackup);
       }catch(error) {
-        setError(error.message);
-        console.error(error);
+        toast.error(errorParser(error.message));
+        setIsLoading(false);
       }
     }
     
     fetch();
-  }, [ loadDepartments, matcher, setError, clientsBackup, loadClients ]);
+  }, [ loadDepartments, matcher, clientsBackup, loadClients ]);
 
   const onSubmit = async (values) => {
     try {
@@ -98,9 +100,8 @@ function VitroForm({ initialValues = {
       setIsLoading(false);
       navigate(`/invitro/${vitroOrder.id}`);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -187,7 +188,7 @@ function VitroForm({ initialValues = {
                     touched={touched.document}
                     value={values.document}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+                    handleChange={(e) => onDocChange(e, setFieldValue, docType)}
                   />
                 </Group>
                 <Input
@@ -266,7 +267,7 @@ function VitroForm({ initialValues = {
 										Icon={BiSearch}
 										value={search}
 										style={{width: "60%"}}
-                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup)}
+                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, clientsBackup)}
 									/>
 									<List 
                     height="150px"

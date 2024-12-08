@@ -7,12 +7,14 @@ import Button from "../../../components/Button";
 import { FaEye } from "react-icons/fa6";
 import { HiDocumentMinus } from "react-icons/hi2";
 import { useAdmin } from "../../../context/admin";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function DocModal({ isActive, setIsActive, pdfUrl, setInvoice, invoiceId }) {
   const [toDelete, setToDelete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteDocInvoice } = useAdmin();
+  const { deleteDocInvoice } = useAdmin();
 
   const handleDeleteClick = async () => {
     if(!toDelete) return setToDelete(true);
@@ -24,9 +26,8 @@ function DocModal({ isActive, setIsActive, pdfUrl, setInvoice, invoiceId }) {
       setIsDeleting(false);
       onClose();
     }catch(error) {
+      toast.error(errorParser(error.message));
       setToDelete(false);
-      console.error(error);
-      setError(error.message);
       setIsDeleting(false);
     }
   }

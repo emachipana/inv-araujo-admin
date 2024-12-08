@@ -1,6 +1,7 @@
+import toast from "react-hot-toast";
 import { getDoc } from "../../services/getByDocument";
 
-export const onDocChange = async (event, setFieldValue, setError, docType) => {
+export const onDocChange = async (event, setFieldValue, docType) => {
   const value = event.target.value;
   setFieldValue("document", value);
 
@@ -12,12 +13,13 @@ export const onDocChange = async (event, setFieldValue, setError, docType) => {
         setFieldValue("address", info.direccion);          
         return;
       }
-      setError(info.message);
+
+      toast.error(info.message);
     }
 
     if(docType === "DNI" && value.length === 8) {
       const info = await getDoc("dni", value);
-      if(!info.success) return setError(info.message);
+      if(!info.success) return toast.error(info.message);
       setFieldValue("rsocial", `${info.apellidoPaterno} ${info.apellidoMaterno} ${info.nombres}`);
       setFieldValue("address", "");
     }

@@ -9,10 +9,12 @@ import Input from "../../../components/Input";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
 import Button from "../../../components/Button";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addInvoiceItem, editInvoiceItem } = useAdmin();
+  const { addInvoiceItem, editInvoiceItem } = useAdmin();
 
   let initialValues = {
     invoiceId,
@@ -38,9 +40,8 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
       setIsLoading(false);
       onClose();
     }catch(error) {
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      setError(error.message);
     }
   }
 

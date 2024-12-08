@@ -5,12 +5,13 @@ import { useEffect, useState } from "react";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import Product from "../../../components/Product";
-import AlertError from "../../../components/AlertError";
 import Modal from "../../../components/Modal";
 import ProductForm from "../../../components/ProductForm";
 import List from "./List";
 import Filter from "../../../components/Filter";
 import { onSearchChange } from "./handlers";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Products() {
   const [currentCategory, setCurrentCategory] = useState("Todo");
@@ -18,26 +19,21 @@ function Products() {
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
-  const { products, isLoading, error, setError, loadProducts, setIsLoading, matcher, setProducts, backup } = useAdmin();
+  const { products, isLoading, setIsLoading, loadProducts, setProducts, backup } = useAdmin();
   const [type, setType] = useState(localStorage.getItem("productType") || "group");
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.products) {
-          setIsLoading(true);
-          await loadProducts();
-          setIsLoading(false);
-        }
+        await loadProducts();
       }catch(error) {
         setIsLoading(false);
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
       }
     }
 
     fetch();
-  }, [ loadProducts, matcher.products, setError, setIsLoading ]);
+  }, [ loadProducts, setIsLoading ]);
 
   return (
     <>
@@ -58,7 +54,7 @@ function Products() {
         setIsSearching={setIsSearching}
         labelSearch="Buscar producto..."
         setCurrentCategory={setCurrentCategory}
-        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup, setError, setIsSearching)}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup, setIsSearching)}
         searchValue={search}
       />
       <Section>
@@ -66,7 +62,7 @@ function Products() {
           isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
-              ? products.map((product, index) => (
+              ? products?.map((product, index) => (
                   <Product 
                     key={index}
                     isInAdmin
@@ -83,15 +79,6 @@ function Products() {
       >
         <ProductForm isToCreate />
       </Modal>
-      {
-        error
-        &&
-        <AlertError
-          from="categories"
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

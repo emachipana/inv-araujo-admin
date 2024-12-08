@@ -9,10 +9,12 @@ import Input from "../../../components/Input";
 import Button from "../../../components/Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ItemModal({ isActive, setIsActive, profitId, item, setExpense, setItem }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addExpenseItem, editExpenseItem } = useAdmin();
+  const { addExpenseItem, editExpenseItem } = useAdmin();
 
   let initialValues = {
     profitId,
@@ -36,9 +38,8 @@ function ItemModal({ isActive, setIsActive, profitId, item, setExpense, setItem 
       setIsLoading(false);
       onClose();
     }catch(error) {
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      setError(error.message);
     }
   }
 

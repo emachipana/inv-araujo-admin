@@ -11,12 +11,13 @@ import Badge from "../../../components/Badge";
 import { capitalize } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
 import { FaEdit, FaFileInvoice, FaTrashAlt, FaShoppingCart } from "react-icons/fa";
-import AlertError from "../../../components/AlertError";
 import DeleteModal from "../Product/DeleteModal";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
 import { handleClick } from "../InvitroOrder/handlers";
 import InvoiceModal from "../../../components/InvoiceModal";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +26,7 @@ function Order() {
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
-  const { error, setError, deleteOrder, setOrder: setOrderSecond } = useAdmin();
+  const { deleteOrder, setOrder: setOrderSecond } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -36,14 +37,13 @@ function Order() {
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [id, setError]);
+  }, [ id ]);
 
   const handleEdit = async (item) => {
     setItem(item);
@@ -308,15 +308,6 @@ function Order() {
                 items={order.items.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError
-            from="product"
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

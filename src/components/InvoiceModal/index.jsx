@@ -14,12 +14,14 @@ import Button from "../Button";
 import Input from "../Input";
 import { useNavigate } from "react-router-dom";
 import apiFetch from "../../services/apiFetch";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, address, items, order, updateOrder }) {
   const [isLoading, setIsLoading] = useState(false);
   const [invoiceType, setInvoiceType] = useState("");
   const [docType, setDocType] = useState("");
-  const { setError, addInvoice, matcher, setMatcher, setInfo } = useAdmin();
+  const { addInvoice, matcher, setMatcher } = useAdmin();
   const navigate = useNavigate();
 
   const initialValues = {
@@ -67,11 +69,10 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
 
       setIsLoading(false);
       navigate(`/comprobantes/${invoice.id}`);
-      setInfo(true);
+      setTimeout(() => toast.success(`La ${invoice.invoiceType.toLowerCase()} se creó con éxito`), 200);
     }catch(error) {
-      console.error(error.message);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 
@@ -173,7 +174,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType)}
             />
             <Input
               disabled={invoiceType === "FACTURA" || !(invoiceType === "FACTURA" && documentType !== "RUC")}

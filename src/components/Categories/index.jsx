@@ -8,10 +8,12 @@ import Modal from "../Modal";
 import EditCategories from "../EditCategories";
 import { FaRegEdit } from "react-icons/fa";
 import apiFetch from "../../services/apiFetch";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetting }) {
   const [editModal, setEditModal] = useState(false);
-  const { categories, isLoading, setProducts, backup, setError } = useAdmin();
+  const { categories, isLoading, setProducts, backup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -24,13 +26,12 @@ function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetti
         setIsGetting(false);
       }catch(error) {
         setIsGetting(false);
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
       }
     }
 
     fetch();
-  }, [currentCategory, backup, categories, setProducts, setError, setIsGetting]);
+  }, [currentCategory, backup, categories, setProducts, setIsGetting]);
 
   return (
     <Container isLoading={isLoading}>

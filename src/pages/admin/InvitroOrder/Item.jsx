@@ -7,10 +7,12 @@ import { useAdmin } from "../../../context/admin";
 import Button from "../../../components/Button";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteItem } = useAdmin();
+  const { deleteItem } = useAdmin();
   const { id, variety, price, quantity, subTotal } = item;
 
   const handleDelete = async () => {
@@ -20,9 +22,8 @@ function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGener
       setVitro(updatedVitroOrder);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   } 
 

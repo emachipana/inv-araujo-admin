@@ -8,10 +8,12 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 import { TextDescription } from "../../../components/Product/styles";
 import { COLORS } from "../../../styles/colors";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Item({ item, handleEdit, profitId, setExpense }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteExpenseItem } = useAdmin();
+  const { deleteExpenseItem } = useAdmin();
 
   const handleDelete = async () => {
     try {
@@ -20,9 +22,8 @@ function Item({ item, handleEdit, profitId, setExpense }) {
       setExpense(updatedExpense);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 

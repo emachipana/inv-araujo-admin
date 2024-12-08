@@ -5,10 +5,11 @@ import { CategoryContainer as Container, Wrapper } from "./styles";
 import { MdClose, MdCheck } from "react-icons/md";
 import { FaEdit, FaTrashAlt, FaCaretRight } from "react-icons/fa";
 import Input from "../Input";
-import { useAdmin } from "../../context/admin";
 import { Spinner } from "reactstrap";
 import { closeEdit, handleChange, handleBlur, setupEdit, onSave } from "./handlers";
 import SubCategory from "./SubCategory";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Category({ id, children, isFromTuber, subCategories, forCategory, forSubCategory }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,14 +20,12 @@ function Category({ id, children, isFromTuber, subCategories, forCategory, forSu
     error: "",
     touched: false
   });
-  const { setError } = useAdmin();
 
   const onDelete = async () => {
     try {
       await forCategory.deleteCategory(id);
     }catch(error) {
-      setError(error.message);
-      console.error(error);
+      toast.error(errorParser(error.message));
     }
   }
 

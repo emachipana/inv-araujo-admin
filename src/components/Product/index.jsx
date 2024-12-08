@@ -6,10 +6,12 @@ import { FaCheck } from "react-icons/fa6";
 import { FlexRow, Text } from "../../styles/layout";
 import { COLORS } from "../../styles/colors";
 import { useAdmin } from "../../context/admin";
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
 
 function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
   const { id, images = [], name, price, discount, description, brand, category, active } = product;
-  const { updateProduct, setError } = useAdmin();
+  const { updateProduct } = useAdmin();
   const navigate = useNavigate();
 
   const foundProduct = cartItems.find(item => item.id === id);
@@ -35,8 +37,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
       const body = {...product, categoryId: category.id, isActive: !active};
       await updateProduct(id, body);
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
@@ -12,7 +11,8 @@ import Item from "./Item";
 import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Button from "../../../components/Button";
-import AlertError from "../../../components/AlertError";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Expense() {
   const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +20,6 @@ function Expense() {
   const [item, setItem] = useState("");
   const { id } = useParams();
   const [expense, setExpense] = useState({});
-  const { error, setError } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -29,14 +28,13 @@ function Expense() {
         setExpense(expense.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   const handleEdit = (item) => {
     setItemModal(true);
@@ -148,14 +146,6 @@ function Expense() {
                 setItem={setItem}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

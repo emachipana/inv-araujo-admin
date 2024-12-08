@@ -12,11 +12,12 @@ import { BiSolidOffer } from "react-icons/bi";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import DiscountModal from "./DiscountModal";
 import { useAdmin } from "../../../context/admin";
-import AlertError from "../../../components/AlertError";
 import DeleteModal from "./DeleteModal";
 import { AiTwotoneFileAdd } from "react-icons/ai";
 import ImageModal from "./ImageModal";
 import ImageCard from "./ImageCard";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
@@ -26,7 +27,7 @@ function Product() {
   const [isLoading, setIsLoading] = useState(true);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { error, setError, deleteProduct } = useAdmin();
+  const { deleteProduct } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -35,14 +36,13 @@ function Product() {
         setProduct(product.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error.message);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -296,15 +296,6 @@ function Product() {
                 setProduct={setProduct}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-            from="product"
-          />
         }
       </>
   );

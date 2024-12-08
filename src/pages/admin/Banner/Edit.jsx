@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Container } from "../Product/styles";
 import BannerForm from "../../../components/BannerForm";
-import AlertError from "../../../components/AlertError";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function EditBanner() {
   const [isLoading, setIsLoading] = useState(true);
   const [banner, setBanner] = useState({});
   const { id } = useParams();
-  const { setError, error } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -21,14 +20,13 @@ function EditBanner() {
         setBanner(banner.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -44,14 +42,6 @@ function EditBanner() {
                 bannerId={banner.id}
               />
             </Container>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

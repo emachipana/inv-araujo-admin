@@ -7,7 +7,6 @@ import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
 import { FlexColumn, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
-import AlertError from "../../../components/AlertError";
 import Badge from "../../../components/Badge";
 import { capitalize } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
@@ -21,6 +20,8 @@ import AdvancesModal from "./AdvancesModal";
 import Item from "./Item";
 import InvoiceModal from "../../../components/InvoiceModal";
 import { handleClick } from "./handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +32,7 @@ function InvitroOrder() {
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { error, setError, deleteVitro, loadTubers, matcher, updateVitro } = useAdmin();
+  const { deleteVitro, loadTubers, matcher, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,14 +48,13 @@ function InvitroOrder() {
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError, loadTubers, matcher.tubers, matcher.vitroOrders]);
+  }, [id, loadTubers, matcher.tubers, matcher.vitroOrders]);
 
   const options = {
     day: "numeric",
@@ -335,14 +335,6 @@ function InvitroOrder() {
                 updateOrder={updateVitro}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

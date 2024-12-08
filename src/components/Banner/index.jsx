@@ -9,7 +9,7 @@ import { handleChecked, parsedTitle } from "./handlers";
 
 function Banner({ id, title, description, markedWord, isUsed, products}) {
   const [checked, setChecked] = useState(isUsed);
-  const { setError, updateBanner } = useAdmin();
+  const { updateBanner } = useAdmin();
   const navigate = useNavigate();
 
   return (
@@ -45,8 +45,7 @@ function Banner({ id, title, description, markedWord, isUsed, products}) {
             checked,
             { id, title, description, markedWord, used: isUsed, products },
             setChecked,
-            updateBanner,
-            setError
+            updateBanner
           )
         }
       />

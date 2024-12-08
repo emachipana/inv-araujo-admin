@@ -6,14 +6,15 @@ import { useAdmin } from "../../../context/admin";
 import { useEffect, useState } from "react";
 import Banner from "../../../components/Banner";
 import { Spinner } from "reactstrap";
-import AlertError from "../../../components/AlertError";
 import Modal from "../../../components/Modal";
 import BannerForm from "../../../components/BannerForm";
 import { Section } from "../Products/styles";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Banners() {
   const [modalCreate, setModalCreate] = useState(false);
-  const { isLoading, setIsLoading, error, setError, matcher, loadBanners, banners } = useAdmin();
+  const { isLoading, setIsLoading, matcher, loadBanners, banners } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -24,14 +25,13 @@ function Banners() {
           setIsLoading(false);
         }
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        console.error(error);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ loadBanners, matcher.banners, setError, setIsLoading ]);
+  }, [ loadBanners, matcher.banners, setIsLoading ]);
 
   return (
     <>
@@ -70,14 +70,6 @@ function Banners() {
       >
         <BannerForm isToCreate />
       </Modal>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

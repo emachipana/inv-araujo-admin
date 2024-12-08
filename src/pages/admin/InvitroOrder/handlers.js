@@ -1,10 +1,13 @@
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
+
 export const handleClick = (order, navigate, setInvoiceModal) => {
   if(order.invoice) return navigate(`/comprobantes/${order.invoice.id}`);
 
   setInvoiceModal(invoiceModal => !invoiceModal);
 }
 
-export const updateStatus = async (order, updateOrder, setIsLoading, setError, navigate, navTo, invoice) => {
+export const updateStatus = async (order, updateOrder, setIsLoading, navigate, navTo, invoice) => {
   try {
     let body = {
       ...order,
@@ -20,8 +23,7 @@ export const updateStatus = async (order, updateOrder, setIsLoading, setError, n
     setIsLoading(false);
     navigate(`/${navTo}/${order.id}`);
   }catch(error) {
-    console.error(error);
-    setError(error.message);
+    toast.error(errorParser(error.message));
     setIsLoading(false);
   }
 }

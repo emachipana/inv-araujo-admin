@@ -8,10 +8,12 @@ import { FaRegEdit } from "react-icons/fa";
 import Category from "../Category";
 import Modal from "../Modal";
 import EditTubers from "../EditTubers";
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
 
 function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
   const [editModal, setEditModal] = useState(false);
-  const { tubers, isLoading, setVitroOrders, vitroOrdersBack, setError } = useAdmin();
+  const { tubers, isLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -23,14 +25,13 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
         setVitroOrders(vitroOrders);
         setIsGetting(false);
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsGetting(false);
-        setError(error.message);
-        console.error(error);
       }
     }
 
     fetch();
-  }, [currentTuber, setError, setVitroOrders, tubers, vitroOrdersBack, setIsGetting]);
+  }, [currentTuber, setVitroOrders, tubers, vitroOrdersBack, setIsGetting]);
 
   return (
     <Container isLoading={isLoading}>

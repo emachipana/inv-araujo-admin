@@ -11,7 +11,7 @@ import { onSubmit } from "./handlers";
 
 function AddSubCategory({ setCurrentAction }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { addSubCategory, setError, categories } = useAdmin();
+  const { addSubCategory, categories } = useAdmin();
 
   const values = {
     name: "",
@@ -24,7 +24,7 @@ function AddSubCategory({ setCurrentAction }) {
     <Formik
       initialValues={values}
       validate={(values) => validate(values, "subCategory")}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addSubCategory, setCurrentAction, setError, "categories")}
+      onSubmit={(values) => onSubmit(values, setIsLoading, addSubCategory, setCurrentAction, "categories")}
     >
       {({
         values,

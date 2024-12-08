@@ -9,11 +9,13 @@ import { COLORS } from "../../../styles/colors";
 import AdvanceForm from "./AdvanceForm";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteAdvance } = useAdmin();
+  const { deleteAdvance } = useAdmin();
 
   const options = {
     day: "numeric",
@@ -32,8 +34,8 @@ function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total })
       setOrder(updatedVitro);
       setIsDeleting(false);
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
+      setIsDeleting(false);
     }
   }
 

@@ -4,13 +4,11 @@ import Input from "../Input";
 import Button from "../Button";
 import { useState } from "react";
 import { Spinner } from "reactstrap";
-import { useAdmin } from "../../context/admin";
 import { validate } from "./validate";
 import { onSubmit } from "./handlers";
 
 function AddCategory({ setCurrentAction, to, addCategory }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError } = useAdmin();
 
   const values = {name: ""}
 
@@ -18,7 +16,7 @@ function AddCategory({ setCurrentAction, to, addCategory }) {
     <Formik
       initialValues={values}
       validate={validate}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, setError, to)}
+      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, to)}
     >
       {({
         values,

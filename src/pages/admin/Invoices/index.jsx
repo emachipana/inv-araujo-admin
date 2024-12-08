@@ -4,13 +4,14 @@ import { Title } from "../styles";
 import Type from "./Type";
 import { Section } from "../Products/styles";
 import { useAdmin } from "../../../context/admin";
-import AlertError from "../../../components/AlertError";
 import { Spinner } from "reactstrap";
 import List from "./List";
 import Invoice from "../../../components/Order/Invoice";
 import Modal from "../../../components/Modal";
 import InvoiceForm from "../../../components/InvoiceForm";
 import { onSearchChange } from "../Products/handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Invoices() {
   const [currentType, setCurrentType] = useState("Todo");
@@ -19,7 +20,7 @@ function Invoices() {
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("invoiceType") || "group");
-  const { error, setError, isLoading, setIsLoading, 
+  const { isLoading, setIsLoading, 
     matcher, loadInvoices, invoices, setInvoices,
     invoicesBackup } = useAdmin();
 
@@ -32,14 +33,13 @@ function Invoices() {
           setIsLoading(false);
         }
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        console.error(error);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ loadInvoices, matcher.invoices, setError, setIsLoading ]);
+  }, [ loadInvoices, matcher.invoices, setIsLoading ]);
   
   return (
     <>
@@ -58,7 +58,7 @@ function Invoices() {
         type={type}
         isSearching={isSearching}
         labelSearch="Buscar comprobante..."
-        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setInvoices, "invoices", invoicesBackup, setError, setIsSearching)}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setInvoices, "invoices", invoicesBackup, setIsSearching)}
         searchValue={search}
         setCurrentCategory={setCurrentType}
         setIsSearching={setIsSearching}
@@ -90,14 +90,6 @@ function Invoices() {
       >
         <InvoiceForm isToCreate />
       </Modal>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

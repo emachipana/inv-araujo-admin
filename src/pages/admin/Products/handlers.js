@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 import apiFetch from "../../../services/apiFetch";
 
 export const handleClick = (event, id, navigate) => {
@@ -5,7 +7,7 @@ export const handleClick = (event, id, navigate) => {
   navigate(`${id}/edit`);
 }
 
-export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup, setError, setIsSearching) => {
+export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup, setIsSearching) => {
   const value = e.target.value;
   
   try {
@@ -24,8 +26,7 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
 
     if(value.length <= 0) setIsSearching(false);
   }catch(error) {
-    console.error(error);
+    toast.error(errorParser(error.message));
     setIsGetting(false);
-    setError(error.message);
   }
 }

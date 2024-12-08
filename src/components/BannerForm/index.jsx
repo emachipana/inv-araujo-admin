@@ -10,6 +10,8 @@ import TextArea from "../Input/TextArea";
 import Button from "../Button";
 import { Spinner } from "reactstrap";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function BannerForm({ initialValues = {
   title: "",
@@ -18,7 +20,7 @@ function BannerForm({ initialValues = {
   used: false
 }, isToCreate, bannerId, width }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addBanner, updateBanner } = useAdmin();
+  const { addBanner, updateBanner } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -28,9 +30,8 @@ function BannerForm({ initialValues = {
       setIsLoading(false);
       navigate(`/banners/${banner.id}`);
     }catch(error) {
-      console.error(error);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 

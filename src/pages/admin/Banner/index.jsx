@@ -16,7 +16,8 @@ import { MdDiscount } from "react-icons/md";
 import Item from "./Item";
 import ItemModal from "./ItemModal";
 import DeleteModal from "../Product/DeleteModal";
-import AlertError from "../../../components/AlertError";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Banner() {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +25,7 @@ function Banner() {
   const [itemModal, setItemModal] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
   const [banner, setBanner] = useState({});
-  const { error, setError, deleteBanner, matcher, loadProducts, updateBanner } = useAdmin();
+  const { deleteBanner, matcher, loadProducts, updateBanner } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -41,14 +42,13 @@ function Banner() {
         setIsUsed(banner.data.used);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ id, loadProducts, matcher.products, setError ]);
+  }, [ id, loadProducts, matcher.products ]);
 
   return (
     isLoading
@@ -104,7 +104,7 @@ function Banner() {
                       fontSize={15}
                       iconSize={17}
                       color="secondary"
-                      onClick={(e) => handleChecked(e, isUsed, banner, setIsUsed, updateBanner, setError)}
+                      onClick={(e) => handleChecked(e, isUsed, banner, setIsUsed, updateBanner)}
                     >
                       { banner.used ? "Dejar de usar" : "Empezar a usar" }
                     </Button>
@@ -183,14 +183,6 @@ function Banner() {
                 title="¿Eliminar banner?"
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

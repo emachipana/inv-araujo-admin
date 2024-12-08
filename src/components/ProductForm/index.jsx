@@ -11,6 +11,8 @@ import { useAdmin } from "../../context/admin";
 import Select from "../Input/Select";
 import { useNavigate } from "react-router-dom";
 import { Form } from "../../styles/layout";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ProductForm({ initialValues = {
   name: "",
@@ -23,7 +25,7 @@ function ProductForm({ initialValues = {
   isActive: true
 }, isToCreate, productId }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { categories, setError, addProduct, updateProduct } = useAdmin();
+  const { categories, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -33,9 +35,8 @@ function ProductForm({ initialValues = {
       setIsLoading(false);
       navigate(`/productos/${product.id}`);
     }catch(error) {
-      console.error(error);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 

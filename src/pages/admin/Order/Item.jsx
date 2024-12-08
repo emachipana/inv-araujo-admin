@@ -10,10 +10,12 @@ import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa6";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { deleteOrderItem, setError } = useAdmin();
+  const { deleteOrderItem } = useAdmin();
   const { id, product, price, quantity, subTotal } = item;
   const { images = [] } = product;
   const navigate = useNavigate();
@@ -25,9 +27,8 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
       setOrder(updatedOrder);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 

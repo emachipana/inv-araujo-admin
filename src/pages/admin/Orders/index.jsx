@@ -5,12 +5,13 @@ import Filter from "../../../components/Filter";
 import { Section } from "../Products/styles";
 import { Spinner } from "reactstrap";
 import Order from "../../../components/Order";
-import AlertError from "../../../components/AlertError";
 import List from "./List";
 import Modal from "../../../components/Modal";
 import OrderForm from "../../../components/OrderForm";
 import Status from "./Status";
 import { onSearchChange } from "../Products/handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Orders() {
   const [currentStatus, setCurrentStatus] = useState("Todo");
@@ -19,7 +20,7 @@ function Orders() {
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
-  const { error, setError, orders, isLoading, setIsLoading, 
+  const { orders, isLoading, setIsLoading, 
     matcher, loadOrders, setOrders, ordersBackup } = useAdmin();
 
   useEffect(() => {
@@ -31,14 +32,13 @@ function Orders() {
           setIsLoading(false);
         }
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ loadOrders, setError, setIsLoading, matcher.orders ]);
+  }, [ loadOrders, setIsLoading, matcher.orders ]);
 
   return (
     <>
@@ -57,7 +57,7 @@ function Orders() {
         type={type}
         isSearching={isSearching}
         labelSearch="Buscar pedido..."
-        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setOrders, "orders", ordersBackup, setError, setIsSearching)}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setOrders, "orders", ordersBackup, setIsSearching)}
         searchValue={search}
         setCurrentCategory={setCurrentStatus}
         setIsSearching={setIsSearching}
@@ -91,14 +91,6 @@ function Orders() {
       >
         <OrderForm isToCreate />
       </Modal>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

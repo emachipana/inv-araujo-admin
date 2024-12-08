@@ -4,10 +4,11 @@ import { Title } from "../styles";
 import { Section } from "../Products/styles";
 import { Spinner } from "reactstrap";
 import Expense from "../../../components/Expense";
-import AlertError from "../../../components/AlertError";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Expenses() {
-  const { isLoading, setIsLoading, error, setError, matcher, loadExpenses, expenses } = useAdmin(); 
+  const { isLoading, setIsLoading, matcher, loadExpenses, expenses } = useAdmin(); 
 
   useEffect(() => {
     const fetch = async () => {
@@ -18,14 +19,13 @@ function Expenses() {
           setIsLoading(false);
         }
       }catch(error) {
-        console.error(error);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ loadExpenses, matcher.expenses, setError, setIsLoading ]);
+  }, [ loadExpenses, matcher.expenses, setIsLoading ]);
 
   return (
     <>
@@ -42,14 +42,6 @@ function Expenses() {
             ))
         }
       </Section>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

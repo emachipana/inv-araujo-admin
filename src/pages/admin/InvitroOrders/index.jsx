@@ -5,12 +5,13 @@ import { Title } from "../styles";
 import { Section } from "../Products/styles";
 import Modal from "../../../components/Modal";
 import { useAdmin } from "../../../context/admin";
-import AlertError from "../../../components/AlertError";
 import { Spinner } from "reactstrap";
 import Order from "../../../components/Order";
 import List from "./List";
 import VitroForm from "../../../components/VitroForm";
 import { onSearchChange } from "../Products/handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function InvitroOrders() {
   const [currentTuber, setCurrentTuber] = useState("Todo");
@@ -19,7 +20,7 @@ function InvitroOrders() {
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("vitroType") || "group");
-  const { error, setError, vitroOrders, isLoading, 
+  const { vitroOrders, isLoading, 
     loadVitroOrders, setIsLoading, matcher,
     setVitroOrders, vitroOrdersBack } = useAdmin();
 
@@ -32,14 +33,13 @@ function InvitroOrders() {
           setIsLoading(false);
         }
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ loadVitroOrders, setError, setIsLoading, matcher.vitroOrders ]);
+  }, [ loadVitroOrders, setIsLoading, matcher.vitroOrders ]);
 
   return (
     <>
@@ -59,7 +59,7 @@ function InvitroOrders() {
         isSearching={isSearching}
         setIsSearching={setIsSearching}
         labelSearch="Buscar pedido..."
-        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setVitroOrders, "vitroOrders", vitroOrdersBack, setError, setIsSearching)}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setVitroOrders, "vitroOrders", vitroOrdersBack, setIsSearching)}
         searchValue={search}
         setCurrentCategory={setCurrentTuber}
       />
@@ -91,15 +91,6 @@ function InvitroOrders() {
       >
         <VitroForm isToCreate />
       </Modal>
-      {
-        error
-        &&
-        <AlertError 
-          from="invitro"
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

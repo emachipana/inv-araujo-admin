@@ -1,8 +1,11 @@
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
+
 export const parsedTitle = (title, markedWord) => ({
   __html: title.replaceAll(new RegExp(markedWord, 'gi'), `<span class='marked'>${markedWord}</span>`)
 });
 
-export const handleChecked = async (e, checked, banner, setChecked, updateBanner, setError) => {
+export const handleChecked = async (e, checked, banner, setChecked, updateBanner) => {
   e.stopPropagation();
 
   try {
@@ -17,7 +20,6 @@ export const handleChecked = async (e, checked, banner, setChecked, updateBanner
 
     await updateBanner(banner.id, body);
   }catch(error) {
-    console.error(error);
-    setError(error.message);
+    toast.error(errorParser(error.message));
   }
 }

@@ -10,6 +10,8 @@ import { Group } from "../../../components/ProductForm/styles";
 import { Spinner } from "reactstrap";
 import { TiCancel } from "react-icons/ti";
 import { formatDate } from "../../../components/VitroForm/handlers";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function AdvanceForm({
   initialValues = {
@@ -24,7 +26,7 @@ function AdvanceForm({
   total, currentAdvance
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addAdvance, editAdvance } = useAdmin();
+  const { addAdvance, editAdvance } = useAdmin();
 
   const onSubmit = async (values) => {
     try {
@@ -39,9 +41,8 @@ function AdvanceForm({
       setIsActive(false);
       setIsLoading(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 

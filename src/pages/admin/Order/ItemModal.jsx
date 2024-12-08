@@ -10,6 +10,8 @@ import Product from "./Product";
 import { filterProducts, onSearchChange } from "./handlers";
 import Button from "../../../components/Button";
 import { FaShoppingCart } from "react-icons/fa";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, item, setItem }) {
   const [values, setValues] = useState({ productId: "", quantity: "" });
@@ -17,7 +19,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { setError, backup, addOrderItem, editOrderItem, loadProducts, matcher } = useAdmin();
+  const { backup, addOrderItem, editOrderItem, loadProducts, matcher } = useAdmin();
 
   useEffect(() => {
     const init = async () => {
@@ -62,8 +64,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
       onClose();
       setIsSaving(false);
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsSaving(false);
     }
   }
@@ -94,7 +95,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
               placeholder="Buscar un producto..."
               Icon={BiSearch}
               value={search}
-              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, setError, isLoading)}
+              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, isLoading)}
               style={{width: "60%"}}
             />
           }

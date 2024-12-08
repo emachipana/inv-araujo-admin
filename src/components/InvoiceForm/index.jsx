@@ -12,6 +12,8 @@ import Button from "../Button";
 import { Spinner } from "reactstrap";
 import { PiWalletFill } from "react-icons/pi";
 import { onDocChange } from "./handlers";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function InvoiceForm({ initialValues = {
   invoiceType: "",
@@ -25,7 +27,7 @@ function InvoiceForm({ initialValues = {
   const [docType, setDocType] = useState(initDocType);
   const [invoiceType, setInvoiceType] = useState(initInvoiceType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addInvoice, updateInvoice } = useAdmin();
+  const { addInvoice, updateInvoice } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -41,8 +43,7 @@ function InvoiceForm({ initialValues = {
       navigate(`/comprobantes/${invoice.id}`);
     }catch(error) {
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 
@@ -127,7 +128,7 @@ function InvoiceForm({ initialValues = {
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType)}
             />
             <Input
               disabled={invoiceType === "FACTURA"}

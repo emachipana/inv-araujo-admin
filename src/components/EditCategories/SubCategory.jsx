@@ -6,8 +6,9 @@ import { FlexRow, Text } from "../../styles/layout";
 import { Spinner } from "reactstrap";
 import { MdCheck, MdClose } from "react-icons/md";
 import { COLORS } from "../../styles/colors";
-import { useAdmin } from "../../context/admin";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory, deleteSubCategory }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -17,14 +18,12 @@ function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory,
     error: "",
     touched: false
   });
-  const { setError } = useAdmin();
 
   const onDelete = async () => {
     try {
       await deleteSubCategory(id, categoryId)
     }catch(error) {
-      setError(error.message);
-      console.error(error);
+      toast.error(errorParser(error.message));
     }
   }
 

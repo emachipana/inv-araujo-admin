@@ -7,7 +7,6 @@ import { Spinner, Table } from "reactstrap";
 import { Line } from "react-chartjs-2";
 import { CategoryScale, Chart, LinearScale, LineElement, PointElement, Title as ChartTitle, Tooltip, Legend } from "chart.js";
 import { COLORS } from "../../../styles/colors";
-import AlertError from "../../../components/AlertError";
 import { months } from "../../../data/months";
 import { capitalize } from "../../../helpers/capitalize";
 import { FlexColumn, Text } from "../../../styles/layout";
@@ -15,6 +14,8 @@ import { Card } from "../../../components/Expense/styles";
 import { useNavigate } from "react-router-dom";
 import Badge from "../../../components/Badge";
 import Button from "../../../components/Button";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 Chart.register(
   CategoryScale,
@@ -27,47 +28,34 @@ Chart.register(
 );
 
 function Home() {
-  const { isLoading, setIsLoading, error, setError, matcher, 
-    loadExpenses, expenses, loadVitroOrders, loadOrders,
-    vitroOrders, orders } = useAdmin();
-    const navigate = useNavigate();
+  const { isLoading, setIsLoading, expenses, loadOnHome, vitroOrders, orders, totalOrders, totalVitroOrders } = useAdmin();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        setIsLoading(true);
-        if(!matcher.expenses) await loadExpenses();
-        if(!matcher.vitroOrders) await loadVitroOrders();
-        if(!matcher.orders) await loadOrders();
-        setIsLoading(false);
+        await loadOnHome();
       }catch(error) {
-        console.error(error);
-        setIsLoading(false); 
-        setError(error.message);
+        setIsLoading(false);
+        toast.error(errorParser(error.message));
       }
     }
 
     fetch();
-  }, [ loadExpenses, setIsLoading, setError, loadOrders, loadVitroOrders, matcher ]);
-
-  const sortedExpenses = expenses.sort((a, b) => {
-    const firstDate = new Date(a.date);
-    const secondDate = new Date(b.date);
-
-    return firstDate - secondDate;
-  })
+    // eslint-disable-next-line
+  }, [setIsLoading]);
 
   const data = {
-    labels: sortedExpenses.map(ex => capitalize(months[ex.month].toLowerCase())),
+    labels: expenses.map(ex => capitalize(months[ex.month].toLowerCase())),
     datasets: [
       {
         label: "Ingresos",
-        data: sortedExpenses.map(ex => ex.income),
+        data: expenses.map(ex => ex.income),
         borderColor: COLORS.persian
       },
       {
         label: "Gastos",
-        data: sortedExpenses.map(ex => ex.totalExpenses),
+        data: expenses.map(ex => ex.totalExpenses),
         borderColor: COLORS.orange
       },
     ]
@@ -78,17 +66,6 @@ function Home() {
     totalIncome: cur.income + acc.totalIncome,
     totalProfit: cur.profit + acc.totalProfit
   }), { totalExpenses: 0, totalIncome: 0, totalProfit: 0 });
-
-  const totalOrders = {
-    vitroOrders: {
-      ship: vitroOrders.filter(vo => vo.status === "ENTREGADO").length,
-      pending: vitroOrders.filter(vo => vo.status === "PENDIENTE").length
-    },
-    orders: {
-      ship: orders.filter(vo => vo.status === "ENTREGADO").length,
-      pending: orders.filter(vo => vo.status === "PENDIENTE").length
-    }
-  }
 
   return (
     <>
@@ -199,7 +176,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.vitroOrders.ship }
+                    { totalVitroOrders.ship }
                   </Text>
                 </Card>
                 <Card
@@ -229,7 +206,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.vitroOrders.pending }
+                    { totalVitroOrders.pen }
                   </Text>
                 </Card>
               </Group>
@@ -591,7 +568,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.orders.ship }
+                    { totalOrders.ship }
                   </Text>
                 </Card>
                 <Card
@@ -621,20 +598,12 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.orders.pending }
+                    { totalOrders.pen }
                   </Text>
                 </Card>
               </Group>
             </Container>
           </>
-      }
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
       }
     </>
   );

@@ -4,9 +4,11 @@ import apiFetch from "../../../services/apiFetch";
 import { Container } from "../../../components/Categories/styles";
 import { Spinner } from "reactstrap";
 import Category from "../../../components/Category";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
-  const { isLoading, ordersBackup, setOrders, setError } = useAdmin();
+  const { isLoading, ordersBackup, setOrders } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -17,14 +19,13 @@ function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
         setOrders(orders);
         setIsGetting(false);
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsGetting(false);
-        console.error(error);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ currentStatus, ordersBackup, setError, setOrders, setIsGetting ]);
+  }, [ currentStatus, ordersBackup, setOrders, setIsGetting ]);
 
   return (
     <Container isLoading={isLoading}>
