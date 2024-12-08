@@ -20,18 +20,12 @@ function Invoices() {
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("invoiceType") || "group");
-  const { isLoading, setIsLoading, 
-    matcher, loadInvoices, invoices, setInvoices,
-    invoicesBackup } = useAdmin();
+  const { isLoading, setIsLoading, loadInvoices, invoices, setInvoices, invoicesBackup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.invoices) {
-          setIsLoading(true);
-          await loadInvoices();
-          setIsLoading(false);
-        }
+        await loadInvoices();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -39,7 +33,7 @@ function Invoices() {
     }
 
     fetch();
-  }, [ loadInvoices, matcher.invoices, setIsLoading ]);
+  }, [ loadInvoices, setIsLoading ]);
   
   return (
     <>

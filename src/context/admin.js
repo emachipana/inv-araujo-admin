@@ -47,12 +47,15 @@ const AdminProvider = ({ children }) => {
     setIsLoading(false);
   }, [matcher.expenses]);
 
-  const loadClients = async () => {
+  const loadClients = useCallback(async () => {
+    if(matcher.clients) return;
+    setIsLoading(true);
     const clients = await apiFetch("clients");
-    setClients(clients);
-    setClientsBackup(clients);
+    setClients(clients.content);
+    setClientsBackup(clients.content);
     setMatcher(matcher => ({...matcher, clients: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.clients]);
 
   const loadBanners = async () => {
     const banners = await apiFetch("offers");
@@ -60,13 +63,15 @@ const AdminProvider = ({ children }) => {
     setMatcher(matcher => ({...matcher, banners: true}));
   }
 
-  const loadInvoices = async () => {
+  const loadInvoices = useCallback(async () => {
+    if(matcher.invoices) return;
+    setIsLoading(true);
     const invoices = await apiFetch("invoices");
-    const reversed = invoices.reverse();
-    setInvoices(reversed);
-    setInvoicesBackup(reversed);
+    setInvoices(invoices.content);
+    setInvoicesBackup(invoices.content);
     setMatcher(matcher => ({...matcher, invoices: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.invoices]);
 
   const loadOnHome = async () => {
     await loadExpenses();
@@ -110,7 +115,7 @@ const AdminProvider = ({ children }) => {
     if(matcher.vitroOrders) return;
     setIsLoading(true);
     const tubers = await apiFetch("tubers");
-    const vitroOrders = await apiFetch("vitroOrders?sort=DESC");
+    const vitroOrders = await apiFetch("vitroOrders");
     setTubers(tubers);
     setVitroOrders(vitroOrders.content);        
     setVitroOrdersBack(vitroOrders.content);
@@ -121,7 +126,7 @@ const AdminProvider = ({ children }) => {
   const loadOrders = useCallback(async () => {
     if(matcher.orders) return;
     setIsLoading(true);
-    const orders = await apiFetch("orders?sort=DESC");
+    const orders = await apiFetch("orders");
     setOrders(orders.content);
     setOrdersBackup(orders.content);
     setMatcher(matcher => ({...matcher, orders: true}));

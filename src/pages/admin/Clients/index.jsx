@@ -17,16 +17,12 @@ import toast from "react-hot-toast";
 function Clients() {
   const [search, setSearch] = useState("");
   const [isGetting, setIsGetting] = useState(false);
-  const { isLoading, setIsLoading, matcher, loadClients, clients, setClients, clientsBackup } = useAdmin();
+  const { isLoading, setIsLoading, loadClients, clients, setClients, clientsBackup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.clients) {
-          setIsLoading(true);
-          await loadClients();
-          setIsLoading(false);
-        }
+        await loadClients();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -34,7 +30,7 @@ function Clients() {
     }
 
     fetch();
-  }, [ loadClients, matcher.clients, setIsLoading ]);
+  }, [ loadClients, setIsLoading ]);
 
   const onSearchChange = async (e) => {
     const value = e.target.value;

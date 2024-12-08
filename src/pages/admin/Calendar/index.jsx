@@ -12,6 +12,8 @@ import Event from "./Event";
 import Badge from "../../../components/Badge";
 import toast from "react-hot-toast";
 import { errorParser } from "../../../helpers/errorParser";
+import apiFetch from "../../../services/apiFetch";
+import { numberMonths } from "../../../data/months";
 
 function Calendar() {
 	const ref = new Date();
@@ -22,37 +24,21 @@ function Calendar() {
   const lastDay = new Date(ref.getFullYear(), curMonth + 1, 0);
   const days = new Array(firstDay.getDay()).fill(undefined);
   const monthName = firstDay.toLocaleDateString("es-ES", { month: "long", timeZone: "UTC" });
-  const { orders, vitroOrders, isLoading, setIsLoading, matcher, loadOrders, loadVitroOrders } = useAdmin();
+  const { isLoading, setIsLoading } = useAdmin();
 
   for(let i = firstDay.getDate(); i <= lastDay.getDate(); i++) {
     days.push(i);
   }
 
-
   useEffect(() => {
     const fetch = async () => {
       try {
         setIsLoading(true);
-        if(!matcher.orders) await loadOrders();
-        if(!matcher.vitroOrders) await loadVitroOrders();
+        const orders = await apiFetch(`orders/pending?month=${numberMonths[curMonth]}`);
+        const vitroOrders = await apiFetch(`vitroOrders/pending?month=${numberMonths[curMonth]}`)
         setIsLoading(false);
 
-        const filter = [
-          ...orders.filter(order => {
-            const date = new Date(order.maxShipDate);
-
-            return order.status === "PENDIENTE" && date.getMonth() === curMonth;
-          }),
-          ...vitroOrders.filter(order => {
-            if(!order.finishDate) return false;
-
-            const date = new Date(order.finishDate);
-
-            return order.status === "PENDIENTE" && date.getMonth() === curMonth;
-          })
-        ]
-
-        setData(filter.map(order => ({
+        setData([...orders, ...vitroOrders].map(order => ({
           ...order,
           date: order.maxShipDate || order.finishDate,
           type: order.maxShipDate ? "productos" : "invitro"
@@ -64,10 +50,18 @@ function Calendar() {
     }
 
     fetch();
-  }, [ loadOrders, orders, vitroOrders, setIsLoading, matcher, loadVitroOrders, curMonth ]);
+  }, [ setIsLoading, curMonth ]);
 
-	const addMonth = () => setCurMonth(month => month + 1);
-	const restMonth = () => setCurMonth(month => month - 1);
+	const addMonth = () => {
+    const month = curMonth >= 11 ? 0 : curMonth + 1;
+
+    setCurMonth(month);
+  }
+	const restMonth = () => {
+    const month = curMonth <= 0 ? 11 : curMonth - 1;
+
+    setCurMonth(month);
+  }
 
   const options = { 
     weekday: "long",
