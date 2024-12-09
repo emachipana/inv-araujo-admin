@@ -22,7 +22,7 @@ function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetti
         setIsGetting(true);
         const category = categories.find(category => category.name === currentCategory);
         const products = await apiFetch(`products?categoryId=${category.id}`);
-        setProducts(products);
+        setProducts(products.content);
         setIsGetting(false);
       }catch(error) {
         setIsGetting(false);

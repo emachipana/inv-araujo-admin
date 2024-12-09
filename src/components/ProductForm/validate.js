@@ -1,6 +1,8 @@
 export const validate = (values) => {
   const errors = {};
 
+  if(!values.unit) errors.unit = "Este campo es obligatorio";
+
   if(!values.name) {
     errors.name = "Este campo es obligatorio";
   }else if(values.name.length < 3) {

@@ -22,6 +22,7 @@ function ProductForm({ initialValues = {
   price: "",
   purchasePrice: "",
   stock: "",
+  unit: "",
   isActive: true
 }, isToCreate, productId }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,15 +41,7 @@ function ProductForm({ initialValues = {
     }
   }
 
-  const options = categories.reduce((result, category) => {
-    result.push({id: category.id, content: category.name});
-    const subCategories = category.subCategories?.map(subCategory => ({
-      id: subCategory.id,
-      content: `(${category.name}) ${subCategory.name}`
-    }));
-    if(subCategories) result.push(...subCategories);
-    return result;
-  }, []);
+  const options = categories.map(category => ({id: category.id, content: category.name}));
 
   return (
     <Formik
@@ -87,16 +80,28 @@ function ProductForm({ initialValues = {
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
-          <Select
-            id="categoryId"
-            label="Categoría"
-            error={errors.categoryId}
-            touched={touched.categoryId}
-            handleBlur={handleBlur}
-            handleChange={handleChange}
-            options={options}
-            value={values.categoryId}
-          />
+          <Group>
+            <Select
+              id="categoryId"
+              label="Categoría"
+              error={errors.categoryId}
+              touched={touched.categoryId}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={options}
+              value={values.categoryId}
+            />
+            <Input 
+              id="unit"
+              label="Unidad de medida"
+              placeholder="Kg."
+              error={errors.unit}
+              touched={touched.unit}
+              value={values.unit}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+            />
+          </Group>
           <Group>
             <Input 
               id="brand"

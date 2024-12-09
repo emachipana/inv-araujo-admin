@@ -11,7 +11,7 @@ import SubCategory from "./SubCategory";
 import { errorParser } from "../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function Category({ id, children, isFromTuber, subCategories, forCategory, forSubCategory }) {
+function Category({ id, children, isFromTuber, subCategories = [], forCategory, forSubCategory }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isToEdit, setIsToEdit] = useState(false);

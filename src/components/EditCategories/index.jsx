@@ -8,10 +8,9 @@ import { Container as Navigation } from "../Categories/styles";
 import { useAdmin } from "../../context/admin";
 import Category from "./Category";
 import AddCategory from "./AddCategory";
-import AddSubCategory from "./AddSubCategory";
 
 function EditCategories() {
-  const { categories, addCategory, updateCategory, deleteCategory, updateSubCategory, deleteSubCategory } = useAdmin();
+  const { categories, addCategory, updateCategory, deleteCategory } = useAdmin();
   const [currentAction, setCurrentAction] = useState("categories");
 
   return (
@@ -19,7 +18,7 @@ function EditCategories() {
       <Title
         size={1.5}
       >
-        { currentAction === "categories" ? "Categorias" : (currentAction === "addCategory" ? "Agregar categoria" : "Agregar subcategoria") }
+        { currentAction === "categories" ? "Categorias" : "Agregar categoría" }
       </Title>
       <Navigation>
         <NewCategory
@@ -36,13 +35,6 @@ function EditCategories() {
         >
           Agregar categoria
         </NewCategory>
-        <NewCategory
-          onClick={() => setCurrentAction("addSubCategory")}
-          Icon={MdAddCircleOutline}
-          isActive={currentAction === "addSubCategory"}
-        >
-          Agregar subcategoria
-        </NewCategory>
       </Navigation>
       <Section>
         {
@@ -52,24 +44,19 @@ function EditCategories() {
                 categories.map((category, index) => (
                   <Category
                     id={category.id}
-                    subCategories={category.subCategories || []}
                     key={index}
                     forCategory={{updateCategory, deleteCategory}}
-                    forSubCategory={{updateSubCategory, deleteSubCategory}}
                   >
                     { category.name }
                   </Category>
                 ))
               }
             </>
-          : (currentAction === "addCategory"
-              ? <AddCategory 
-                  setCurrentAction={setCurrentAction}
-                  to="categories"
-                  addCategory={addCategory}
-                />
-              : <AddSubCategory setCurrentAction={setCurrentAction} />
-            )
+          : <AddCategory 
+              setCurrentAction={setCurrentAction}
+              to="categories"
+              addCategory={addCategory}
+            />
         }
       </Section>
     </Container>
