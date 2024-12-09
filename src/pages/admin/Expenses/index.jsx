@@ -8,16 +8,12 @@ import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
 function Expenses() {
-  const { isLoading, setIsLoading, matcher, loadExpenses, expenses } = useAdmin(); 
+  const { isLoading, setIsLoading, loadExpenses, expenses } = useAdmin(); 
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.expenses) {
-          setIsLoading(true);
-          await loadExpenses();
-          setIsLoading(false);
-        }
+        await loadExpenses();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -25,7 +21,7 @@ function Expenses() {
     }
 
     fetch();
-  }, [ loadExpenses, matcher.expenses, setIsLoading ]);
+  }, [ loadExpenses, setIsLoading ]);
 
   return (
     <>

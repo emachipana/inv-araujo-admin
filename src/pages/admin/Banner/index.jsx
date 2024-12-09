@@ -25,7 +25,7 @@ function Banner() {
   const [itemModal, setItemModal] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
   const [banner, setBanner] = useState({});
-  const { deleteBanner, matcher, loadProducts, updateBanner } = useAdmin();
+  const { deleteBanner, updateBanner } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -33,11 +33,6 @@ function Banner() {
     const fetch = async () => {
       try {
         const banner = await apiFetch(`offers/${id}`);
-        if(!matcher.products) {
-          setIsLoading(true);
-          await loadProducts();
-        }
-
         setBanner(banner.data);
         setIsUsed(banner.data.used);
         setIsLoading(false);
@@ -48,7 +43,7 @@ function Banner() {
     }
 
     fetch();
-  }, [ id, loadProducts, matcher.products ]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -168,12 +163,16 @@ function Banner() {
                   </FlexColumn>
                 </Card>
               </Section>
-              <ItemModal 
-                banner={banner}
-                isActive={itemModal}
-                setBanner={setBanner}
-                setIsActive={setItemModal}
-              />
+              {
+                itemModal
+                &&
+                <ItemModal 
+                  banner={banner}
+                  isActive={itemModal}
+                  setBanner={setBanner}
+                  setIsActive={setItemModal}
+                />
+              }
               <DeleteModal 
                 handleDelete={deleteBanner}
                 id={banner.id}

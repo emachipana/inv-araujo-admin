@@ -14,16 +14,12 @@ import { errorParser } from "../../../helpers/errorParser";
 
 function Banners() {
   const [modalCreate, setModalCreate] = useState(false);
-  const { isLoading, setIsLoading, matcher, loadBanners, banners } = useAdmin();
+  const { isLoading, setIsLoading, loadBanners, banners } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.banners) {
-          setIsLoading(true);
-          await loadBanners();
-          setIsLoading(false);
-        }
+        await loadBanners();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -31,7 +27,7 @@ function Banners() {
     }
 
     fetch();
-  }, [ loadBanners, matcher.banners, setIsLoading ]);
+  }, [ loadBanners, setIsLoading ]);
 
   return (
     <>

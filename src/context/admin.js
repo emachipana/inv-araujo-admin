@@ -52,11 +52,14 @@ const AdminProvider = ({ children }) => {
     setIsLoading(false);
   }, [matcher.clients]);
 
-  const loadBanners = async () => {
+  const loadBanners = useCallback(async () => {
+    if(matcher.banners) return;
+    setIsLoading(true);
     const banners = await apiFetch("offers");
     setBanners(banners);
     setMatcher(matcher => ({...matcher, banners: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.banners]);
 
   const loadInvoices = useCallback(async () => {
     if(matcher.invoices) return;

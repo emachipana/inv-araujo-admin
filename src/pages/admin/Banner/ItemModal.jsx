@@ -19,16 +19,18 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { backup, addBannerItem } = useAdmin();
+  const { backup, addBannerItem, loadProducts } = useAdmin();
 
   useEffect(() => {
-    const init = () => {
+    const init = async () => {
+      await loadProducts();
+
       const filteredProducts = filterProducts(banner.products, backup);
       setSearchProducts(filteredProducts);
     }
 
     init();
-  }, [ banner.products, backup ]);
+  }, [ banner.products, backup, loadProducts ]);
 
   const onClose = () => {
     setValues({ productId: "" });

@@ -16,7 +16,7 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
         if(currentType === "Todo") return setInvoices(invoicesBackup);
         setIsGetting(true);
         const invoices = await apiFetch(`invoices?type=${currentType.toUpperCase()}`);
-        setInvoices(invoices);
+        setInvoices(invoices.content);
         setIsGetting(false);
       }catch(error) {
         toast.error(errorParser(error.message));
