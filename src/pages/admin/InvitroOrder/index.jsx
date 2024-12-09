@@ -32,18 +32,14 @@ function InvitroOrder() {
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { deleteVitro, loadTubers, matcher, updateVitro } = useAdmin();
+  const { deleteVitro, loadVitroOrders, updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.vitroOrders && !matcher.tubers) {
-          setIsLoading(true);
-          await loadTubers();
-          setIsLoading(false);
-        }
-
+        await loadVitroOrders();
+        setIsLoading(true);
         const order = await apiFetch(`vitroOrders/${id}`);
         setOrder(order.data);
         setIsLoading(false);
@@ -54,7 +50,7 @@ function InvitroOrder() {
     }
 
     fetch();
-  }, [id, loadTubers, matcher.tubers, matcher.vitroOrders]);
+  }, [ id, loadVitroOrders ]);
 
   const options = {
     day: "numeric",

@@ -18,6 +18,7 @@ import { COLORS } from "../../styles/colors";
 import { validate } from "../VitroForm/validate";
 import { errorParser } from "../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { departments, provinces } from "../../data/places";
 
 function OrderForm({ initialValues = {
   documentType: "",
@@ -38,16 +39,13 @@ function OrderForm({ initialValues = {
   const [search, setSearch] = useState("");
   const [searchClients, setSearchClients] = useState([]);
   const [clientSelected, setClientSelected] = useState(clientId);
-  const { addOrder, updateOrder, departments, 
-    provinces, matcher, loadDepartments,
+  const { addOrder, updateOrder, matcher,
     loadClients, addClient, clientsBackup } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.departments) await loadDepartments();
-
         if(!matcher.clients) {
           setIsLoading(true);
           await loadClients();
@@ -62,12 +60,12 @@ function OrderForm({ initialValues = {
     }
     
     fetch();
-  }, [ loadDepartments, matcher, loadClients, clientsBackup ]);
+  }, [ matcher, loadClients, clientsBackup ]);
 
   const onSubmit = async (values) => {
     try {
       if(currentAction === "Cliente registrado" && !clientSelected) return;
-
+      
       let orderBody = {
         clientId: clientSelected,
         department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,

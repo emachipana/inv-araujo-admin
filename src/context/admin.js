@@ -1,7 +1,5 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
-import depJson from "../data/departamentos.json";
-import provJson from "../data/provincias.json";
 
 const AdminContext = createContext();
 
@@ -17,8 +15,6 @@ const AdminProvider = ({ children }) => {
   const [ordersBackup, setOrdersBackup] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [invoicesBackup, setInvoicesBackup] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [provinces, setProvinces] = useState({});
   const [banners, setBanners] = useState([]);
   const [clients, setClients] = useState([]);
   const [clientsBackup, setClientsBackup] = useState([]);
@@ -29,7 +25,6 @@ const AdminProvider = ({ children }) => {
     products: false,
     vitroOrders: false,
     orders: false,
-    departments: false,
     tubers: false,
     invoices: false,
     banners: false,
@@ -85,18 +80,6 @@ const AdminProvider = ({ children }) => {
     setTotalVitroOrders(totalVitroOrders.data);
     setMatcher(matcher => ({...matcher, totalOrders: true}));
     setIsLoading(false);
-  }
-
-  const loadTubers = async () => {
-    const tubers = await apiFetch("tubers");
-    setTubers(tubers);
-    setMatcher(matcher => ({...matcher, tubers: true}));
-  }
-
-  const loadDepartments = () => {
-    setDepartments(depJson);
-    setProvinces(provJson);
-    setMatcher(matcher => ({...matcher, departments: true}));
   }
 
   const loadProducts = useCallback(async () => {
@@ -597,15 +580,12 @@ const AdminProvider = ({ children }) => {
         vitroOrdersBack,
         orders,
         matcher,
-        departments,
-        provinces,
         banners,
         clients,
         clientsBackup,
         totalOrders,
         totalVitroOrders,
         loadBanners,
-        loadDepartments,
         setTubers,
         setVitroOrders,
         setCategories,
@@ -646,7 +626,6 @@ const AdminProvider = ({ children }) => {
         loadProducts,
         loadOrders,
         loadVitroOrders,
-        loadTubers,
         addAdvance,
         editAdvance,
         deleteAdvance,

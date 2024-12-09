@@ -13,19 +13,19 @@ import Badge from "../../../components/Badge";
 import { updateStatus } from "./handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { departments, provinces } from "../../../data/places";
 
 function EditVitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
   const [order, setOrder] = useState({});
   const { id } = useParams();
-  const { matcher, departments, provinces, loadDepartments, updateVitro } = useAdmin();
+  const { updateVitro } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.departments) loadDepartments();
         const order = await apiFetch(`vitroOrders/${id}`);
         setOrder(order.data);
         setIsLoading(false);
@@ -36,7 +36,7 @@ function EditVitroOrder() {
     }
 
     fetch();
-  }, [id, loadDepartments, matcher.departments ]);
+  }, [ id ]);
 
   const departmentId = departments.find(dep => dep.nombre_ubigeo === order.department)?.id_ubigeo;
 
@@ -87,7 +87,7 @@ function EditVitroOrder() {
                     ...order,
                     documentType: order.client.documentType === "DNI" ? 1 : 2,
                     department: departmentId,
-                    city: provinces[departmentId].find(prov => prov.nombre_ubigeo === order.city)?.id_ubigeo
+                    city: provinces[departmentId]?.find(prov => prov.nombre_ubigeo === order.city)?.id_ubigeo
                   }}
                   vitroId={order.id}
                   initialDocType={order.client.documentType}

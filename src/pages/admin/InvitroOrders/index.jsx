@@ -21,17 +21,12 @@ function InvitroOrders() {
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("vitroType") || "group");
   const { vitroOrders, isLoading, 
-    loadVitroOrders, setIsLoading, matcher,
-    setVitroOrders, vitroOrdersBack } = useAdmin();
+    loadVitroOrders, setIsLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.vitroOrders) {
-          setIsLoading(true);
-          await loadVitroOrders();
-          setIsLoading(false);
-        }
+        await loadVitroOrders();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -39,7 +34,7 @@ function InvitroOrders() {
     }
 
     fetch();
-  }, [ loadVitroOrders, setIsLoading, matcher.vitroOrders ]);
+  }, [ loadVitroOrders, setIsLoading ]);
 
   return (
     <>

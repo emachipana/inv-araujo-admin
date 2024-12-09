@@ -13,19 +13,19 @@ import Button from "../../../components/Button";
 import { updateStatus } from "../InvitroOrder/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { departments, provinces } from "../../../data/places";
 
 function EditOrder() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUpdating, setIsUpdating] = useState(false);
 	const [order, setOrder] = useState({});
 	const { id } = useParams();
-	const { matcher, departments, provinces, loadDepartments, updateOrder } = useAdmin();
+	const { updateOrder } = useAdmin();
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const fetch = async () => {
 			try {
-				if(!matcher.departments) loadDepartments();
 				const order = await apiFetch(`orders/${id}`);
 				setOrder(order.data);
 				setIsLoading(false);
@@ -36,7 +36,7 @@ function EditOrder() {
 		}
 
 		fetch();
-	}, [id, matcher.departments, loadDepartments]);
+	}, [ id ]);
 
 	const depId = departments.find(dep => dep.nombre_ubigeo === order.department)?.id_ubigeo;
 

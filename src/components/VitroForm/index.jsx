@@ -18,6 +18,7 @@ import { BiSearch } from "react-icons/bi";
 import Client from "./Client";
 import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
+import { departments, provinces } from "../../data/places";
 
 function VitroForm({ initialValues = {
   documentType: "",
@@ -39,21 +40,13 @@ function VitroForm({ initialValues = {
 	const [search, setSearch] = useState("");
 	const [searchClients, setSearchClients] = useState([]);
 	const [clientSelected, setClientSelected] = useState(clientId);
-  const { addVitro, updateVitro, departments, 
-    provinces, matcher, loadDepartments,
-    clientsBackup, addClient, loadClients } = useAdmin();
+  const { addVitro, updateVitro, clientsBackup, addClient, loadClients } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.departments) await loadDepartments();
-        if(!matcher.clients) {
-          setIsLoading(true);
-          await loadClients();
-          setIsLoading(false);
-        }
-
+        await loadClients();
         setSearchClients(clientsBackup);
       }catch(error) {
         toast.error(errorParser(error.message));
@@ -62,7 +55,7 @@ function VitroForm({ initialValues = {
     }
     
     fetch();
-  }, [ loadDepartments, matcher, clientsBackup, loadClients ]);
+  }, [ clientsBackup, loadClients ]);
 
   const onSubmit = async (values) => {
     try {
