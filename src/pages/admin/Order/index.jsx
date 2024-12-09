@@ -279,15 +279,19 @@ function Order() {
                   </FlexColumn>
                 </Card>
               </Section>
-              <ItemModal 
-                isActive={itemModal}
-                setIsActive={setItemModal}
-                item={item}
-                setItem={setItem}
-                order={order}
-                setOrder={setOrder}
-                isToEdit={!!item}
-              />
+              {
+                itemModal
+                &&
+                <ItemModal 
+                  isActive={itemModal}
+                  setIsActive={setItemModal}
+                  item={item}
+                  setItem={setItem}
+                  order={order}
+                  setOrder={setOrder}
+                  isToEdit={!!item}
+                />
+              }
               <DeleteModal
                 handleDelete={deleteOrder}
                 id={order.id}

@@ -20,17 +20,12 @@ function Orders() {
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
-  const { orders, isLoading, setIsLoading, 
-    matcher, loadOrders, setOrders, ordersBackup } = useAdmin();
+  const { orders, isLoading, setIsLoading, loadOrders, setOrders, ordersBackup } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.orders) {
-          setIsLoading(true);
-          await loadOrders();
-          setIsLoading(false);
-        }
+        await loadOrders();
       }catch(error) {
         toast.error(errorParser(error.message));
         setIsLoading(false);
@@ -38,7 +33,7 @@ function Orders() {
     }
 
     fetch();
-  }, [ loadOrders, setIsLoading, matcher.orders ]);
+  }, [ loadOrders, setIsLoading ]);
 
   return (
     <>

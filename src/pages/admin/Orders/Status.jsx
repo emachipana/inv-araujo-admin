@@ -16,7 +16,7 @@ function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
         if(currentStatus === "Todo") return setOrders(ordersBackup);
         setIsGetting(true);
         const orders = await apiFetch(`orders?status=${currentStatus.toUpperCase()}`);
-        setOrders(orders);
+        setOrders(orders.content);
         setIsGetting(false);
       }catch(error) {
         toast.error(errorParser(error.message));

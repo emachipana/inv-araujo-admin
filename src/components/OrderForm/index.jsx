@@ -39,18 +39,13 @@ function OrderForm({ initialValues = {
   const [search, setSearch] = useState("");
   const [searchClients, setSearchClients] = useState([]);
   const [clientSelected, setClientSelected] = useState(clientId);
-  const { addOrder, updateOrder, matcher,
-    loadClients, addClient, clientsBackup } = useAdmin();
+  const { addOrder, updateOrder, loadClients, addClient, clientsBackup } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.clients) {
-          setIsLoading(true);
-          await loadClients();
-          setIsLoading(false);
-        }
+        await loadClients();
 
         setSearchClients(clientsBackup);
       }catch(error) {
@@ -60,7 +55,7 @@ function OrderForm({ initialValues = {
     }
     
     fetch();
-  }, [ matcher, loadClients, clientsBackup ]);
+  }, [ loadClients, clientsBackup ]);
 
   const onSubmit = async (values) => {
     try {

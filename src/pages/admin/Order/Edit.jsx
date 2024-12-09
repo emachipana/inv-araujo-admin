@@ -57,7 +57,7 @@ function EditOrder() {
                     >
                       Estado actual: 
                     </Text>
-										<Badge 
+										<Badge
                       color={order.status === "PENDIENTE" ? "warning" : "primary"}
                     >
                       { order.status }
