@@ -13,6 +13,9 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetch = async () => {
       try {
+        const token = localStorage.getItem(TOKEN_NAME);
+        if(!token) return setIsLoading(false);
+
         const user = await apiFetch("users/profile/info");
         setUser(user.data);
         setIsLoading(false);
