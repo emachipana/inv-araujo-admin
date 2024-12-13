@@ -34,11 +34,11 @@ function Calendar() {
     const fetch = async () => {
       try {
         setIsLoading(true);
-        const orders = await apiFetch(`orders/pending?month=${numberMonths[curMonth]}`);
-        const vitroOrders = await apiFetch(`vitroOrders/pending?month=${numberMonths[curMonth]}`)
+        const orders = await apiFetch(`orders?status=PENDIENTE&month=${numberMonths[curMonth]}`);
+        const vitroOrders = await apiFetch(`vitroOrders?status=PENDIENTE&month=${numberMonths[curMonth]}`)
         setIsLoading(false);
 
-        setData([...orders, ...vitroOrders].map(order => ({
+        setData([...orders.content, ...vitroOrders.content].map(order => ({
           ...order,
           date: order.maxShipDate || order.finishDate,
           type: order.maxShipDate ? "productos" : "invitro"
