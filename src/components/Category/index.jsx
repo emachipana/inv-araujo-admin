@@ -2,11 +2,11 @@ import { Text } from "../../styles/layout";
 import { Blocker } from "../Categories/styles";
 import { Container } from "./styles";
 
-function Category({ name, setCurrentCategory, currentCategory, isBlocked }) {
+function Category({ id, name, setCurrentCategory, currentCategory, isBlocked }) {
   return (
     <Container 
-      onClick={() => setCurrentCategory(name)}
-      isActive={name === currentCategory}
+      onClick={() => setCurrentCategory(id, name)}
+      isActive={name === currentCategory || (!currentCategory && name === "Todo" )}
       isBlocked={isBlocked}
     >
       <Text

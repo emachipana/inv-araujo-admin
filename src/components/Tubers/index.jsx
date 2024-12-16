@@ -22,7 +22,7 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
         setIsGetting(true);
         const tuber = tubers.find(tuber => tuber.name === currentTuber);
         const vitroOrders = await apiFetch(`vitroOrders?tuberId=${tuber.id}`);
-        setVitroOrders(vitroOrders.content);
+        setVitroOrders(vitroOrders);
         setIsGetting(false);
       }catch(error) {
         toast.error(errorParser(error.message));

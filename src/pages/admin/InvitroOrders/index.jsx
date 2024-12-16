@@ -12,6 +12,8 @@ import VitroForm from "../../../components/VitroForm";
 import { onSearchChange } from "../Products/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import Pagination from "../../../components/Pagination";
+import { FlexRow } from "../../../styles/layout";
 
 function InvitroOrders() {
   const [currentTuber, setCurrentTuber] = useState("Todo");
@@ -58,12 +60,24 @@ function InvitroOrders() {
         searchValue={search}
         setCurrentCategory={setCurrentTuber}
       />
+      <FlexRow
+        width="100%"
+        justify="space-between"
+      >
+        <p>Ordernar por: </p>
+        <Pagination 
+          currentPage={vitroOrders.number || 0}
+          totalPages={vitroOrders.totalPages}
+          isFirst={vitroOrders.first}
+          isLast={vitroOrders.last}
+        />
+      </FlexRow>
       <Section>
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
-              ? vitroOrders.map((order, index) => (
+              ? vitroOrders.content?.map((order, index) => (
                   <Order
                     id={order.id}
                     key={index}

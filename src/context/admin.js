@@ -46,8 +46,8 @@ const AdminProvider = ({ children }) => {
     if(matcher.clients) return;
     setIsLoading(true);
     const clients = await apiFetch("clients");
-    setClients(clients.content);
-    setClientsBackup(clients.content);
+    setClients(clients);
+    setClientsBackup(clients);
     setMatcher(matcher => ({...matcher, clients: true}));
     setIsLoading(false);
   }, [matcher.clients]);
@@ -65,8 +65,8 @@ const AdminProvider = ({ children }) => {
     if(matcher.invoices) return;
     setIsLoading(true);
     const invoices = await apiFetch("invoices");
-    setInvoices(invoices.content);
-    setInvoicesBackup(invoices.content);
+    setInvoices(invoices);
+    setInvoicesBackup(invoices);
     setMatcher(matcher => ({...matcher, invoices: true}));
     setIsLoading(false);
   }, [matcher.invoices]);
@@ -91,8 +91,8 @@ const AdminProvider = ({ children }) => {
     const categories = await apiFetch("categories");
     const products = await apiFetch("products");
     setCategories(categories);
-    setProducts(products.content);
-    setBackup(products.content);
+    setProducts(products);
+    setBackup(products);
     setMatcher(matcher => ({...matcher, products: true}));
     setIsLoading(false);
   }, [matcher.products]);
@@ -103,8 +103,8 @@ const AdminProvider = ({ children }) => {
     const tubers = await apiFetch("tubers");
     const vitroOrders = await apiFetch("vitroOrders");
     setTubers(tubers);
-    setVitroOrders(vitroOrders.content);        
-    setVitroOrdersBack(vitroOrders.content);
+    setVitroOrders(vitroOrders);        
+    setVitroOrdersBack(vitroOrders);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
     setIsLoading(false);
   }, [matcher.vitroOrders]);
@@ -113,8 +113,8 @@ const AdminProvider = ({ children }) => {
     if(matcher.orders) return;
     setIsLoading(true);
     const orders = await apiFetch("orders");
-    setOrders(orders.content);
-    setOrdersBackup(orders.content);
+    setOrders(orders);
+    setOrdersBackup(orders);
     setMatcher(matcher => ({...matcher, orders: true}));
     setIsLoading(false);
   }, [matcher.orders]);

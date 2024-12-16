@@ -108,7 +108,7 @@ function List() {
       </thead>
       <tbody>
         {
-          products.map((product, index) => {
+          products.content.map((product, index) => {
             const { images = [] } = product;
 
             return (

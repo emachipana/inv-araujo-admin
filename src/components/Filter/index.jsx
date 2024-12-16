@@ -2,21 +2,22 @@ import { FaListUl } from "react-icons/fa";
 import { FlexRow } from "../../styles/layout";
 import { Container, Group, Wrapper } from "./styles";
 import { HiSquares2X2 } from "react-icons/hi2";
-import { IoSearchOutline } from "react-icons/io5";
+import { IoClose, IoSearchOutline } from "react-icons/io5";
 import Button from "../Button";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import Input from "../Input";
 import { BiSearch } from "react-icons/bi";
 
-function Filter({ setModal, textButton, localStorageKey, setType, type, isSearching, setIsSearching, labelSearch, setCurrentCategory, onSearchChange, searchValue }) {
+function Filter({ setModal, textButton, localStorageKey, setType, type, isSearching, setIsSearching, labelSearch, setFilters, onSearchChange, searchValue, setSearch }) {
   const handleClick = (type) => {
     setType(type);
     localStorage.setItem(localStorageKey, type);
   }
 
   const handleSearchClick = () => {
-    setIsSearching(true);
-    setCurrentCategory && setCurrentCategory("Todo");
+    setIsSearching(!isSearching);
+    setFilters && setFilters(filters => ({...filters, category: {id: null, name: null}, sort: null}));
+    if(isSearching) setSearch("");
   }
 
   return (
@@ -40,23 +41,34 @@ function Filter({ setModal, textButton, localStorageKey, setType, type, isSearch
             />
           </Wrapper>
         </Group>
-        {
-          isSearching
-          ? <Input
-              Icon={BiSearch}
-              placeholder={labelSearch}
-              style={{maxWidth: "280px"}}
-              backgroundColor="white"
-              handleChange={onSearchChange}
-              value={searchValue}
-            />
-          : <Wrapper>
-              <IoSearchOutline
+        <Wrapper
+          style={{margin: isSearching ? "0 -0.5rem" : 0}}
+        >
+          {
+            isSearching
+            ? <IoClose 
                 size={25}
                 onClick={handleSearchClick}
               />
-            </Wrapper>
+            : <IoSearchOutline
+                size={25}
+                onClick={handleSearchClick}
+              /> 
+          }
+        </Wrapper>
+        {
+          isSearching
+          &&
+          <Input
+            Icon={BiSearch}
+            placeholder={labelSearch}
+            style={{maxWidth: "280px"}}
+            backgroundColor="white"
+            handleChange={onSearchChange}
+            value={searchValue}
+          />
         }
+        
       </FlexRow>
       <Button
         onClick={() => setModal(modal => !modal)}

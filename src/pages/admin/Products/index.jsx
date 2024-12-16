@@ -9,12 +9,15 @@ import Modal from "../../../components/Modal";
 import ProductForm from "../../../components/ProductForm";
 import List from "./List";
 import Filter from "../../../components/Filter";
-import { onSearchChange } from "./handlers";
+import { filterBuilder, onSearchChange } from "./handlers";
 import toast from "react-hot-toast";
 import { errorParser } from "../../../helpers/errorParser";
+import { FlexRow } from "../../../styles/layout";
+import Pagination from "../../../components/Pagination";
+import apiFetch from "../../../services/apiFetch";
 
 function Products() {
-  const [currentCategory, setCurrentCategory] = useState("Todo");
+  const [filters, setFilters] = useState({category: { id: null, name: null }, sort: null});
   const [createModal, setCreateModal] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
@@ -35,16 +38,35 @@ function Products() {
     fetch();
   }, [ loadProducts, setIsLoading ]);
 
+  useEffect(() => {
+    const filter = async () => {
+      if(!filters.category.id && !filters.sort) return setProducts(backup);
+
+      try {
+        setIsGetting(true);
+        const params = filterBuilder(filters);
+        const products = await apiFetch(`products${params}`);
+        setProducts(products);
+        setIsGetting(false)
+      }catch(error) {
+        setIsGetting(false);
+        toast.error(errorParser(error.message));
+      }
+    }
+
+    filter();
+  }, [filters, backup, setProducts]);
+
   return (
     <>
       <Title>Productos</Title>
       <Categories 
         isBlocked={isSearching}
-        currentCategory={currentCategory}
-        setCurrentCategory={setCurrentCategory}
+        currentCategory={filters.category.name}
+        setFilters={setFilters}
         setIsGetting={setIsGetting}
       />
-      <Filter 
+      <Filter
         setModal={setCreateModal}
         textButton="Nuevo producto"
         localStorageKey="productType"
@@ -53,16 +75,32 @@ function Products() {
         isSearching={isSearching}
         setIsSearching={setIsSearching}
         labelSearch="Buscar producto..."
-        setCurrentCategory={setCurrentCategory}
-        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup, setIsSearching)}
+        setFilters={setFilters}
+        onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup)}
         searchValue={search}
+        setSearch={setSearch}
       />
+      <FlexRow
+        width="100%"
+        justify="space-between"
+      >
+        <p>Ordernar por: </p>
+        <Pagination
+          currentPage={products.number}
+          totalPages={products.totalPages}
+          filters={filters}
+          isLoading={isGetting}
+          setIsLoading={setIsGetting}
+          set={setProducts}
+          to="products"
+        />
+      </FlexRow>
       <Section>
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
-              ? products?.map((product, index) => (
+              ? products.content?.map((product, index) => (
                   <Product 
                     key={index}
                     isInAdmin

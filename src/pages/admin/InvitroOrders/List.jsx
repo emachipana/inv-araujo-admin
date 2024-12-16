@@ -103,7 +103,7 @@ function List() {
       </thead>
       <tbody>
         {
-          vitroOrders.map((order, index) => {
+          vitroOrders.content.map((order, index) => {
             const parsedDate = new Date(order.finishDate);
             const options = {
               day: "numeric",

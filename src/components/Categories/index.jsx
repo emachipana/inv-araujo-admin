@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Container } from "./styles";
 import NewCategory from "../Category/New";
 import Category from "../Category";
@@ -7,31 +7,16 @@ import { Spinner } from "reactstrap";
 import Modal from "../Modal";
 import EditCategories from "../EditCategories";
 import { FaRegEdit } from "react-icons/fa";
-import apiFetch from "../../services/apiFetch";
-import { errorParser } from "../../helpers/errorParser";
-import toast from "react-hot-toast";
 
-function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetting }) {
+function Categories({ isBlocked, currentCategory, setFilters }) {
   const [editModal, setEditModal] = useState(false);
-  const { categories, isLoading, setProducts, backup } = useAdmin();
+  const { categories, isLoading } = useAdmin();
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        if(currentCategory === "Todo") return setProducts(backup);
-        setIsGetting(true);
-        const category = categories.find(category => category.name === currentCategory);
-        const products = await apiFetch(`products?categoryId=${category.id}`);
-        setProducts(products.content);
-        setIsGetting(false);
-      }catch(error) {
-        setIsGetting(false);
-        toast.error(errorParser(error.message));
-      }
-    }
+  const setCurrentCategory = (id, name) => {
+    if(name === "Todo") return setFilters(filters => ({...filters, category: { id: null, name: null }}));
 
-    fetch();
-  }, [currentCategory, backup, categories, setProducts, setIsGetting]);
+    setFilters(filters => ({...filters, category: {id, name}}));
+  }
 
   return (
     <Container isLoading={isLoading}>
@@ -55,6 +40,7 @@ function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetti
             {
               categories.map((category, index) => (
                 <Category
+                  id={category.id}
                   isBlocked={isBlocked}
                   key={index}
                   name={category.name}

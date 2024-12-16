@@ -7,7 +7,7 @@ export const handleClick = (event, id, navigate) => {
   navigate(`${id}/edit`);
 }
 
-export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup, setIsSearching) => {
+export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup) => {
   const value = e.target.value;
   
   try {
@@ -17,16 +17,32 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
     if(value.length >= 3) {
       setIsGetting(true);
       const searched = await apiFetch(`${from}/search?param=${value}`);
-      setSearched(searched);
+      setSearched({content: searched});
       setIsGetting(false);
       return;
     }
 
     setSearched(backup);
-
-    if(value.length <= 0) setIsSearching(false);
   }catch(error) {
     toast.error(errorParser(error.message));
     setIsGetting(false);
   }
+}
+
+export const filterBuilder = (filters = { category: { id: null }, sort: null, page: 0 }) => {
+  let filter = "";
+
+  if(filters.category.id) filter += `?categoryId=${filters.category.id}`;
+  
+  if(filters.sort) {
+    const op = filters.category.id ? "&" : "?";
+    filter += `${op}sort=${filters.sort}`;
+  } 
+
+  if(filters.page > 0) {
+    const op = (filters.category.id || filters.sort) ? "&" : "?";
+    filter += `${op}page=${filters.page}`;
+  }
+
+  return filter;
 }
