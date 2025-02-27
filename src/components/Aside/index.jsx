@@ -8,6 +8,7 @@ import { FaUserGroup, FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
 import { RiLogoutBoxFill } from "react-icons/ri";
 import { useLocation } from "react-router-dom";
+import { IoMdMail } from "react-icons/io";
 
 function Aside({ isOpen, setIsOpen }) {
   const { pathname } = useLocation();
@@ -92,6 +93,14 @@ function Aside({ isOpen, setIsOpen }) {
           Icon={FaUserGroup}
         >
           Clientes
+        </NavItem>
+        <NavItem
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+          redirectTo="/mensajes"
+          Icon={IoMdMail}
+        >
+          Mensajes
         </NavItem>
         <NavItem
           isOpen={isOpen}

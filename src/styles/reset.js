@@ -42,8 +42,7 @@ export const RESET = css`
   }
 
   ::-webkit-scrollbar-thumb {
-    background-color: ${COLORS.dim};
-    border-radius: 6px;
+    background-color: ${COLORS.taupe};
     cursor: grab;
   }
 

@@ -14,6 +14,7 @@ export const Container = styled.div`
   grid-area: aside;
   position: sticky;
   top: 70px;
+  overflow-y: auto;
 
   @media screen and (max-width: 800px) {
     position: fixed;
