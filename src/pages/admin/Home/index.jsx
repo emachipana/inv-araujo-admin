@@ -28,7 +28,7 @@ Chart.register(
 );
 
 function Home() {
-  const { isLoading, setIsLoading, expenses, loadOnHome, vitroOrders, orders, totalOrders, totalVitroOrders } = useAdmin();
+  const { isLoading, setIsLoading, expenses, loadOnHome, homeData } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,8 +42,7 @@ function Home() {
     }
 
     fetch();
-    // eslint-disable-next-line
-  }, [setIsLoading]);
+  }, [setIsLoading, loadOnHome]);
 
   const data = {
     labels: expenses.map(ex => capitalize(months[ex.month].toLowerCase())),
@@ -176,7 +175,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalVitroOrders.ship }
+                    { homeData.vitroOrders.data.ship }
                   </Text>
                 </Card>
                 <Card
@@ -206,7 +205,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalVitroOrders.pen }
+                    { homeData.vitroOrders.data.pen }
                   </Text>
                 </Card>
               </Group>
@@ -294,7 +293,7 @@ function Home() {
                   </thead>
                   <tbody>
                     {
-                      vitroOrders.slice(0, 5).map((order, index) => {
+                      homeData.vitroOrders.content.map((order, index) => {
                         const date = new Date(order.finishDate);
                         const options = {
                           day: "numeric",
@@ -460,7 +459,7 @@ function Home() {
                   </thead>
                   <tbody>
                     {
-                      orders.slice(0, 5).map((order, index) => {
+                      homeData.orders.content.map((order, index) => {
                         const date = new Date(order.maxShipDate);
                         const options = {
                           day: "numeric",
@@ -568,7 +567,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.ship }
+                    { homeData.orders.data.ship }
                   </Text>
                 </Card>
                 <Card
@@ -598,7 +597,7 @@ function Home() {
                     weight={800}
                     size={35}
                   >
-                    { totalOrders.pen }
+                    { homeData.orders.data.pen }
                   </Text>
                 </Card>
               </Group>

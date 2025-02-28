@@ -19,9 +19,18 @@ const AdminProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [clientsBackup, setClientsBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [totalOrders, setTotalOrders] = useState({ ship: 0, pen: 0 });
-  const [totalVitroOrders, setTotalVitroOrders] = useState({ ship: 0, pen: 0 });
+  const [homeData, setHomeData] = useState({
+    orders: {
+      data: {ship: 0, pen: 0},
+      content: []
+    },
+    vitroOrders: {
+      data: {ship: 0, pen: 0},
+      content: []
+    }
+  });
   const [matcher, setMatcher] = useState({
+    home: false,
     products: false,
     vitroOrders: false,
     orders: false,
@@ -29,8 +38,7 @@ const AdminProvider = ({ children }) => {
     invoices: false,
     banners: false,
     clients: false,
-    expenses: false,
-    totalOrders: false
+    expenses: false
   });
 
   const loadExpenses = useCallback(async () => {
@@ -71,19 +79,26 @@ const AdminProvider = ({ children }) => {
     setIsLoading(false);
   }, [matcher.invoices]);
 
-  const loadOnHome = async () => {
-    await loadExpenses();
-    await loadVitroOrders();
-    await loadOrders();
-    if(matcher.totalOrders) return;
+  const loadOnHome = useCallback(async () => {
+    if(matcher.home) return;
     setIsLoading(true);
-    const totalVitroOrders = await apiFetch("vitroOrders/data");
-    const totalOrders = await apiFetch("orders/data");
-    setTotalOrders(totalOrders.data);
-    setTotalVitroOrders(totalVitroOrders.data);
-    setMatcher(matcher => ({...matcher, totalOrders: true}));
+    const vitroOrdersData = await apiFetch("vitroOrders/data");
+    const ordersData = await apiFetch("orders/data");
+    const orders = await apiFetch("orders?size=5&sort=DESC");
+    const vitroOrders = await apiFetch("vitroOrders?size=5&sort=DESC");
+    setHomeData({
+      orders: {
+        data: ordersData.data,
+        content: orders.content
+      },
+      vitroOrders: {
+        data: vitroOrdersData.data,
+        content: vitroOrders.content
+      }
+    });
+    setMatcher(matcher => ({...matcher, home: true}));
     setIsLoading(false);
-  }
+  }, [matcher.home]);
 
   const loadProducts = useCallback(async () => {
     if(matcher.products) return;
@@ -551,8 +566,7 @@ const AdminProvider = ({ children }) => {
         banners,
         clients,
         clientsBackup,
-        totalOrders,
-        totalVitroOrders,
+        homeData,
         loadBanners,
         setTubers,
         setVitroOrders,
