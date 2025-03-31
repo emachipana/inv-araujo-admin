@@ -10,6 +10,8 @@ import toast from "react-hot-toast";
 function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
   const { isLoading, ordersBackup, setOrders } = useAdmin();
 
+  const setCurrent = (_id, name) => setCurrentStatus(name);
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -37,19 +39,19 @@ function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
               isBlocked={isBlocked}
               name="Todo"
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
             />
             <Category
               isBlocked={isBlocked}
               name="Entregado"
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
             />
             <Category 
               name="Pendiente"
               isBlocked={isBlocked}
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
             />
           </>
       }

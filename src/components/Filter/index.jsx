@@ -8,7 +8,11 @@ import { IoMdAddCircleOutline } from "react-icons/io";
 import Input from "../Input";
 import { BiSearch } from "react-icons/bi";
 
-function Filter({ setModal, textButton, localStorageKey, setType, type, isSearching, setIsSearching, labelSearch, setFilters, onSearchChange, searchValue, setSearch }) {
+function Filter({ 
+  setModal, textButton, localStorageKey, setType, type, isSearching,
+  setIsSearching, labelSearch, setFilters, onSearchChange, searchValue,
+  setSearch, reset, secondButton
+}) {
   const handleClick = (type) => {
     setType(type);
     localStorage.setItem(localStorageKey, type);
@@ -17,7 +21,10 @@ function Filter({ setModal, textButton, localStorageKey, setType, type, isSearch
   const handleSearchClick = () => {
     setIsSearching(!isSearching);
     setFilters && setFilters(filters => ({...filters, category: {id: null, name: null}, sort: null}));
-    if(isSearching) setSearch("");
+    if(isSearching) {
+      setSearch("");
+      reset();
+    }
   }
 
   return (
@@ -70,14 +77,28 @@ function Filter({ setModal, textButton, localStorageKey, setType, type, isSearch
         }
         
       </FlexRow>
-      <Button
-        onClick={() => setModal(modal => !modal)}
-        fontSize={15}
-        Icon={IoMdAddCircleOutline}
-        iconSize={18}
-      >
-        { textButton }
-      </Button>
+      <FlexRow>
+        {
+          secondButton
+          &&
+          <Button
+            onClick={() => secondButton.setModal(modal => !modal)}
+            fontSize={15}
+            Icon={IoMdAddCircleOutline}
+            iconSize={18}
+          >
+            { secondButton.textButton }
+          </Button>
+        }
+        <Button
+          onClick={() => setModal(modal => !modal)}
+          fontSize={15}
+          Icon={IoMdAddCircleOutline}
+          iconSize={18}
+        >
+          { textButton }
+        </Button>
+      </FlexRow>
     </Container>
   );
 }

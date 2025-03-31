@@ -21,7 +21,6 @@ function ProductForm({ initialValues = {
   categoryId: "",
   price: "",
   purchasePrice: "",
-  stock: "",
   unit: "",
   isActive: true
 }, isToCreate, productId }) {
@@ -104,12 +103,12 @@ function ProductForm({ initialValues = {
           </Group>
           <Group>
             <Input 
-              id="brand"
-              label="Marca"
-              placeholder="Ingresa una marca"
-              error={errors.brand}
-              touched={touched.brand}
-              value={values.brand}
+              id="price"
+              label="Precio venta"
+              placeholder="S/. 0.0"
+              error={errors.price}
+              touched={touched.price}
+              value={values.price}
               handleChange={handleChange}
               handleBlur={handleBlur}
             />
@@ -124,28 +123,16 @@ function ProductForm({ initialValues = {
               handleBlur={handleBlur}
             />
           </Group>
-          <Group>
-            <Input 
-              id="price"
-              label="Precio venta"
-              placeholder="S/. 0.0"
-              error={errors.price}
-              touched={touched.price}
-              value={values.price}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-            />
-            <Input 
-              id="stock"
-              label="Cantidad"
-              placeholder="Ingresa el stock"
-              error={errors.stock}
-              touched={touched.stock}
-              value={values.stock}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-            />
-          </Group>
+          <Input 
+            id="brand"
+            label="Marca"
+            placeholder="Ingresa una marca"
+            error={errors.brand}
+            touched={touched.brand}
+            value={values.brand}
+            handleChange={handleChange}
+            handleBlur={handleBlur}
+          />
           <Button
             type="submit"
             iconSize={18}

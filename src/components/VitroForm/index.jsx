@@ -30,17 +30,18 @@ function VitroForm({ initialValues = {
   city: "",
   initDate: "",
   finishDate: "",
-  status: ""
-}, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "", invoice = null }) {
+  status: "",
+  shippingType: "",
+}, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "", invoice = null, evidence = null, employee = null }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
 	const [isGetting, setIsGetting] = useState(false);
 	const [search, setSearch] = useState("");
-	const [searchClients, setSearchClients] = useState([]);
+	const [searchClients, setSearchClients] = useState({});
 	const [clientSelected, setClientSelected] = useState(clientId);
-  const { addVitro, updateVitro, clientsBackup, addClient, loadClients } = useAdmin();
+  const { addVitro, updateVitro, clientsBackup, addClient, loadClients, isLoading: isClientsLoading, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,12 +51,12 @@ function VitroForm({ initialValues = {
         setSearchClients(clientsBackup);
       }catch(error) {
         toast.error(errorParser(error.message));
-        setIsLoading(false);
+        setClientsLoading(false);
       }
     }
     
     fetch();
-  }, [ clientsBackup, loadClients ]);
+  }, [ clientsBackup, loadClients, setClientsLoading ]);
 
   const onSubmit = async (values) => {
     try {
@@ -66,28 +67,35 @@ function VitroForm({ initialValues = {
         department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
         city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
         initDate: values.initDate,
-        finishDate: values.finishDate
+        finishDate: values.finishDate,
+        shippingType: (values.shippingType * 1) === 1 ? "RECOJO_ALMACEN" : "ENVIO_AGENCIA",
       }
       
       setIsLoading(true);
       if(currentAction === "Nuevo cliente" && isToCreate) {
-        const now = new Date();
         const clientBody = {
           ...values,
           department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
           city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
           documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-          email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+          email: values.email ? values.email : `${values.document}@inversiones.com`,
+          createdBy: "ADMINISTRADOR",
         }
 
         const client = await addClient(clientBody);
         vitroBody = {
           ...vitroBody,
-          clientId: client.id
+          clientId: client.id,
         }
       }
 
-      if(!isToCreate) vitroBody = {...vitroBody, status: initialValues.status, invoiceId: invoice ? invoice.id : null};
+      if(!isToCreate) vitroBody = {
+        ...vitroBody,
+        status: initialValues.status,
+        invoiceId: invoice ? invoice.id : null,
+        imageId: evidence ? evidence.id : null,
+        employeeId: employee ? employee.id : null,
+      };
 
       const vitroOrder = isToCreate ? await addVitro(vitroBody) : await updateVitro(vitroId, vitroBody);
       setIsLoading(false);
@@ -102,6 +110,8 @@ function VitroForm({ initialValues = {
   const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
   const today = new Date();
   today.setHours(12);
+
+  const setCurrent = (_id, name) => setCurrentAction(name); 
 
   return (
     <Formik
@@ -128,12 +138,12 @@ function VitroForm({ initialValues = {
               <Category
                 currentCategory={currentAction}
                 name="Nuevo cliente"
-                setCurrentCategory={setCurrentAction}
+                setCurrentCategory={setCurrent}
               />
               <Category
                 currentCategory={currentAction}
                 name="Cliente registrado"
-                setCurrentCategory={setCurrentAction}
+                setCurrentCategory={setCurrent}
               />
             </FlexRow>
           }
@@ -267,9 +277,9 @@ function VitroForm({ initialValues = {
                     gap="1rem"
                   >
 										{
-											isGetting
+											isGetting || isClientsLoading
 											? <Spinner color="secondary" />
-											: searchClients.map((client, index) => (
+											: searchClients.content?.map((client, index) => (
 													<Client 
                             id={client.id}
                             rsocial={client.rsocial}
@@ -326,7 +336,7 @@ function VitroForm({ initialValues = {
               />
             </Group>
           }
-          <Group width={isToCreate ? 48 : ""}>
+          <Group>
             <Input
               id="initDate"
               labelSize={17}
@@ -339,22 +349,42 @@ function VitroForm({ initialValues = {
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
-            {
-              !isToCreate
-              &&
-              <Input
-                labelSize={17}
-                id="finishDate"
-                label="Fecha entrega"
-                type="date"
-                error={errors.finishDate}
-                touched={touched.finishDate}
-                value={values.finishDate}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-              />
-            }
+           <Select
+              labelSize={17}
+              id="shippingType"
+              label="Tipo de entrega"
+              error={errors.shippingType}
+              touched={touched.shippingType}
+              value={values.shippingType}
+              options={[
+                {
+                  id: 1,
+                  content: "Recojo en almacén"
+                },
+                {
+                  id: 2,
+                  content: "Envío a agencia"
+                }
+              ]}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
           </Group>
+          {
+            !isToCreate
+            &&
+            <Input
+              labelSize={17}
+              id="finishDate"
+              label="Fecha entrega"
+              type="date"
+              error={errors.finishDate}
+              touched={touched.finishDate}
+              value={values.finishDate}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
+          }
           <Button
             type="submit"
             iconSize={18}

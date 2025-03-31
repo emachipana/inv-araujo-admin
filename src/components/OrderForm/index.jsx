@@ -29,18 +29,21 @@ function OrderForm({ initialValues = {
   department: "",
   city: "",
   initDate: "",
-  status: ""
-}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId = "", invoice = null }) {
+  status: "",
+  shippingType: "",
+}, isToCreate, orderId, initialDocType = "", initialDep = "", clientId = "", invoice = null, evidence = null, employee = null }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
   const [docType, setDocType] = useState(initialDocType);
   const [isLoading, setIsLoading] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
-  const [searchClients, setSearchClients] = useState([]);
+  const [searchClients, setSearchClients] = useState({});
   const [clientSelected, setClientSelected] = useState(clientId);
-  const { addOrder, updateOrder, loadClients, addClient, clientsBackup } = useAdmin();
+  const { addOrder, updateOrder, loadClients, addClient, isLoading: isClientsLoading, clientsBackup, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
+
+  const setCurrent = (_id, name) => setCurrentAction(name); 
 
   useEffect(() => {
     const fetch = async () => {
@@ -51,11 +54,12 @@ function OrderForm({ initialValues = {
       }catch(error) {
         setIsLoading(false);
         toast.error(errorParser(error.message));
+        setClientsLoading(false);
       }
     }
     
     fetch();
-  }, [ loadClients, clientsBackup ]);
+  }, [ loadClients, clientsBackup, setClientsLoading ]);
 
   const onSubmit = async (values) => {
     try {
@@ -65,7 +69,8 @@ function OrderForm({ initialValues = {
         clientId: clientSelected,
         department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
         city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
-        date: values.initDate
+        date: values.initDate,
+        shippingType: (values.shippingType * 1) === 1 ? "RECOJO_ALMACEN" : "ENVIO_AGENCIA",
       }
 
       setIsLoading(true);
@@ -77,17 +82,24 @@ function OrderForm({ initialValues = {
           department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
           city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
           documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-          email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+          email: values.email ? values.email : `${now.getTime()}@inversiones.com`,
+          createdBy: "ADMINISTRADOR"
         }
 
-        const newCliet = await addClient(clientBody);
+        const client = await addClient(clientBody);
         orderBody = {
           ...orderBody,
-          clientId: newCliet.id
+          clientId: client.id
         }
       }
 
-      if(!isToCreate) orderBody = {...orderBody, status: initialValues.status, invoiceId: invoice ? invoice.id : null};
+      if(!isToCreate) orderBody = {
+        ...orderBody,
+        status: initialValues.status,
+        invoiceId: invoice ? invoice.id : null,
+        imageId: evidence ? evidence.id : null,
+        employeeId: employee ? employee.id : null,
+      };
 
       const order = isToCreate ? await addOrder(orderBody) : await updateOrder(orderId, orderBody);
       setIsLoading(false);
@@ -128,12 +140,12 @@ function OrderForm({ initialValues = {
               <Category
                 currentCategory={currentAction}
                 name="Nuevo cliente"
-                setCurrentCategory={setCurrentAction}
+                setCurrentCategory={setCurrent}
               />
               <Category
                 currentCategory={currentAction}
                 name="Cliente registrado"
-                setCurrentCategory={setCurrentAction}
+                setCurrentCategory={setCurrent}
               />
             </FlexRow>
           }
@@ -267,9 +279,9 @@ function OrderForm({ initialValues = {
                     gap="1rem"
                   >
 										{
-											isGetting
+											isGetting || isClientsLoading
 											? <Spinner color="secondary" />
-											: searchClients.map((client, index) => (
+											: searchClients.content?.map((client, index) => (
 													<Client
                             id={client.id}
                             rsocial={client.rsocial}
@@ -326,7 +338,7 @@ function OrderForm({ initialValues = {
               />
             </Group>
           }
-          <Group width={isToCreate ? 48 : ""}>
+          <Group>
             <Input 
               id="initDate"
               label="Fecha pedido"
@@ -335,6 +347,26 @@ function OrderForm({ initialValues = {
               error={errors.initDate}
               touched={touched.initDate}
               value={values.initDate}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
+            <Select
+              labelSize={17}
+              id="shippingType"
+              label="Tipo de entrega"
+              error={errors.shippingType}
+              touched={touched.shippingType}
+              value={values.shippingType}
+              options={[
+                {
+                  id: 1,
+                  content: "Recojo en almacén"
+                },
+                {
+                  id: 2,
+                  content: "Envío a agencia"
+                }
+              ]}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />

@@ -82,7 +82,7 @@ function Product() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { product.category.name }
+                        { product.categoryName }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -105,8 +105,8 @@ function Product() {
                       >
                         Estado
                       </Text>
-                      <Badge color={product.active ? "primary" : "danger"}>
-                        { product.active ? "activo" : "inactivo" }
+                      <Badge color={product.isActive ? "primary" : "danger"}>
+                        { product.isActive ? "activo" : "inactivo" }
                       </Badge>
                     </FlexColumn>
                   </Wrapper>

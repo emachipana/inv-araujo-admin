@@ -12,6 +12,8 @@ import Status from "./Status";
 import { onSearchChange } from "../Products/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import Pagination from "../../../components/Pagination";
+import { FlexRow } from "../../../styles/layout";
 
 function Orders() {
   const [currentStatus, setCurrentStatus] = useState("Todo");
@@ -35,6 +37,10 @@ function Orders() {
     fetch();
   }, [ loadOrders, setIsLoading ]);
 
+  const resetAtClose = () => {
+    setOrders(ordersBackup);
+  }
+
   return (
     <>
       <Title>Pedidos</Title>
@@ -56,13 +62,27 @@ function Orders() {
         searchValue={search}
         setCurrentCategory={setCurrentStatus}
         setIsSearching={setIsSearching}
+        setSearch={setSearch}
+        reset={resetAtClose}
       />
+      <FlexRow
+        width="100%"
+        justify="space-between"
+      >
+        <p>Ordernar por: </p>
+        <Pagination
+          currentPage={orders.number || 0}
+          totalPages={orders.totalPages}
+          isFirst={orders.first}
+          isLast={orders.last}
+        />
+      </FlexRow>
       <Section>
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
-              ? orders.map((order, index) => (
+              ? orders.content?.map((order, index) => (
                   <Order 
                     clientName={order.client.rsocial}
                     id={order.id}

@@ -13,7 +13,7 @@ import { Spinner } from "reactstrap";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated }) {
+function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated, setOrderItems }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteOrderItem } = useAdmin();
   const { id, product, price, quantity, subTotal } = item;
@@ -23,7 +23,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedOrder = await deleteOrderItem(id, orderId);
+      const updatedOrder = await deleteOrderItem(id, orderId, setOrderItems);
       setOrder(updatedOrder);
       setIsDeleting(false);
     }catch(error) {
@@ -67,11 +67,12 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             Precio
           </Text>
           <Text
+            style={{whiteSpace: "nowrap"}}
             weight={600}
             size={14}
             color={COLORS.dim}
           >
-            S/. { price }
+            S/. { price.toFixed(2) }
           </Text>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -93,6 +94,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
           <Text 
             weight={700}
             size={15}
+            style={{whiteSpace: "nowrap"}}
           >
             Subtotal
           </Text>
@@ -101,7 +103,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             size={14}
             color={COLORS.dim}
           >
-            S/. { subTotal }
+            S/. { subTotal.toFixed(2) }
           </Text>
         </FlexColumn>
       </Wrapper>

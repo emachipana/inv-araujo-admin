@@ -39,7 +39,7 @@ function EditProduct() {
               <ProductForm 
                 initialValues={{
                   ...product,
-                  categoryId: product.category.id,
+                  categoryId: product.categoryId,
                   isActive: product.active
                 }}
                 productId={product.id}

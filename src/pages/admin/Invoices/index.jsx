@@ -62,7 +62,7 @@ function Invoices() {
           isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
-              ? invoices.map((invoice, index) => (
+              ? invoices.content?.map((invoice, index) => (
                   <Invoice 
                     key={index}
                     id={invoice.id}

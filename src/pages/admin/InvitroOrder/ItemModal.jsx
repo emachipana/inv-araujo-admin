@@ -14,7 +14,7 @@ import { COLORS } from "../../../styles/colors";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem }) {
+function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem, orderItems, setOrderItems }) {
   const [currentVariety, setCurrentVariety] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { tubers, addItem, editItem } = useAdmin();
@@ -42,7 +42,8 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const newVitroOrder = item ? await editItem(item.id, values) : await addItem(values);
+      const {orderVariety, newVitroOrder} = item ? await editItem(item.id, values, setOrderItems) : await addItem(values);
+      if(!item) setOrderItems([orderVariety, ...orderItems]);
       setVitroOrder(newVitroOrder);
       setIsLoading(false);
       setIsActive(false);
@@ -55,7 +56,7 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
 
   const options = tubers.reduce((result, tuber) => {
     const varieties = tuber.varieties?.map(va => {
-      const found = vitroOrder.items?.find(v => v.variety.id === va.id);
+      const found = orderItems.find(v => v.variety.id === va.id);
 
       return {
         id: va.id,

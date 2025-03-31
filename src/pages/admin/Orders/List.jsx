@@ -96,7 +96,7 @@ function List() {
       </thead>
       <tbody>
         {
-          orders.map((order, index) => {
+          orders.content?.map((order, index) => {
             const parsedShipDate = new Date(order.maxShipDate);
             const parsedDate = new Date(order.date);
             const options = {

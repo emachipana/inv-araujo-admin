@@ -254,7 +254,7 @@ function Home() {
                           color={COLORS.gray}
                           weight={600}
                         >
-                          Destino
+                          Entrega
                         </Text>
                       </th>
                       <th>
@@ -270,15 +270,7 @@ function Home() {
                           color={COLORS.gray}
                           weight={600}
                         >
-                          Entrega
-                        </Text>
-                      </th>
-                      <th>
-                        <Text
-                          color={COLORS.gray}
-                          weight={600}
-                        >
-                          Variedades
+                          Fecha entrega
                         </Text>
                       </th>
                       <th>
@@ -293,7 +285,7 @@ function Home() {
                   </thead>
                   <tbody>
                     {
-                      homeData.vitroOrders.content.map((order, index) => {
+                      homeData.vitroOrders.content?.map((order, index) => {
                         const date = new Date(order.finishDate);
                         const options = {
                           day: "numeric",
@@ -322,7 +314,7 @@ function Home() {
                                 color={COLORS.dim}
                                 style={{whiteSpace: "nowrap"}}
                               >
-                                { `${order.city}, ${order.department}` }
+                                { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
                               </Text>
                             </td>
                             <td>
@@ -341,14 +333,6 @@ function Home() {
                                 style={{whiteSpace: "nowrap"}}
                               >
                                 { !order.finishDate ? "Por asignar" : date.toLocaleDateString("es-ES", options) }
-                              </Text>
-                            </td>
-                            <td>
-                              <Text
-                                size={15}
-                                color={COLORS.dim}
-                              >
-                                { order.items ? order.items?.length : 0 }
                               </Text>
                             </td>
                             <td>
@@ -420,7 +404,7 @@ function Home() {
                           color={COLORS.gray}
                           weight={600}
                         >
-                          Destino
+                          Entrega
                         </Text>
                       </th>
                       <th>
@@ -436,15 +420,7 @@ function Home() {
                           color={COLORS.gray}
                           weight={600}
                         >
-                          Entrega
-                        </Text>
-                      </th>
-                      <th>
-                        <Text
-                          color={COLORS.gray}
-                          weight={600}
-                        >
-                          Productos
+                          Fecha entrega
                         </Text>
                       </th>
                       <th>
@@ -459,7 +435,7 @@ function Home() {
                   </thead>
                   <tbody>
                     {
-                      homeData.orders.content.map((order, index) => {
+                      homeData.orders.content?.map((order, index) => {
                         const date = new Date(order.maxShipDate);
                         const options = {
                           day: "numeric",
@@ -488,7 +464,7 @@ function Home() {
                                 color={COLORS.dim}
                                 style={{whiteSpace: "nowrap"}}
                               >
-                                { `${order.city}, ${order.department}` }
+                                { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
                               </Text>
                             </td>
                             <td>
@@ -507,14 +483,6 @@ function Home() {
                                 style={{whiteSpace: "nowrap"}}
                               >
                                 { date.toLocaleDateString("es-ES", options) }
-                              </Text>
-                            </td>
-                            <td>
-                              <Text
-                                size={15}
-                                color={COLORS.dim}
-                              >
-                                { order.items ? order.items?.length : 0 }
                               </Text>
                             </td>
                             <td>

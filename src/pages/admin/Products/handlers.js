@@ -17,7 +17,7 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
     if(value.length >= 3) {
       setIsGetting(true);
       const searched = await apiFetch(`${from}/search?param=${value}`);
-      setSearched({content: searched});
+      setSearched(searched);
       setIsGetting(false);
       return;
     }

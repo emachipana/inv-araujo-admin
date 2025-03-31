@@ -142,7 +142,7 @@ function Clients() {
                     </thead>
                     <tbody>
                       {    
-                        clients?.map((client, index) => {
+                        clients.content?.map((client, index) => {
                           const orders = (client.vitroOrders ? client.vitroOrders.length : 0) + (client.orders ? client.orders.length : 0);
 
                           return (

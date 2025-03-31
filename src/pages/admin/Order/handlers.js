@@ -2,8 +2,8 @@ import toast from "react-hot-toast";
 import apiFetch from "../../../services/apiFetch";
 import { errorParser } from "../../../helpers/errorParser";
 
-export const filterProducts = (items, backup) => { 
-  return backup.filter(product => !items.find(item => item.product.id === product.id));
+export const filterProducts = (items, backup) => {
+  return backup.content?.filter(product => !items.find(item => item.product.id === product.id)) || [];
 }
 
 export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearchProducts, toFind, isLoading) => {

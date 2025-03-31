@@ -10,7 +10,7 @@ import { Spinner } from "reactstrap";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated }) {
+function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated, setOrderItems }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteItem } = useAdmin();
   const { id, variety, price, quantity, subTotal } = item;
@@ -18,7 +18,7 @@ function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGener
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedVitroOrder = await deleteItem(id, vitroId);
+      const updatedVitroOrder = await deleteItem(id, vitroId, setOrderItems);
       setVitro(updatedVitroOrder);
       setIsDeleting(false);
     }catch(error) {

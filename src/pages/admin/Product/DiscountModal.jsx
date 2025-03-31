@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 
 function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { setProduct } = useAdmin();
 
   const initialValues = {
@@ -45,16 +46,16 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
 
   const onDelete = async () => {
     try {
-      setIsLoading(true);
+      setIsDeleting(true);
       await apiFetch(`discounts/${product.discount.id}`, { method: "DELETE" });
       const updatedProduct = {...product, discount: null};
       setProduct(product.id, updatedProduct);
       setMainProduct(updatedProduct);
-      setIsLoading(false);
+      setIsDeleting(false);
       setIsActive(false);
     }catch(error) {
       toast.error(errorParser(error.message));
-      setIsLoading(false);
+      setIsDeleting(false);
     }
   }
   
@@ -130,12 +131,19 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
                   iconSize={18}
                   fontSize={17}
                   size="full"
-                  disabled={isLoading}
+                  disabled={isDeleting || isLoading}
                   Icon={FaTrashAlt}
                   color="danger"
                   onClick={onDelete}
                 >
-                  Eliminar
+                  {
+                    isDeleting
+                    ? <>
+                        <Spinner size="sm" />
+                        Eliminando...
+                      </>
+                    : "Eliminar"
+                  }
                 </Button>
               }
             </FlexRow>

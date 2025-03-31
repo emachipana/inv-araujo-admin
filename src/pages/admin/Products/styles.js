@@ -31,3 +31,11 @@ export const Container = css`
   }
 `;
 
+export const ProductItem = styled.label`
+  width: 100%;
+  cursor: pointer;
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0px 6px 10px 1px rgba(0, 0, 0, .2);
+  padding: 0.5rem 1rem;
+`;

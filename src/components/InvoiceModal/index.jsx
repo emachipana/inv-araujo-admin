@@ -51,7 +51,9 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
         ...restOrder,
         clientId: restOrder.client?.id,
         docType: restOrder.documentType,
-        invoiceId: invoice.id
+        invoiceId: invoice.id,
+        imageId: order.evidence ? order.evidence.id : null,
+        employeeId: order.employee ? order.employee.id : null,
       }
 
       await updateOrder(id, orderBody);

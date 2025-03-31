@@ -15,10 +15,12 @@ import { errorParser } from "../../../helpers/errorParser";
 import { FlexRow } from "../../../styles/layout";
 import Pagination from "../../../components/Pagination";
 import apiFetch from "../../../services/apiFetch";
+import BatchModal from "./BatchModal";
 
 function Products() {
   const [filters, setFilters] = useState({category: { id: null, name: null }, sort: null});
   const [createModal, setCreateModal] = useState(false);
+  const [batchModal, setBatchModal] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
@@ -62,11 +64,12 @@ function Products() {
       <Title>Productos</Title>
       <Categories 
         isBlocked={isSearching}
-        currentCategory={filters.category.name}
+        currentCategory={filters.category?.name}
         setFilters={setFilters}
         setIsGetting={setIsGetting}
       />
       <Filter
+        secondButton={{textButton: "Nuevo lote", setModal: setBatchModal}}
         setModal={setCreateModal}
         textButton="Nuevo producto"
         localStorageKey="productType"
@@ -79,6 +82,7 @@ function Products() {
         onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setProducts, "products", backup)}
         searchValue={search}
         setSearch={setSearch}
+        reset={() => {}}
       />
       <FlexRow
         width="100%"
@@ -117,6 +121,14 @@ function Products() {
       >
         <ProductForm isToCreate />
       </Modal>
+      {
+        batchModal
+        &&
+        <BatchModal 
+          isActive={batchModal}
+          setIsActive={setBatchModal}
+        />
+      }
     </>
   );
 }

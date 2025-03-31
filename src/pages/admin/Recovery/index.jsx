@@ -84,7 +84,6 @@ function Recovery() {
   const handleCodeChange = (e, setFieldValue) => {
     const value = e.target.value;
     setFieldValue("code", value);
-    console.log(data, value);
     if(value.length === 6) setData(data => ({...data, code: value}));
   }
 

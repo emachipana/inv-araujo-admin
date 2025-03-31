@@ -5,7 +5,7 @@ import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, shadowSm, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
 import { capitalize } from "../../../helpers/capitalize";
@@ -15,22 +15,29 @@ import DeleteModal from "../Product/DeleteModal";
 import { PiPlantFill } from "react-icons/pi";
 import ItemModal from "./ItemModal";
 import NewCategory from "../../../components/Category/New";
-import { FaMoneyBillWheat } from "react-icons/fa6";
+import { FaMoneyBillWheat, FaFileCircleCheck } from "react-icons/fa6";
 import AdvancesModal from "./AdvancesModal";
 import Item from "./Item";
 import InvoiceModal from "../../../components/InvoiceModal";
 import { handleClick } from "./handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import OrderStateModal from "./OrderStateModal";
+import { MdPhotoSizeSelectActual } from "react-icons/md";
+import EvidenceModal from "../Order/EvidenceModal";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
   const [invoiceModal, setInvoiceModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [stateModal, setStateModal] = useState(false);
   const [advanceModal, setAdvanceModal] = useState(false);
   const [itemModal, setItemModal] = useState(false);
+  const [evidenceModal, setEvidenceModal] = useState(false);
   const [item, setItem] = useState("");
   const [order, setOrder] = useState({});
+  const [orderItems, setOrderItems] = useState([]);
+  const [advances, setAdvances] = useState([]);
   const { id } = useParams();
   const { deleteVitro, loadVitroOrders, updateVitro } = useAdmin();
   const navigate = useNavigate();
@@ -41,6 +48,11 @@ function InvitroOrder() {
         await loadVitroOrders();
         setIsLoading(true);
         const order = await apiFetch(`vitroOrders/${id}`);
+        console.log(order);
+        const items = await apiFetch(`orderVarieties/vitroOrder/${order.data.id}`);
+        const advances = await apiFetch(`advances/vitroOrder/${order.data.id}`);
+        setAdvances(advances);
+        setOrderItems(items);
         setOrder(order.data);
         setIsLoading(false);
       }catch(error) {
@@ -74,13 +86,33 @@ function InvitroOrder() {
           ? <Title>El pedido invitro no existe</Title>
           : <>
               <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
-              <NewCategory
-                Icon={FaMoneyBillWheat}
-                style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                onClick={() => setAdvanceModal(!advanceModal)}
-              >
-                Adelantos
-              </NewCategory>
+              <FlexRow>
+                <NewCategory
+                  Icon={FaMoneyBillWheat}
+                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                  onClick={() => setAdvanceModal(!advanceModal)}
+                >
+                  Adelantos
+                </NewCategory>
+                <NewCategory
+                  Icon={FaFileCircleCheck}
+                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                  onClick={() => setStateModal(!stateModal)}
+                >
+                  Estado
+                </NewCategory>
+                {
+                  (order.employee || order.evidence)
+                  &&
+                  <NewCategory
+                    Icon={MdPhotoSizeSelectActual}
+                    style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                    onClick={() => setEvidenceModal(!evidenceModal)}
+                  >
+                    Evidencia
+                  </NewCategory>
+                }
+              </FlexRow>
               <Section>
                 <Card>
                   <Wrapper>
@@ -174,14 +206,14 @@ function InvitroOrder() {
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Variedades
+                        Entrega
                       </Text>
                       <Text
                         weight={600}
                         size={15}
                         color={COLORS.dim}
                       >
-                        { order.items ? order.items.length : 0 }
+                        { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
                       </Text>
                     </FlexColumn>
                   </Wrapper>
@@ -222,7 +254,7 @@ function InvitroOrder() {
                       iconSize={17}
                       color={order.invoice ? "primary" : "secondary"}
                       onClick={() => handleClick(order, navigate, setInvoiceModal)}
-                      disabled={order.items.length <= 0}
+                      disabled={orderItems.length <= 0}
                     >
                       {
                         order.invoice 
@@ -265,7 +297,7 @@ function InvitroOrder() {
                       gap={1}
                     >
                       {
-                        order.items?.map((item, index) => (
+                        orderItems.map((item, index) => (
                           <Item 
                             key={index}
                             handleEdit={handleEdit}
@@ -274,6 +306,7 @@ function InvitroOrder() {
                             setVitro={setOrder}
                             vitroId={id}
                             isInvoiceGenerated={order.invoice?.isGenerated}
+                            setOrderItems={setOrderItems}
                           />
                         ))
                       }
@@ -309,15 +342,18 @@ function InvitroOrder() {
                 item={item}
                 setItem={setItem}
                 setVitroOrder={setOrder}
+                orderItems={orderItems}
+                setOrderItems={setOrderItems}
               />
               <AdvancesModal 
                 isActive={advanceModal}
                 setIsActive={setAdvanceModal}
-                advances={order.advances}
+                advances={advances}
                 setVitroOrder={setOrder}
                 vitroId={order.id}
                 currentAdvance={order.totalAdvance}
                 total={order.total}
+                setAdvances={setAdvances}
               />
               <InvoiceModal 
                 address={`${order.city}, ${order.department}`}
@@ -326,9 +362,21 @@ function InvitroOrder() {
                 isActive={invoiceModal}
                 rsocial={order.client.rsocial}
                 setIsActive={setInvoiceModal}
-                items={order.items.map(item => ({ name: item.variety.name, price: item.price, quantity: item.quantity }))}
+                items={orderItems.map(item => ({ name: item.variety.name, price: item.price, quantity: item.quantity }))}
                 order={order}
                 updateOrder={updateVitro}
+              />
+              <OrderStateModal 
+                isActive={stateModal}
+                setIsActive={setStateModal}
+                order={order}
+                setOrder={setOrder}
+              />
+              <EvidenceModal 
+                employee={order.employee}
+                evidence={order.evidence}
+                isActive={evidenceModal}
+                setIsActive={setEvidenceModal}
               />
             </>
         }

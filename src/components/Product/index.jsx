@@ -10,8 +10,8 @@ import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
 
 function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
-  const { id, images = [], name, price, discount, description, brand, category, active } = product;
-  const { updateProduct } = useAdmin();
+  const { id, images = [], name, price, discount, description, categoryId, brand, categoryName, isActive } = product;
+  const { updateActiveProduct } = useAdmin();
   const navigate = useNavigate();
 
   const foundProduct = cartItems.find(item => item.id === id);
@@ -20,7 +20,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
     window.scrollTo(0, 0);
     if(isInAdmin) return navigate(`/productos/${id}`);
 
-    navigate(`/tienda/${category.name}/${id}`);
+    navigate(`/tienda/${categoryName}/${id}`);
   }
 
   const handleCartButtonClick = (e) => {
@@ -34,8 +34,8 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
 
   const handleChange = async () => {
     try {
-      const body = {...product, categoryId: category.id, isActive: !active};
-      await updateProduct(id, body);
+      const body = {...product, categoryId, isActive: !isActive};
+      await updateActiveProduct(id, body);
     }catch(error) {
       toast.error(errorParser(error.message));
     }
@@ -69,9 +69,9 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
             size={12.5}
             color={COLORS.taupe}
             weight={700}
-            style={{textTransform: "uppercase"}}
+            style={{textTransform: "uppercase", whiteSpace: "nowrap"}}
           >
-            { category.name }
+            { categoryName }
           </Text>
           <Brand>{ brand }</Brand>
         </FlexRow>
@@ -113,7 +113,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
           }
         </Button>
       </Description>
-      { !active && <Blocker /> }
+      { !isActive && <Blocker /> }
       {
         isInAdmin
         &&
@@ -122,7 +122,7 @@ function Product({ product, isInAdmin, addCartProduct, cartItems = [] }) {
             type="checkbox"
             className="checkbox"
             id={id}
-            checked={active}
+            checked={isActive}
             onChange={handleChange}
           />
           <label className="switch" htmlFor={id}>

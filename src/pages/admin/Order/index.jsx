@@ -5,7 +5,7 @@ import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
-import { FlexColumn, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
 import { capitalize } from "../../../helpers/capitalize";
@@ -18,12 +18,20 @@ import { handleClick } from "../InvitroOrder/handlers";
 import InvoiceModal from "../../../components/InvoiceModal";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import NewCategory from "../../../components/Category/New";
+import { FaFileCircleCheck } from "react-icons/fa6";
+import OrderStateModal from "./OrderStateModal";
+import { MdPhotoSizeSelectActual } from "react-icons/md";
+import EvidenceModal from "./EvidenceModal";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteModal, setDeleteModal] = useState(false);
   const [invoiceModal, setInvoiceModal] = useState(false);
+  const [stateModal, setStateModal] = useState(false);
+  const [orderItems, setOrderItems] = useState([]);
   const [itemModal, setItemModal] = useState(false);
+  const [evidenceModal, setEvidenceModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
   const { deleteOrder, setOrder: setOrderSecond } = useAdmin();
@@ -34,7 +42,10 @@ function Order() {
     const fetch = async () => {
       try {
         const order = await apiFetch(`orders/${id}`);
+        console.log(order);
+        const items = await apiFetch(`orderProducts/order/${order.data.id}`);
         setOrder(order.data);
+        setOrderItems(items);
         setIsLoading(false);
       }catch(error) {
         toast.error(errorParser(error.message));
@@ -77,6 +88,26 @@ function Order() {
           ? <Title>El pedido no existe</Title>
           : <>
               <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
+              <FlexRow>
+                <NewCategory
+                  Icon={FaFileCircleCheck}
+                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                  onClick={() => setStateModal(!stateModal)}
+                >
+                  Estado
+                </NewCategory>
+                {
+                  (order.employee || order.evidence)
+                  &&
+                  <NewCategory
+                    Icon={MdPhotoSizeSelectActual}
+                    style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                    onClick={() => setEvidenceModal(!evidenceModal)}
+                  >
+                    Evidencia
+                  </NewCategory>
+                }
+              </FlexRow>
               <Section>
                 <Card>
                   <Wrapper>
@@ -113,7 +144,7 @@ function Order() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        S/. { order.total }
+                        S/. { order.total?.toFixed(2) }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -173,6 +204,18 @@ function Order() {
                         </Text>
                       </FlexColumn>
                     }
+                    <FlexColumn gap={0.3}>
+                      <Text weight={700}>
+                        Entrega
+                      </Text>
+                      <Text
+                        weight={600}
+                        size={15}
+                        color={COLORS.dim}
+                      >
+                        { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
+                      </Text>
+                    </FlexColumn>
                   </Wrapper>
                   <Wrapper>
                     <FlexColumn gap={0.3}>
@@ -207,7 +250,7 @@ function Order() {
                       iconSize={17}
                       color={order.invoice ? "primary" : "secondary"}
                       onClick={() => handleClick(order, navigate, setInvoiceModal)}
-                      disabled={order.items.length <= 0}
+                      disabled={orderItems.length <= 0}
                     >
                       {
                         order.invoice 
@@ -250,8 +293,8 @@ function Order() {
                       gap={1}
                     >
                       {
-                        order.items?.map((item, index) => (
-                          <Item 
+                        orderItems.map((item, index) => (
+                          <Item
                             key={index}
                             handleEdit={handleEdit}
                             item={item}
@@ -259,6 +302,7 @@ function Order() {
                             orderStatus={order.status}
                             setOrder={setOrder}
                             isInvoiceGenerated={order.invoice?.isGenerated}
+                            setOrderItems={setOrderItems}
                           />
                         ))
                       }
@@ -290,6 +334,8 @@ function Order() {
                   order={order}
                   setOrder={setOrder}
                   isToEdit={!!item}
+                  orderItems={orderItems}
+                  setOrderItems={setOrderItems}
                 />
               }
               <DeleteModal
@@ -309,7 +355,19 @@ function Order() {
                 rsocial={order.client.rsocial}
                 setIsActive={setInvoiceModal}
                 updateOrder={updateOrder}
-                items={order.items.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}
+                items={orderItems.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}
+              />
+              <OrderStateModal 
+                isActive={stateModal}
+                order={order}
+                setIsActive={setStateModal}
+                setOrder={setOrder}
+              />
+              <EvidenceModal 
+                isActive={evidenceModal}
+                setIsActive={setEvidenceModal}
+                employee={order.employee}
+                evidence={order.evidence}
               />
             </>
         }

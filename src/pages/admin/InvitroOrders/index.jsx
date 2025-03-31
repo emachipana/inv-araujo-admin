@@ -38,6 +38,10 @@ function InvitroOrders() {
     fetch();
   }, [ loadVitroOrders, setIsLoading ]);
 
+  const resetAtClose = () => {
+    setVitroOrders(vitroOrdersBack);
+  }
+
   return (
     <>
       <Title>Invitro</Title>
@@ -59,6 +63,8 @@ function InvitroOrders() {
         onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setVitroOrders, "vitroOrders", vitroOrdersBack, setIsSearching)}
         searchValue={search}
         setCurrentCategory={setCurrentTuber}
+        setSearch={setSearch}
+        reset={resetAtClose}
       />
       <FlexRow
         width="100%"

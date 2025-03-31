@@ -23,7 +23,9 @@ function AdvanceForm({
   id,
   setVitroOrder,
   vitroOrderId,
-  total, currentAdvance
+  total, 
+  currentAdvance,
+  setAdvances,
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { addAdvance, editAdvance } = useAdmin();
@@ -36,7 +38,8 @@ function AdvanceForm({
       }
 
       setIsLoading(true);
-      const updatedVitroOrder = isToCreate ? await addAdvance(body) : await editAdvance(id, body)
+      const {advance, updatedVitroOrder} = isToCreate ? await addAdvance(body) : await editAdvance(id, body, setAdvances);
+      if(isToCreate) setAdvances((advances) => [advance, ...advances]);
       setVitroOrder(updatedVitroOrder);
       setIsActive(false);
       setIsLoading(false);

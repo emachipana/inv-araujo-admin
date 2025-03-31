@@ -47,13 +47,5 @@ export const validate = (values) => {
     errors.price = "El precio de venta debe ser mayor al precio de compra";
   }
 
-  if(!values.stock) {
-    errors.stock = "Este campo es obligatorio";
-  }else if(isNaN(values.stock * 1)) {
-    errors.stock = "Solo se aceptan números";
-  }else if(values.stock <= 0) {
-    errors.stock = "Solo se aceptan valores mayores a 0";
-  }
-
   return errors;
 }

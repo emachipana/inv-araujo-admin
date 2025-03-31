@@ -43,7 +43,7 @@ function Order({ id, clientName, date, destination, total, status, isOrder = fal
           <Text
             weight={600}
           >
-            S/. { total }
+            S/. { total.toFixed(2) }
           </Text>
         </FlexColumn>
         <FlexColumn

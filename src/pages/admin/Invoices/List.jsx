@@ -89,7 +89,7 @@ function List() {
       </thead>
       <tbody>
         {
-          invoices.map((invoice, index) => {
+          invoices.content?.map((invoice, index) => {
             const base = (invoice.total / 1.18).toFixed(2);
             const igv = (parseFloat(base) * 0.18).toFixed(2);
 

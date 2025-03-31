@@ -15,6 +15,8 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
   const [editModal, setEditModal] = useState(false);
   const { tubers, isLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
 
+  const setCurrent = (_id, name) => setCurrentTuber(name);
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -50,7 +52,7 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
               isBlocked={isBlocked}
               name="Todo"
               currentCategory={currentTuber}
-              setCurrentCategory={setCurrentTuber}
+              setCurrentCategory={setCurrent}
             />
             {
               tubers.map((tuber, index) => (
@@ -58,8 +60,9 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
                   isBlocked={isBlocked}
                   key={index}
                   name={tuber.name}
+                  id={tuber.id}
                   currentCategory={currentTuber}
-                  setCurrentCategory={setCurrentTuber}
+                  setCurrentCategory={setCurrent}
                 />
               ))
             }

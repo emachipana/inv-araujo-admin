@@ -12,7 +12,7 @@ import { Spinner } from "reactstrap";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total }) {
+function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total, setAdvances }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteAdvance } = useAdmin();
@@ -30,7 +30,7 @@ function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total })
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedVitro = await deleteAdvance(id, vitroId);
+      const updatedVitro = await deleteAdvance(id, vitroId, setAdvances);
       setOrder(updatedVitro);
       setIsDeleting(false);
     }catch(error) {
@@ -55,6 +55,7 @@ function Advance({ id, date, amount, setOrder, vitroId, currentAdvance, total })
             vitroOrderId={vitroId}
             currentAdvance={currentAdvance}
             total={total}
+            setAdvances={setAdvances}
           />
         : <>
             <Wrapper>
