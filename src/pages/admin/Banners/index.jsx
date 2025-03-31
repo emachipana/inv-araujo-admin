@@ -51,10 +51,10 @@ function Banners() {
               <Banner 
                 key={index}
                 id={banner.id}
-                isUsed={banner.used}
+                isUsed={banner.isUsed}
                 description={banner.description}
                 title={banner.title}
-                products={banner.products || []}
+                items={banner.items || []}
                 markedWord={banner.markedWord}
               />
             ))

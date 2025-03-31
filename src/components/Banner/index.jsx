@@ -7,7 +7,7 @@ import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
 import { handleChecked, parsedTitle } from "./handlers";
 
-function Banner({ id, title, description, markedWord, isUsed, products}) {
+function Banner({ id, title, description, markedWord, isUsed, items}) {
   const [checked, setChecked] = useState(isUsed);
   const { updateBanner } = useAdmin();
   const navigate = useNavigate();
@@ -43,7 +43,7 @@ function Banner({ id, title, description, markedWord, isUsed, products}) {
           (e) => handleChecked(
             e,
             checked,
-            { id, title, description, markedWord, used: isUsed, products },
+            { id, title, description, markedWord, isUsed, items },
             setChecked,
             updateBanner
           )

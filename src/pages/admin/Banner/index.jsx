@@ -34,7 +34,7 @@ function Banner() {
       try {
         const banner = await apiFetch(`offers/${id}`);
         setBanner(banner.data);
-        setIsUsed(banner.data.used);
+        setIsUsed(banner.data.isUsed);
         setIsLoading(false);
       }catch(error) {
         toast.error(errorParser(error.message));
@@ -101,7 +101,7 @@ function Banner() {
                       color="secondary"
                       onClick={(e) => handleChecked(e, isUsed, banner, setIsUsed, updateBanner)}
                     >
-                      { banner.used ? "Dejar de usar" : "Empezar a usar" }
+                      { banner.isUsed ? "Dejar de usar" : "Empezar a usar" }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -137,7 +137,7 @@ function Banner() {
                       gap={1}
                     >
                       {
-                        banner.products?.map((item, index) => (
+                        banner.items?.map((item, index) => (
                           <Item 
                             key={index}
                             item={item}
@@ -147,7 +147,7 @@ function Banner() {
                         ))
                       }
                       {
-                        banner.products.length < 4
+                        banner.items?.length < 4
                         &&
                         <Button
                           style={{marginTop: "1rem"}}

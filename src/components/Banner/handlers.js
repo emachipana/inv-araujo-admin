@@ -9,13 +9,13 @@ export const handleChecked = async (e, checked, banner, setChecked, updateBanner
   e.stopPropagation();
 
   try {
-    if(!checked && banner.products.length <= 0) throw new Error("Primero elige productos");
-    if(setChecked) setChecked(!banner.used);
+    if(!checked && banner.items.length <= 0) throw new Error("Primero elige productos");
+    if(setChecked) setChecked(!banner.isUsed);
     const body = {
       title: banner.title,
       description: banner.description,
       markedWord: banner.markedWord,
-      used: !banner.used
+      isUsed: !banner.isUsed
     }
 
     await updateBanner(banner.id, body);

@@ -19,18 +19,18 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { backup, addBannerItem, loadProducts } = useAdmin();
+  const { backup, addBannerItem, loadProducts, isLoading: isProductsLoading } = useAdmin();
 
   useEffect(() => {
     const init = async () => {
       await loadProducts();
 
-      const filteredProducts = filterProducts(banner.products, backup);
+      const filteredProducts = filterProducts(banner.items, backup);
       setSearchProducts(filteredProducts);
     }
 
     init();
-  }, [ banner.products, backup, loadProducts ]);
+  }, [ banner.items, backup, loadProducts ]);
 
   const onClose = () => {
     setValues({ productId: "" });
@@ -75,12 +75,12 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
             placeholder="Buscar un producto..."
             Icon={BiSearch}
             value={search}
-            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.products, setSearchProducts, backup, isLoading)}
+            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.items, setSearchProducts, backup, isLoading)}
             style={{width: "60%"}}
           />
           <List>
             {
-              isLoading
+              isLoading || isProductsLoading
               ? <Spinner color="secondary" />
               : <>
                   {
