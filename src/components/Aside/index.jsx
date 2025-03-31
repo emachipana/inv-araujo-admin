@@ -6,9 +6,9 @@ import { PiPottedPlantFill } from "react-icons/pi";
 import { GiShoppingBag, GiWallet } from "react-icons/gi";
 import { FaUserGroup, FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
-import { RiLogoutBoxFill } from "react-icons/ri";
 import { useLocation } from "react-router-dom";
 import { IoMdMail } from "react-icons/io";
+import { BsFillPersonBadgeFill } from "react-icons/bs";
 
 function Aside({ isOpen, setIsOpen }) {
   const { pathname } = useLocation();
@@ -97,19 +97,18 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/mensajes"
-          Icon={IoMdMail}
+          redirectTo="/empleados"
+          Icon={BsFillPersonBadgeFill}
         >
-          Mensajes
+          Empleados
         </NavItem>
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/login"
-          Icon={RiLogoutBoxFill}
-          isLogout
+          redirectTo="/mensajes"
+          Icon={IoMdMail}
         >
-          Salir
+          Mensajes
         </NavItem>
       </Container>
       {

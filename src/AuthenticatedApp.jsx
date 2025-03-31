@@ -26,6 +26,7 @@ import Expense from "./pages/admin/Expense";
 import Clients from "./pages/admin/Clients";
 import Profile from "./pages/admin/Profile";
 import NotFound from "./pages/admin/NotFound";
+import Employees from "./pages/admin/Employees";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -60,6 +61,7 @@ function AuthenticatedApp() {
           <Route path="/gastos/:id" element={<Expense />} />
           <Route path="/clientes" element={<Clients />} />
           <Route path="/perfil" element={<Profile />} />
+          <Route path="/empleados" element={<Employees />} />
           <Route path="*" element={<NotFound navTo="/" />} />
         </Routes>
       </Section>

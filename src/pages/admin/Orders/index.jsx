@@ -38,6 +38,7 @@ function Orders() {
   }, [ loadOrders, setIsLoading ]);
 
   const resetAtClose = () => {
+    setCurrentStatus("Todo");
     setOrders(ordersBackup);
   }
 
@@ -60,7 +61,6 @@ function Orders() {
         labelSearch="Buscar pedido..."
         onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setOrders, "orders", ordersBackup, setIsSearching)}
         searchValue={search}
-        setCurrentCategory={setCurrentStatus}
         setIsSearching={setIsSearching}
         setSearch={setSearch}
         reset={resetAtClose}

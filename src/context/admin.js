@@ -20,6 +20,8 @@ const AdminProvider = ({ children }) => {
   const [clientsBackup, setClientsBackup] = useState({});
   const [warehouses, setWarehouses] = useState([]);
   const [warehousesBackup, setWarehousesBackup] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [employeesBackup, setEmployeesBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [homeData, setHomeData] = useState({
     orders: {
@@ -42,6 +44,7 @@ const AdminProvider = ({ children }) => {
     clients: false,
     expenses: false,
     warehouses: false,
+    employees: false,
   });
 
   const loadExpenses = useCallback(async () => {
@@ -148,6 +151,17 @@ const AdminProvider = ({ children }) => {
     setMatcher(matcher => ({...matcher, orders: true}));
     setIsLoading(false);
   }, [matcher.orders]);
+
+  const loadEmployees = useCallback(async () => {
+    if(matcher.employees) return;
+
+    setIsLoading(true);
+    const employees = await apiFetch("employees");
+    setEmployees(employees.filter((emp) => emp.role !== "ADMINISTRADOR"));
+    setEmployeesBackup(employees.filter((emp) => emp.role !== "ADMINISTRADOR"));
+    setMatcher(matcher => ({...matcher, employees: true}));
+    setIsLoading(false);
+  }, [matcher.employees]);
 
   const updateCategory = async (id, body) => {
     const category = categories.find(category => category.id === id);
@@ -606,10 +620,10 @@ const AdminProvider = ({ children }) => {
 
   const deleteBannerItem = async (id, banner) => {
     await apiFetch(`offerProducts/${id}`, { method: "DELETE" });
-    if(banner.products.length <= 1 && banner.used) {
+    if(banner.items.length <= 1 && banner.isUsed) {
       const body = {
         ...banner,
-        used: !banner.used
+        isUsed: !banner.isUsed
       }
 
       return updateBanner(banner.id, body);
@@ -634,6 +648,18 @@ const AdminProvider = ({ children }) => {
     return {newOrder: newOrder.data, orderItem};
   }
 
+  const addEmployee = async (body) => {
+    const newEmployee = await apiFetch(`employees`, { body });
+    const employee = {...newEmployee.data?.employee, role: newEmployee.data?.user.role};
+    setEmployees(employees => [employee, ...employees]);
+    setEmployeesBackup(employees => [employee, ...employees]);
+    return employee;
+  }
+
+  const updateEmployee = async (employeeId, body) => {
+
+  }
+
   return (
     <AdminContext.Provider
       value={{
@@ -656,6 +682,13 @@ const AdminProvider = ({ children }) => {
         homeData,
         warehouses,
         warehousesBackup,
+        employees,
+        employeesBackup,
+        addEmployee,
+        setEmployees,
+        setEmployeesBackup,
+        updateEmployee,
+        loadEmployees,
         loadBanners,
         setTubers,
         setVitroOrders,

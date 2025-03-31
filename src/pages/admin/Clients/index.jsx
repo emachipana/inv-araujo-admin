@@ -201,7 +201,7 @@ function Clients() {
                                   weight={500}
                                   color={COLORS.persian}
                                 >
-                                  S/. { client.consumption }
+                                  S/. { client.consumption.toFixed(2) }
                                 </Text>
                               </td>
                               <td>
