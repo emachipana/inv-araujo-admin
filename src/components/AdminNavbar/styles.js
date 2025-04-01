@@ -42,13 +42,19 @@ export const Logo = styled.img`
 `;
 
 export const Point = styled.div`
-  width: 10px;
-  height: 10px;
+  width: ${({ size }) => size || 15}px;
+  height: ${({ size }) => size || 15}px;
   background-color: ${COLORS.red};
   border-radius: 50%;
   position: absolute;
   top: 0;
   right: 0;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const Notification = styled.div`
@@ -68,7 +74,7 @@ export const Header = styled.div`
 `;
 
 export const Item = styled.div`
-  width: 145px;
+  width: ${({ width }) => width || "145px"};
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -85,4 +91,20 @@ export const Item = styled.div`
 
 export const Hr = styled.hr`
   margin: 0 0.8rem;
+`;
+
+export const NotificationItemContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.5rem 0.7rem;
+  width: 300px;
+  transition: background-color .2s ease;
+  position: relative;
+  gap: 0.5rem;
+
+  &:hover {
+    background-color: ${COLORS.platinium};
+  }
 `;

@@ -23,6 +23,7 @@ const AdminProvider = ({ children }) => {
   const [employees, setEmployees] = useState([]);
   const [employeesBackup, setEmployeesBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [homeData, setHomeData] = useState({
     orders: {
       data: {ship: 0, pen: 0},
@@ -45,7 +46,26 @@ const AdminProvider = ({ children }) => {
     expenses: false,
     warehouses: false,
     employees: false,
+    notifications: false,
   });
+
+  const markAsRead = async (id) => {
+    if(!id) throw Error("Hubo un problema vuelve a intentarlo más tarde");
+    const index = notifications.findIndex((noti) => noti.id === id);
+    const notification = notifications[index];
+    if(!notification) return;
+    notifications[index] = {...notification, isRead: true};
+    setNotifications([...notifications]);
+
+    await apiFetch(`notifications/${id}`, { method: "PUT" });
+  }
+
+  const loadNotifications = useCallback(async () => {
+    if(matcher.notifications) return;
+    const notifications = await apiFetch("notifications/getByUser");
+    setNotifications(notifications.data);
+    setMatcher(matcher => ({...matcher, notifications: true}));
+  }, [matcher.notifications]);
 
   const loadExpenses = useCallback(async () => {
     if(matcher.expenses) return;
@@ -232,16 +252,16 @@ const AdminProvider = ({ children }) => {
   }
 
   const addVitro = async (body) => {
-    const newVitro = await apiFetch("vitroOrders", { body });
-    setVitroOrders(vitros => [newVitro.data, ...vitros.content]);
-    setVitroOrdersBack(vitros => [newVitro.data, ...vitros.content]);
+    const newVitro = await apiFetch("vitroOrders?alert=false", { body });
+    setVitroOrders(vitros => ({...vitros, content: [newVitro.data, ...vitros.content]}));
+    setVitroOrdersBack(vitros => ({...vitros, content: [newVitro.data, ...vitros.content]}));
     return newVitro.data;
   }
 
   const addOrder = async (body) => {
-    const newOrder = await apiFetch("orders", { body });
-    setOrders(orders => [newOrder.data, ...orders.content]);
-    setOrdersBackup(orders => [newOrder.data, ...orders.content]);
+    const newOrder = await apiFetch("orders?alert=false", { body });
+    setOrders(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
+    setOrdersBackup(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
     return newOrder.data;
   }
 
@@ -684,6 +704,7 @@ const AdminProvider = ({ children }) => {
         warehousesBackup,
         employees,
         employeesBackup,
+        notifications,
         addEmployee,
         setEmployees,
         setEmployeesBackup,
@@ -758,6 +779,9 @@ const AdminProvider = ({ children }) => {
         updateActiveProduct,
         loadWarehouses,
         newBatch,
+        loadNotifications,
+        setNotifications,
+        markAsRead,
       }}
     >
       { children }

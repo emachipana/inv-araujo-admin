@@ -27,44 +27,47 @@ import Clients from "./pages/admin/Clients";
 import Profile from "./pages/admin/Profile";
 import NotFound from "./pages/admin/NotFound";
 import Employees from "./pages/admin/Employees";
+import { WebSocketProvider } from "./context/websocket";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <AdminProvider>
-      <AdminNavbar setIsOpen={setIsOpen} />
-      <Aside 
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
-      <Section>
-        <Routes>
-          <Route index path="/" element={<Home />} />
-          <Route path="/productos" element={<Products />} />
-          <Route path="/productos/:id" element={<Product />} />
-          <Route path="/productos/:id/edit" element={<EditProduct />} />
-          <Route path="/invitro" element={<InvitroOrders />} />
-          <Route path="/invitro/:id" element={<InvitroOrder />} />
-          <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
-          <Route path="/pedidos" element={<Orders />} />
-          <Route path="/pedidos/:id" element={<Order />} />
-          <Route path="/pedidos/:id/edit" element={<EditOrder />} />
-          <Route path="/calendario" element={<Calendar />} />
-          <Route path="/comprobantes" element={<Invoices />} />
-          <Route path="/comprobantes/:id" element={<Invoice />} />
-          <Route path="/comprobantes/:id/edit" element={<EditInvoice />} />
-          <Route path="/banners" element={<Banners />} />
-          <Route path="/banners/:id" element={<Banner />} />
-          <Route path="/banners/:id/edit" element={<EditBanner />} />
-          <Route path="/gastos" element={<Expenses />} />
-          <Route path="/gastos/:id" element={<Expense />} />
-          <Route path="/clientes" element={<Clients />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="/empleados" element={<Employees />} />
-          <Route path="*" element={<NotFound navTo="/" />} />
-        </Routes>
-      </Section>
+      <WebSocketProvider>
+        <AdminNavbar setIsOpen={setIsOpen} />
+        <Aside 
+          isOpen={isOpen}
+          setIsOpen={setIsOpen}
+        />
+        <Section>
+          <Routes>
+            <Route index path="/" element={<Home />} />
+            <Route path="/productos" element={<Products />} />
+            <Route path="/productos/:id" element={<Product />} />
+            <Route path="/productos/:id/edit" element={<EditProduct />} />
+            <Route path="/invitro" element={<InvitroOrders />} />
+            <Route path="/invitro/:id" element={<InvitroOrder />} />
+            <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
+            <Route path="/pedidos" element={<Orders />} />
+            <Route path="/pedidos/:id" element={<Order />} />
+            <Route path="/pedidos/:id/edit" element={<EditOrder />} />
+            <Route path="/calendario" element={<Calendar />} />
+            <Route path="/comprobantes" element={<Invoices />} />
+            <Route path="/comprobantes/:id" element={<Invoice />} />
+            <Route path="/comprobantes/:id/edit" element={<EditInvoice />} />
+            <Route path="/banners" element={<Banners />} />
+            <Route path="/banners/:id" element={<Banner />} />
+            <Route path="/banners/:id/edit" element={<EditBanner />} />
+            <Route path="/gastos" element={<Expenses />} />
+            <Route path="/gastos/:id" element={<Expense />} />
+            <Route path="/clientes" element={<Clients />} />
+            <Route path="/perfil" element={<Profile />} />
+            <Route path="/empleados" element={<Employees />} />
+            <Route path="*" element={<NotFound navTo="/" />} />
+          </Routes>
+        </Section>
+      </WebSocketProvider>
     </AdminProvider>
   );
 }

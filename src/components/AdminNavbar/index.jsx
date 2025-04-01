@@ -1,8 +1,7 @@
-import { useState } from "react";
-import { IoNotifications } from "react-icons/io5";
+import React, { useEffect, useState } from "react";
 import { MdDarkMode } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { Container, Header, Hr, Item, Logo, Notification, Point } from "./styles";
+import { Container, Header, Hr, Item, Logo } from "./styles";
 import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { FlexRow, Text } from "../../styles/layout";
 import { COLORS } from "../../styles/colors";
@@ -11,12 +10,34 @@ import DropDown from "../DropDown";
 import Profile from "./Buttons/Profile";
 import { FaUser } from "react-icons/fa";
 import { RiLogoutBoxFill } from "react-icons/ri";
+import { useAdmin } from "../../context/admin";
+import NotificationButton from "./Buttons/Notification";
+import NotificationItem from "./NotificationItem";
 
 function AdminNavbar({ setIsOpen }) {
   const { logout } = useAuth();
   const [userDrop, setUserDrop] = useState(false);
+  const [notiDrop, setNotiDrop] = useState(false);
+  const [isNotiLoading, setIsNotiLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { notifications, loadNotifications } = useAdmin();
+
+  const nonReadNotifications = notifications.filter((noti) => !noti.isRead)?.length;
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        setIsNotiLoading(true);
+        await loadNotifications();
+        setIsNotiLoading(false);
+      }catch(e) {
+        setIsNotiLoading(false);
+      }
+    }
+
+    fetch();
+  }, [loadNotifications]);
 
   const handleLogout = () => {
     logout();
@@ -53,13 +74,37 @@ function AdminNavbar({ setIsOpen }) {
         </FlexRow>
       </FlexRow>
       <FlexRow gap={1.5}>
-        <Notification>
-          <IoNotifications 
-            size={25}
-            color={COLORS.white}
-          />
-          <Point />
-        </Notification>
+        <DropDown
+          isOpen={notiDrop}
+          Button={NotificationButton}
+          setIsOpen={setNotiDrop}
+          buttonData={{ isNotiLoading }}
+          rightPosition={"-0.5rem"}
+        >
+          <Header style={{minWidth: "220px"}}>
+            {
+              nonReadNotifications <= 0
+              ? "Notificaciones"
+              : `Tienes ${nonReadNotifications} notificaciones`
+            }
+          </Header>
+          {
+            notifications.length <= 0
+            ? <Text
+                style={{marginTop: "1rem"}}
+                size={18}
+                weight={700}
+              >
+                Sin notificaciones por ahora
+              </Text>
+            : notifications.map((noti, index) => (
+                <NotificationItem 
+                  key={index}
+                  notification={noti}
+                />
+              ))
+          }
+        </DropDown>
         <DropDown
           isOpen={userDrop}
           Button={Profile}

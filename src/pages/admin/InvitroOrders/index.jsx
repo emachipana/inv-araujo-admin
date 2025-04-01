@@ -25,6 +25,8 @@ function InvitroOrders() {
   const { vitroOrders, isLoading, 
     loadVitroOrders, setIsLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
 
+    console.log(vitroOrders);
+
   useEffect(() => {
     const fetch = async () => {
       try {

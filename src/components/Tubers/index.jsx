@@ -15,6 +15,8 @@ function Tubers({ currentTuber, setCurrentTuber, isBlocked, setIsGetting }) {
   const [editModal, setEditModal] = useState(false);
   const { tubers, isLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
 
+  console.log(vitroOrdersBack);
+
   const setCurrent = (_id, name) => setCurrentTuber(name);
 
   useEffect(() => {
