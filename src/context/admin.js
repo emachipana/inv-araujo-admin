@@ -782,6 +782,7 @@ const AdminProvider = ({ children }) => {
         loadNotifications,
         setNotifications,
         markAsRead,
+        setOrdersBackup,
       }}
     >
       { children }
