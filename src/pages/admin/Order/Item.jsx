@@ -53,6 +53,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
               align="start"
               weight={600}
               size="14px"
+              width={"150px"}
               color={COLORS.dim}
             >
               { product.name }
@@ -102,6 +103,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             weight={600}
             size={14}
             color={COLORS.dim}
+            style={{whiteSpace: "nowrap"}}
           >
             S/. { subTotal.toFixed(2) }
           </Text>

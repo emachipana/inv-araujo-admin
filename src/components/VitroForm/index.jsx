@@ -68,7 +68,7 @@ function VitroForm({ initialValues = {
         city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
         initDate: values.initDate,
         finishDate: values.finishDate,
-        shippingType: (values.shippingType * 1) === 1 ? "RECOJO_ALMACEN" : "ENVIO_AGENCIA",
+        shippingType: values.shippingType,
       }
       
       setIsLoading(true);
@@ -77,7 +77,7 @@ function VitroForm({ initialValues = {
           ...values,
           department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
           city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
-          documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
+          documentType: values.documentType,
           email: values.email ? values.email : `${values.document}@inversiones.com`,
           createdBy: "ADMINISTRADOR",
         }
@@ -172,11 +172,11 @@ function VitroForm({ initialValues = {
                     handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
                     options={[
                       {
-                        id: 1,
+                        id: "DNI",
                         content: "DNI"
                       },
                       {
-                        id: 2,
+                        id: "RUC",
                         content: "RUC"
                       }
                     ]}
@@ -358,11 +358,11 @@ function VitroForm({ initialValues = {
               value={values.shippingType}
               options={[
                 {
-                  id: 1,
+                  id: "RECOJO_ALMACEN",
                   content: "Recojo en almacén"
                 },
                 {
-                  id: 2,
+                  id: "ENVIO_AGENCIA",
                   content: "Envío a agencia"
                 }
               ]}

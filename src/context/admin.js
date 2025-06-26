@@ -63,7 +63,7 @@ const AdminProvider = ({ children }) => {
   const loadNotifications = useCallback(async () => {
     if(matcher.notifications) return;
     const notifications = await apiFetch("notifications/getByUser");
-    setNotifications(notifications.data);
+    setNotifications(notifications.data?.reverse());
     setMatcher(matcher => ({...matcher, notifications: true}));
   }, [matcher.notifications]);
 
@@ -142,7 +142,7 @@ const AdminProvider = ({ children }) => {
     if(matcher.products) return;
     setIsLoading(true);
     const categories = await apiFetch("categories");
-    const products = await apiFetch("products");
+    const products = await apiFetch("products?activeProducts=false");
     setCategories(categories);
     setProducts(products);
     setBackup(products);

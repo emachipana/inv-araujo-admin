@@ -27,7 +27,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
   const initialValues = {
     invoiceType: "",
     document,
-    documentType: documentType === "DNI" ? 1 : 2,
+    documentType,
     rsocial,
     address
   }
@@ -39,8 +39,6 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
       now.setHours(12);
       const body = {
         ...values,
-        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-        invoiceType: (values.invoiceType * 1) === 1 ? "BOLETA" : "FACTURA",
         issueDate: now.toISOString(),
         comment: ""
       }
@@ -86,11 +84,10 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
   const onInvoiceTypeChange = (e, setFieldValue) => {
     const value = e.target.value;
     setFieldValue("invoiceType", value);
-    const toSave = (value * 1) === 1 ? "BOLETA" : "FACTURA";
-    setInvoiceType(toSave);
+    setInvoiceType(value);
 
-    if(toSave === "FACTURA" && documentType !== "RUC") {
-      setFieldValue("documentType", 2);
+    if(value === "FACTURA" && documentType !== "RUC") {
+      setFieldValue("documentType", "FACTURA");
       setDocType("RUC");
       setFieldValue("document", "");
       setFieldValue("rsocial", "");
@@ -98,7 +95,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
       return;
     };
 
-    setFieldValue("documentType", documentType === "DNI" ? 1 : 2);
+    setFieldValue("documentType", documentType);
     setDocType(documentType);
     setFieldValue("document", document);
     setFieldValue("rsocial", rsocial);
@@ -137,11 +134,11 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               handleChange={(e) => onInvoiceTypeChange(e, setFieldValue)}
               options={[
                 {
-                  id: 1,
+                  id: "BOLETA",
                   content: "BOLETA"
                 },
                 {
-                  id: 2,
+                  id: "FACTURA",
                   content: "FACTURA"
                 }
               ]}
@@ -157,12 +154,12 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
               options={[
                 {
-                  id: 1,
+                  id: "DNI",
                   content: "DNI",
                   disabled: invoiceType === "FACTURA"
                 },
                 {
-                  id: 2,
+                  id: "RUC",
                   content: "RUC"
                 }
               ]}

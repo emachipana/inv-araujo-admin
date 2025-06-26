@@ -20,7 +20,8 @@ function ItemModal({ isActive, setIsActive, profitId, item, setExpense, setItem 
     profitId,
     name: "",
     price: "",
-    quantity: ""
+    quantity: "",
+    type: "BIEN",
   }
 
   if(item) initialValues = {

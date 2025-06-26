@@ -47,8 +47,8 @@ export const Point = styled.div`
   background-color: ${COLORS.red};
   border-radius: 50%;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: ${({ top }) => top || 0}px;
+  right: ${({ right }) => right || 0}px;
   color: white;
   font-size: 12px;
   font-weight: 700;
@@ -95,7 +95,6 @@ export const Hr = styled.hr`
 
 export const NotificationItemContainer = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   cursor: pointer;
   padding: 0.5rem 0.7rem;

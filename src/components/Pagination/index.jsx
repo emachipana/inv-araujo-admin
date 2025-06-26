@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
 import apiFetch from "../../services/apiFetch";
 
-function Pagination({ currentPage, totalPages, isLoading, setIsLoading, set, to, filters }) {
+function Pagination({ currentPage, totalPages, isLoading, setIsLoading, set, to, filters, ...props }) {
   const isLast = currentPage === totalPages - 1;
   const isFirst = currentPage <= 0;
   const pages = Array(totalPages).fill(0);
@@ -58,7 +58,10 @@ function Pagination({ currentPage, totalPages, isLoading, setIsLoading, set, to,
   }
 
   return (
-    <FlexRow gap={0.25}>
+    <FlexRow 
+      gap={0.25}
+      {...props}
+    >
       <FaAngleLeft 
         size={16}
         style={{cursor: "pointer"}}

@@ -4,8 +4,7 @@ import { Title } from "../styles";
 import Filter from "../../../components/Filter";
 import { Section } from "../Products/styles";
 import { Spinner } from "reactstrap";
-import Order from "../../../components/Order";
-import List from "./List";
+import OrderCard from "../../../components/OrderCard";
 import Modal from "../../../components/Modal";
 import OrderForm from "../../../components/OrderForm";
 import Status from "./Status";
@@ -13,7 +12,6 @@ import { onSearchChange } from "../Products/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import Pagination from "../../../components/Pagination";
-import { FlexRow } from "../../../styles/layout";
 
 function Orders() {
   const [currentStatus, setCurrentStatus] = useState("Todo");
@@ -65,37 +63,24 @@ function Orders() {
         setSearch={setSearch}
         reset={resetAtClose}
       />
-      <FlexRow
-        width="100%"
-        justify="space-between"
-      >
-        <p>Ordernar por: </p>
-        <Pagination
-          currentPage={orders.number || 0}
-          totalPages={orders.totalPages}
-          isFirst={orders.first}
-          isLast={orders.last}
-        />
-      </FlexRow>
+      <Pagination
+        currentPage={orders.number || 0}
+        totalPages={orders.totalPages}
+        isFirst={orders.first}
+        isLast={orders.last}
+        style={{alignSelf: "flex-end"}}
+      />
       <Section>
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : (type === "group"
-              ? orders.content?.map((order, index) => (
-                  <Order 
-                    clientName={order.client.rsocial}
-                    id={order.id}
-                    key={index}
-                    date={order.maxShipDate}
-                    total={order.total}
-                    destination={order.city}
-                    status={order.status}
-                    isOrder
-                  />
-                ))
-              : <List />
-            )
+          : orders.content?.map((order, index) => (
+              <OrderCard
+                key={index}
+                order={order}
+                fullSize={type === "list"}
+              />
+            ))
         }
       </Section>
       <Modal

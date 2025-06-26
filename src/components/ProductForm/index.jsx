@@ -40,7 +40,33 @@ function ProductForm({ initialValues = {
     }
   }
 
-  const options = categories.map(category => ({id: category.id, content: category.name}));
+  const categoryOptions = categories.map(category => ({id: category.id, content: category.name}));
+  const unitOptions = [
+    {
+      id: "NIU",
+      content: "Unidad"
+    },
+    {
+      id: "SA",
+      content: "Saco"
+    },
+    {
+      id: "KGM",
+      content: "Kilogramo"
+    },
+    {
+      id: "WG",
+      content: "Galón"
+    },
+    {
+      id: "BJ",
+      content: "Balde"
+    },
+    {
+      id: "BX",
+      content: "Caja"
+    },
+  ];
 
   return (
     <Formik
@@ -87,18 +113,18 @@ function ProductForm({ initialValues = {
               touched={touched.categoryId}
               handleBlur={handleBlur}
               handleChange={handleChange}
-              options={options}
+              options={categoryOptions}
               value={values.categoryId}
             />
-            <Input 
+            <Select
               id="unit"
               label="Unidad de medida"
-              placeholder="Kg."
-              error={errors.unit}
-              touched={touched.unit}
-              value={values.unit}
-              handleChange={handleChange}
+              error={errors.categoryId}
+              touched={touched.categoryId}
               handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={unitOptions}
+              value={values.categoryId}
             />
           </Group>
           <Group>

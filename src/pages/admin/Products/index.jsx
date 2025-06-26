@@ -12,7 +12,6 @@ import Filter from "../../../components/Filter";
 import { filterBuilder, onSearchChange } from "./handlers";
 import toast from "react-hot-toast";
 import { errorParser } from "../../../helpers/errorParser";
-import { FlexRow } from "../../../styles/layout";
 import Pagination from "../../../components/Pagination";
 import apiFetch from "../../../services/apiFetch";
 import BatchModal from "./BatchModal";
@@ -47,7 +46,7 @@ function Products() {
       try {
         setIsGetting(true);
         const params = filterBuilder(filters);
-        const products = await apiFetch(`products${params}`);
+        const products = await apiFetch(`products${!params ? `?activeProducts=false` : `${params}&activeProducts=false`}`);
         setProducts(products);
         setIsGetting(false)
       }catch(error) {
@@ -84,21 +83,16 @@ function Products() {
         setSearch={setSearch}
         reset={() => {}}
       />
-      <FlexRow
-        width="100%"
-        justify="space-between"
-      >
-        <p>Ordernar por: </p>
-        <Pagination
-          currentPage={products.number}
-          totalPages={products.totalPages}
-          filters={filters}
-          isLoading={isGetting}
-          setIsLoading={setIsGetting}
-          set={setProducts}
-          to="products"
-        />
-      </FlexRow>
+      <Pagination
+        style={{alignSelf: "flex-end"}}
+        currentPage={products.number}
+        totalPages={products.totalPages}
+        filters={filters}
+        isLoading={isGetting}
+        setIsLoading={setIsGetting}
+        set={setProducts}
+        to="products"
+      />
       <Section>
         {
           isLoading || isGetting

@@ -6,14 +6,12 @@ import { Section } from "../Products/styles";
 import Modal from "../../../components/Modal";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
-import Order from "../../../components/Order";
-import List from "./List";
+import OrderCard from "../../../components/OrderCard";
 import VitroForm from "../../../components/VitroForm";
 import { onSearchChange } from "../Products/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import Pagination from "../../../components/Pagination";
-import { FlexRow } from "../../../styles/layout";
 
 function InvitroOrders() {
   const [currentTuber, setCurrentTuber] = useState("Todo");
@@ -68,36 +66,24 @@ function InvitroOrders() {
         setSearch={setSearch}
         reset={resetAtClose}
       />
-      <FlexRow
-        width="100%"
-        justify="space-between"
-      >
-        <p>Ordernar por: </p>
-        <Pagination 
-          currentPage={vitroOrders.number || 0}
-          totalPages={vitroOrders.totalPages}
-          isFirst={vitroOrders.first}
-          isLast={vitroOrders.last}
-        />
-      </FlexRow>
+      <Pagination
+        style={{alignSelf: "flex-end"}}
+        currentPage={vitroOrders.number || 0}
+        totalPages={vitroOrders.totalPages}
+        isFirst={vitroOrders.first}
+        isLast={vitroOrders.last}
+      />
       <Section>
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : (type === "group"
-              ? vitroOrders.content?.map((order, index) => (
-                  <Order
-                    id={order.id}
-                    key={index}
-                    clientName={order.client.rsocial}
-                    date={order.finishDate}
-                    destination={order.city}
-                    total={order.total}
-                    status={order.status}
-                  />
-                ))
-              : <List />
-            )
+          : vitroOrders.content?.map((order, index) => (
+              <OrderCard
+                key={index}
+                order={order}
+                fullSize={type === "list"}
+              />
+            ))
         }
       </Section>
       <Modal

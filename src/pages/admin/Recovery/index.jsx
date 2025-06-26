@@ -64,6 +64,7 @@ function Recovery() {
     }
   }
 
+  // TODO - cambiar los endpoints y email por userId
   const validCode = async () => {
     try {
       if(!data.code) return;

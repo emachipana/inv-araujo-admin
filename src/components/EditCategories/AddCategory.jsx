@@ -29,7 +29,7 @@ function AddCategory({ setCurrentAction, to, addCategory }) {
   return (
     <Formik
       initialValues={values}
-      validate={(values) => validate(values, "categories")}
+      validate={(values) => validate(values, to === "tubers" ? "tubers" : "categories")}
       onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, to)}
     >
       {({

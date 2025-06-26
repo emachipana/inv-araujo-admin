@@ -6,7 +6,7 @@ import { Section } from "../Products/styles";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import List from "./List";
-import Invoice from "../../../components/Order/Invoice";
+import Invoice from "../../../components/OrderCard/Invoice";
 import Modal from "../../../components/Modal";
 import InvoiceForm from "../../../components/InvoiceForm";
 import { onSearchChange } from "../Products/handlers";

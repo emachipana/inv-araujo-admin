@@ -4,10 +4,9 @@ import { BackDrop, Container } from "./styles";
 import { FaCalendarAlt, FaClipboardList } from "react-icons/fa";
 import { PiPottedPlantFill } from "react-icons/pi";
 import { GiShoppingBag, GiWallet } from "react-icons/gi";
-import { FaUserGroup, FaMoneyBillTransfer } from "react-icons/fa6";
+import { FaUserGroup, FaMoneyBillTransfer, FaWarehouse } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
 import { useLocation } from "react-router-dom";
-import { IoMdMail } from "react-icons/io";
 import { BsFillPersonBadgeFill } from "react-icons/bs";
 
 function Aside({ isOpen, setIsOpen }) {
@@ -105,10 +104,10 @@ function Aside({ isOpen, setIsOpen }) {
         <NavItem
           isOpen={isOpen}
           setIsOpen={setIsOpen}
-          redirectTo="/mensajes"
-          Icon={IoMdMail}
+          redirectTo="/almacenes"
+          Icon={FaWarehouse}
         >
-          Mensajes
+          Almacenes
         </NavItem>
       </Container>
       {

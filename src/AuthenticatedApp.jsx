@@ -28,6 +28,7 @@ import Profile from "./pages/admin/Profile";
 import NotFound from "./pages/admin/NotFound";
 import Employees from "./pages/admin/Employees";
 import { WebSocketProvider } from "./context/websocket";
+import Categories from "./pages/admin/Categories";
 
 function AuthenticatedApp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +45,7 @@ function AuthenticatedApp() {
           <Routes>
             <Route index path="/" element={<Home />} />
             <Route path="/productos" element={<Products />} />
+            <Route path="/productos/categorias" element={<Categories />} />
             <Route path="/productos/:id" element={<Product />} />
             <Route path="/productos/:id/edit" element={<EditProduct />} />
             <Route path="/invitro" element={<InvitroOrders />} />

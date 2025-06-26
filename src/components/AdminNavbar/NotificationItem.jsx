@@ -1,48 +1,67 @@
 import { useNavigate } from "react-router-dom";
 import { Hr, NotificationItemContainer, Point } from "./styles";
 import { FaShoppingBag, FaCalendar } from "react-icons/fa";
-import { RiPlantFill, RiCheckDoubleFill } from "react-icons/ri";
+import { RiPlantFill } from "react-icons/ri";
 import { IoPersonCircleSharp, IoPersonAdd } from "react-icons/io5";
 import { FaMessage } from "react-icons/fa6";
 import { COLORS } from "../../styles/colors";
-import { FlexRow, Text } from "../../styles/layout";
+import { FlexColumn, FlexRow, Text } from "../../styles/layout";
 import { useAdmin } from "../../context/admin";
 import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
+import { formatDistanceToNow } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 function NotificationItem({ notification }) {
-  const { id, type, message, isRead, redirectTo } = notification;
+  const { id, type, message, isRead, redirectTo, createdAt } = notification;
   const { markAsRead } = useAdmin();
   const navigate = useNavigate();
+  
+  const timeAgo = createdAt ? formatDistanceToNow(new Date(createdAt), { 
+    addSuffix: true,
+    locale: es 
+  }) : '';
 
-  const icons = {
-    NEW_VITRO_ORDER: RiPlantFill,
-    NEW_ORDER: FaShoppingBag,
-    NEW_CONTACT_MESSAGE: IoPersonCircleSharp,
-    NEW_USER: IoPersonAdd,
-    PROX_VITRO_ORDER: FaCalendar,
-    PROX_ORDER: FaCalendar,
-    NEW_ORDER_MESSAGE: FaMessage,
-    NEW_VITROORDER_MESSAGE: FaMessage,
+  const data = {
+    NEW_VITRO_ORDER: {
+      icon: RiPlantFill,
+      color: COLORS.persian,
+    },
+    NEW_ORDER: {
+      icon: FaShoppingBag,
+      color: COLORS.blue,
+    },
+    NEW_CONTACT_MESSAGE: {
+      icon: IoPersonCircleSharp,
+      color: COLORS.dim,
+    },
+    NEW_USER: {
+      icon: IoPersonAdd,
+      color: COLORS.orange,
+    },
+    PROX_VITRO_ORDER: {
+      icon: FaCalendar,
+      color: COLORS.red,
+    },
+    PROX_ORDER: {
+      icon: FaCalendar,
+      color: COLORS.red,
+    },
+    NEW_ORDER_MESSAGE: {
+      icon: FaMessage,
+      color: COLORS.blue,
+    },
+    NEW_VITROORDER_MESSAGE: {
+      icon: FaMessage,
+      color: COLORS.persian,
+    },
   }
 
-  const colors = {
-    NEW_VITRO_ORDER: COLORS.persian,
-    NEW_ORDER: COLORS.blue,
-    NEW_CONTACT_MESSAGE: COLORS.dim,
-    NEW_USER: COLORS.orange,
-    PROX_VITRO_ORDER: COLORS.red,
-    PROX_ORDER: COLORS.red,
-    NEW_ORDER_MESSAGE: COLORS.blue,
-    NEW_VITROORDER_MESSAGE: COLORS.persian,
-  }
-
-  const Icon = icons[type];
+  const Icon = data[type].icon;
+  const color = data[type].color;
 
   const onRead = async (e) => {
     if(isRead) return;
-
-    e.stopPropagation();
 
     try {
       await markAsRead(id);
@@ -51,36 +70,49 @@ function NotificationItem({ notification }) {
     }
   }
 
+  const onClick = async (e) => {
+    e.stopPropagation();
+    navigate(redirectTo);
+    await onRead();
+  }
+
   return (
     <>
       <NotificationItemContainer
-        onClick={() => navigate(redirectTo)}
+        onClick={onClick}
       >
         <FlexRow>
           {
             !isRead
             &&
             <Point
+              top={8}
+              right={16}
               size={10}
             />
           }
           <Icon 
             size={20}
-            color={colors[type]}
+            color={color}
             style={{marginTop: "-2px"}}
           />
-          <Text
-            size={16}
-            weight={600}
+          <FlexColumn
+            gap={0.1}
           >
-            { message }
-          </Text>
+            <Text
+              size={16}
+              weight={600}
+            >
+              { message }
+            </Text>
+            <Text
+              size={13}
+              color={COLORS.dim}
+            >
+              { timeAgo }
+            </Text>
+          </FlexColumn>
         </FlexRow>
-        <RiCheckDoubleFill
-          onClick={onRead}
-          size={28}
-          color={isRead ? COLORS.persian : COLORS.dim}
-        />
       </NotificationItemContainer>
       <Hr />
     </>

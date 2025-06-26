@@ -87,7 +87,7 @@ function Order() {
           !order.client
           ? <Title>El pedido no existe</Title>
           : <>
-              <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
+              <Title capitalize>{ order.client.rsocial.toLowerCase().replaceAll('"', "") }</Title>
               <FlexRow>
                 <NewCategory
                   Icon={FaFileCircleCheck}
@@ -143,6 +143,7 @@ function Order() {
                         weight={600}
                         size={15}
                         color={COLORS.dim}
+                        style={{whiteSpace: "nowrap"}}
                       >
                         S/. { order.total?.toFixed(2) }
                       </Text>
@@ -169,7 +170,7 @@ function Order() {
                         weight={600}
                         size={15}
                         color={COLORS.dim}
-                        style={{textTransform: "capitalize"}}
+                        style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
                       >
                         { `${order.city}, ${order.department}` }
                       </Text>
@@ -212,6 +213,7 @@ function Order() {
                         weight={600}
                         size={15}
                         color={COLORS.dim}
+                        style={{whiteSpace: "nowrap"}}
                       >
                         { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
                       </Text>

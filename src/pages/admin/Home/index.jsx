@@ -455,7 +455,7 @@ function Home() {
                                 style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
                                 color={COLORS.dim}
                               >
-                                { order.client?.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
+                                { order.client?.rsocial.split(" ").slice(0, 3).join(" ").toLowerCase().replaceAll('"', "") }
                               </Text>
                             </td>
                             <td>

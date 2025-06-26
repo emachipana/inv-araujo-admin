@@ -35,6 +35,7 @@ function Invoice() {
     const fetch = async () => {
       try {
         const invoice = await apiFetch(`invoices/${id}`);
+        console.log(invoice);
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
@@ -64,7 +65,7 @@ function Invoice() {
   const igv = (parseFloat(base) * 0.18).toFixed(2);
 
   const handleDocClick = async () => {
-    if(invoice.isGenerated) return setDocModal(true);
+    if(invoice.isSended) return setDocModal(true);
 
     try {
       const today = new Date();
@@ -90,7 +91,7 @@ function Invoice() {
           !invoice.rsocial
           ? <Title>El comprobante no existe</Title>
           : <>
-              <Title capitalize>{ invoice.rsocial.toLowerCase() }</Title>
+              <Title capitalize>{ invoice.rsocial.toLowerCase().replaceAll('"', "") }</Title>
               <Section>
                 <Card>
                   <Wrapper>
@@ -189,7 +190,7 @@ function Invoice() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { invoice.items.length }
+                        { invoice.items?.length }
                       </Text>
                     </FlexColumn>
                   </Wrapper>
@@ -233,14 +234,14 @@ function Invoice() {
                   <Wrapper isButtons>
                     <Button
                       onClick={handleDocClick}
-                      disabled={invoice.items.length <= 0 || isGenerating}
-                      Icon={isGenerating ? null : (invoice.isGenerated ? FaEye : FaFileInvoice)}
+                      disabled={invoice.items?.length <= 0 || isGenerating}
+                      Icon={isGenerating ? null : (invoice.isSended ? FaEye : FaFileInvoice)}
                       fontSize={15}
                       iconSize={17}
-                      color={invoice.isGenerated ? "primary" : "secondary"}
+                      color={invoice.isSended ? "primary" : "secondary"}
                     >
                       { 
-                        invoice.isGenerated
+                        invoice.isSended
                         ? "Ver" 
                         : (isGenerating
                             ? <>
@@ -259,7 +260,7 @@ function Invoice() {
                       iconSize={18}
                       color="warning"
                       onClick={() => navigate("edit")}
-                      disabled={invoice.isGenerated}
+                      disabled={invoice.isSended}
                     >
                       Editar
                     </Button>
@@ -269,7 +270,7 @@ function Invoice() {
                       fontSize={15}
                       iconSize={16}
                       color="danger"
-                      disabled={invoice.isGenerated}
+                      disabled={invoice.isSended}
                     >
                       Eliminar
                     </Button>
@@ -295,13 +296,13 @@ function Invoice() {
                             item={item}
                             handleEdit={handleEditItem}
                             invoiceId={id}
-                            isInvoiceGenerated={invoice.isGenerated}
+                            isInvoiceGenerated={invoice.isSended}
                             setInvoice={setInvoice}
                           />
                         ))
                       }
                       {
-                        !invoice.isGenerated
+                        !invoice.isSended
                         &&
                         <Button
                           style={{marginTop: "1rem"}}

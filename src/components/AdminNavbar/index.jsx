@@ -17,7 +17,7 @@ import NotificationItem from "./NotificationItem";
 function AdminNavbar({ setIsOpen }) {
   const { logout } = useAuth();
   const [userDrop, setUserDrop] = useState(false);
-  const [notiDrop, setNotiDrop] = useState(false);
+  const [notiDrop, setNotiDrop] = useState(true);
   const [isNotiLoading, setIsNotiLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();

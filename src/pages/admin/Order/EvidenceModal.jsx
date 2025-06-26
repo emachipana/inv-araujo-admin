@@ -55,12 +55,12 @@ function EvidenceModal({isActive, setIsActive, employee, evidence}) {
                     Nombre
                   </Text>
                   <Text
-                    style={{whiteSpace: "nowrap"}}
+                    style={{whiteSpace: "nowrap", textTransform: "capitalize"}}
                     weight={600}
                     size={15}
                     color={COLORS.dim}
                   >
-                    {employee.rsocial}
+                    {employee.rsocial?.toLowerCase()?.split(" ")?.slice(0, 2)?.join(" ")}
                   </Text>
                 </FlexColumn>
                 <FlexColumn gap={0.1}>

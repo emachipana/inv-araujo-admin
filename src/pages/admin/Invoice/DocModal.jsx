@@ -86,23 +86,23 @@ function DocModal({ isActive, setIsActive, pdfUrl, setInvoice, invoiceId }) {
         </Button>
       </FlexRow>
       <Doc>
-        { 
-          isLoading
-          &&
+        {isLoading && (
           <Loader>
-            <Spinner 
-              color="light"
-            />
+            <Spinner color="light" />
           </Loader>
-        }
+        )}
         <iframe 
           title="factura"
-          src={pdfUrl}
+          src={`https://docs.google.com/viewer?url=${encodeURIComponent(pdfUrl)}&embedded=true`}
           width="100%"
           height="100%"
+          style={{ border: 'none' }}
           onLoad={() => setIsLoading(false)}
-        >
-        </iframe>
+          onError={() => {
+            setIsLoading(false);
+            toast.error('No se pudo cargar la vista previa del documento');
+          }}
+        />
       </Doc>
     </Modal>
   );

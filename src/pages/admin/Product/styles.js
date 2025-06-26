@@ -38,7 +38,7 @@ export const Wrapper = styled.section`
   display: flex;
   align-items: flex-start;
   justify-content: ${({ justify }) => justify || "space-between"};
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: ${({ wrap }) => wrap ? "wrap" : ""};
 
   @media screen and (max-width: 1340px) {

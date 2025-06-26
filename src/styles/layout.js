@@ -8,11 +8,6 @@ export const Text = styled.p`
   text-decoration: ${({ isLink }) => isLink ? "underline" : "none"};
   cursor: ${({ isLink }) => isLink ? "pointer" : "inherit"};
   text-align: ${({ align }) => align || "center"};
-  transition: color .1s ease;
-
-  &:hover {
-    color: ${({ hColor, color }) => hColor || color};
-  }
 `;
 
 export const FlexRow = styled.div`
@@ -71,6 +66,10 @@ export const Image = styled.img`
 `;
 
 export const shadowSm = "0 2px 3px 1px rgba(0, 0, 0, .2)";
+
+export const shadowMd = "0 4px 6px 2px rgba(0, 0, 0, .25)";
+
+export const shadowLg = "0 8px 16px rgba(0, 0, 0, .25)"
 
 export const Form = styled.form`
   width: ${({ width }) => width || "100%"};

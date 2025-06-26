@@ -32,13 +32,8 @@ function InvoiceForm({ initialValues = {
 
   const onSubmit = async (values) => {
     try {
-      const body = {
-        ...values,
-        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-        invoiceType: (values.invoiceType * 1) === 1 ? "BOLETA" : "FACTURA"
-      }
       setIsLoading(true);
-      const invoice = isToCreate ? await addInvoice(body) : await updateInvoice(invoiceId, body)
+      const invoice = isToCreate ? await addInvoice(values) : await updateInvoice(invoiceId, values)
       setIsLoading(false);
       navigate(`/comprobantes/${invoice.id}`);
     }catch(error) {
@@ -50,7 +45,7 @@ function InvoiceForm({ initialValues = {
   const onInvoiceChange = (event, setFieldValue) => {
     const value = event.target.value;
     setFieldValue("invoiceType", value);
-    setInvoiceType((value * 1) === 1 ? "BOLETA" : "FACTURA");
+    setInvoiceType(value);
   }
 
   const today = new Date();
@@ -87,11 +82,11 @@ function InvoiceForm({ initialValues = {
               handleChange={(e) => onInvoiceChange(e, setFieldValue)}
               options={[
                 {
-                  id: 1,
+                  id: "BOLETA",
                   content: "BOLETA"
                 },
                 {
-                  id: 2,
+                  id: "FACTURA",
                   content: "FACTURA"
                 }
               ]}
@@ -107,12 +102,12 @@ function InvoiceForm({ initialValues = {
               handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
               options={[
                 {
-                  id: 1,
+                  id: "DNI",
                   content: "DNI",
                   disabled: invoiceType === "FACTURA"
                 },
                 {
-                  id: 2,
+                  id: "RUC",
                   content: "RUC"
                 }
               ]}
