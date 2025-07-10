@@ -10,7 +10,7 @@ export const Container = styled.div`
 `;
 
 export const Section = styled.div`
-  min-height: 180px;
+  // min-height: 180px;
   position: absolute;
   background-color: ${COLORS.white};
   border-radius: 10px;

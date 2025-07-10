@@ -23,7 +23,7 @@ export const onDocChange = async (event, setFieldValue, docType) => {
     if(docType === "DNI" && value.length === 8) {
       const info = await getDoc("dni", value);
       if(!info.success) return toast.error(info.message);
-      setFieldValue("rsocial", `${info.apellidoPaterno} ${info.apellidoMaterno} ${info.nombres}`);
+      setFieldValue("rsocial", `${info.nombres} ${info.apellidoPaterno} ${info.apellidoMaterno}`);
     }
   }
 }

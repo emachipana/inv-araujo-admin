@@ -30,23 +30,39 @@ export const RESET = css`
     font-size: 1rem;
   }
 
-  // styling scrollbar
-
+  // Estilos modernos para el scrollbar
   ::-webkit-scrollbar {
-    width: 5px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
     background-color: ${COLORS.white};
+    border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb {
     background-color: ${COLORS.taupe};
-    cursor: grab;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: ${COLORS.taupe}80; /* Añade transparencia al hacer hover */
+    transform: scale(1.1);
   }
 
   ::-webkit-scrollbar-thumb:active {
     cursor: grabbing;
+    background-color: ${COLORS.taupe};
+  }
+
+  /* Para Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: ${COLORS.taupe} ${COLORS.white};
   }
 `;

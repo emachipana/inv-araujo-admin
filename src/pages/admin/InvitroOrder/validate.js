@@ -39,10 +39,5 @@ export const advanceValidate = (values, total, currentAdvance) => {
     errors.amount = "El adelanto es mayor que el total";
   }
 
-  console.log("adelnto total", currentAdvance);
-  console.log("amount actual", values.amount);
-  console.log("total", total);
-  console.log(currentAdvance + values.amount);
-
   return errors;
 }

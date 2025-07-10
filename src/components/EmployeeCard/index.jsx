@@ -25,7 +25,7 @@ function EmployeeCard({employee}) {
           <Text
             color={COLORS.taupe}
           >
-            { capitalize(role.toLowerCase()) }
+            { capitalize(role.name.toLowerCase()) }
           </Text>
         </FlexRow>
         <Name>

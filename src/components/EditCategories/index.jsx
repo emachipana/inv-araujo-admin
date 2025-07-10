@@ -8,10 +8,14 @@ import { Container as Navigation } from "../Categories/styles";
 import { useAdmin } from "../../context/admin";
 import Category from "./Category";
 import AddCategory from "./AddCategory";
+import { useAuth } from "../../context/auth";
 
 function EditCategories() {
   const { categories, addCategory, updateCategory, deleteCategory } = useAdmin();
   const [currentAction, setCurrentAction] = useState("categories");
+  const { user } = useAuth();
+
+  const userPermissions = user.role.permissions;
 
   return (
     <Container>
@@ -28,13 +32,17 @@ function EditCategories() {
         >
           Ver categorias
         </NewCategory>
-        <NewCategory
-          onClick={() => setCurrentAction("addCategory")}
-          Icon={MdAddCircleOutline}
-          isActive={currentAction === "addCategory"}
-        >
-          Agregar categoria
-        </NewCategory>
+        {
+          userPermissions.includes("PRODUCTS_CATEGORY_CREATE")
+          &&
+          <NewCategory
+            onClick={() => setCurrentAction("addCategory")}
+            Icon={MdAddCircleOutline}
+            isActive={currentAction === "addCategory"}
+          >
+            Agregar categoria
+          </NewCategory>
+        }
       </Navigation>
       <Section>
         {
@@ -46,6 +54,8 @@ function EditCategories() {
                     id={category.id}
                     key={index}
                     forCategory={{updateCategory, deleteCategory}}
+                    ableToEdit={userPermissions.includes("PRODUCTS_CATEGORY_UPDATE")}
+                    ableToDelete={userPermissions.includes("PRODUCTS_CATEGORY_DELETE")}
                   >
                     { category.name }
                   </Category>

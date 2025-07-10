@@ -15,7 +15,7 @@ function App() {
     <Container>
       <Toaster />
       {
-        user && user.role === "ADMINISTRADOR"
+        user && user.employeeId
         ? <AuthenticatedApp />
         : <UnauthenticatedApp />
       }

@@ -1,10 +1,9 @@
 import styled from "@emotion/styled";
 import { COLORS } from "../../styles/colors";
+import { FlexRow } from "../../styles/layout";
 
-export const Container = styled.section`
+export const Container = styled(FlexRow)`
   width: 100%;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: 1rem;
 `;

@@ -48,7 +48,6 @@ function InvitroOrder() {
         await loadVitroOrders();
         setIsLoading(true);
         const order = await apiFetch(`vitroOrders/${id}`);
-        console.log(order);
         const items = await apiFetch(`orderVarieties/vitroOrder/${order.data.id}`);
         const advances = await apiFetch(`advances/vitroOrder/${order.data.id}`);
         setAdvances(advances);

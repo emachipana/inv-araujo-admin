@@ -36,8 +36,8 @@ function Badge({ color, children, size }) {
   return (
     <Container
       size={size}
-      color={colorList[color].color || COLORS.persian}
-      bgColor={colorList[color].bgColor || COLORS.persian_light}
+      color={colorList[color || "primary"].color || COLORS.persian}
+      bgColor={colorList[color || "primary"].bgColor || COLORS.persian_light}
     >
       { children }
     </Container>

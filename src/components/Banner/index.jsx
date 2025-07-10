@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { COLORS } from "../../styles/colors";
 import { FlexColumn, Text } from "../../styles/layout";
-import CheckBox from "../Input/CheckBox";
 import { Content, Section, Title } from "./styles";
 import { useAdmin } from "../../context/admin";
 import { useNavigate } from "react-router-dom";
 import { handleChecked, parsedTitle } from "./handlers";
+import SelectBox from "../Input/SelectBox";
 
 function Banner({ id, title, description, markedWord, isUsed, items}) {
   const [checked, setChecked] = useState(isUsed);
@@ -35,7 +35,7 @@ function Banner({ id, title, description, markedWord, isUsed, items}) {
           { description }
         </Text>
       </FlexColumn>
-      <CheckBox
+      <SelectBox
         size={18}
         checked={checked}
         label={checked ? "Usando" : "Usar"}

@@ -29,6 +29,13 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
   }
 }
 
+const sortData = {
+  "PRICE_HIGH_TO_LOW": "sortby=price&direction=DESC",
+  "PRICE_LOW_TO_HIGH": "sortby=price&direction=ASC",
+  "STOCK_HIGH_TO_LOW": "sortby=stock&direction=DESC",
+  "STOCK_LOW_TO_HIGH": "sortby=stock&direction=ASC",
+}
+
 export const filterBuilder = (filters = { category: { id: null }, sort: null, page: 0 }) => {
   let filter = "";
 
@@ -36,7 +43,7 @@ export const filterBuilder = (filters = { category: { id: null }, sort: null, pa
   
   if(filters.sort) {
     const op = filters.category.id ? "&" : "?";
-    filter += `${op}sort=${filters.sort}`;
+    filter += `${op}${sortData[filters.sort]}`;
   } 
 
   if(filters.page > 0) {

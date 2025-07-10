@@ -3,7 +3,7 @@ import { FlexRow, Text } from "../../styles/layout";
 import { CheckContainer } from "./styles";
 import { FaCheck } from "react-icons/fa6";
 
-function CheckBox({ size, checked, onChange, label, labelColor }) {
+function SelectBox({ size, checked, onChange, label, labelColor }) {
   return (
     <FlexRow 
       onClick={onChange}
@@ -31,4 +31,4 @@ function CheckBox({ size, checked, onChange, label, labelColor }) {
   );
 }
 
-export default CheckBox;
+export default SelectBox;

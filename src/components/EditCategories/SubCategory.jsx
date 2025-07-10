@@ -10,7 +10,7 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { errorParser } from "../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory, deleteSubCategory }) {
+function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory, deleteSubCategory, ableToEdit, ableToDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isToEdit, setIsToEdit] = useState(false);
   const [category, setCategory] = useState({
@@ -78,18 +78,26 @@ function SubCategory({ id, children, categoryId, isFromTuber, updateSubCategory,
               />
             </>
           : <>
-              <FaEdit
-                onClick={() => isFromTuber ? updateSubCategory(id, categoryId) : setupEdit(children, setIsToEdit, setCategory)}
-                size={17}
-                color={COLORS.dim}
-                style={{cursor: "pointer"}}
-              />
-              <FaTrashAlt
-                size={16}
-                color={COLORS.red}
-                style={{cursor: "pointer"}}
-                onClick={onDelete}
-              />
+              {
+                ableToEdit
+                &&
+                <FaEdit
+                  onClick={() => isFromTuber ? updateSubCategory(id, categoryId) : setupEdit(children, setIsToEdit, setCategory)}
+                  size={17}
+                  color={COLORS.dim}
+                  style={{cursor: "pointer"}}
+                />
+              }
+              {
+                ableToDelete
+                &&
+                <FaTrashAlt
+                  size={16}
+                  color={COLORS.red}
+                  style={{cursor: "pointer"}}
+                  onClick={onDelete}
+                />
+              }
             </>
         }
       </FlexRow>

@@ -92,7 +92,7 @@ function EvidenceModal({isActive, setIsActive, employee, evidence}) {
                     size={15}
                     color={COLORS.dim}
                   >
-                    {employee.role}
+                    {employee.role.name}
                   </Text>
                 </FlexColumn>  
               </Wrapper>

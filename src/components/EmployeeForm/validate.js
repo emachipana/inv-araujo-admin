@@ -23,5 +23,7 @@ export const validate = (values) => {
     errors.phone = "Solo se aceptan números";
   }
 
+  if(!values.roleId) errors.roleId = "Este campo es obligatorio";
+
   return errors;
 }

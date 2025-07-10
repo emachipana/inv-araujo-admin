@@ -19,7 +19,7 @@ export const Container = styled.div`
 export const Card = styled.div`
   width: ${({ size }) => (size + 10) || 130}px;
   height: ${({ size }) => size || 120}px;
-  border-radius: 0.75rem;
+  border-radius: 0.8rem;
   background-color: ${({ color }) => color || COLORS.orange};
   display: flex;
   flex-direction: column;
@@ -29,4 +29,5 @@ export const Card = styled.div`
   color: white;
   position: relative;
   padding: 0.5rem;
+  box-shadow: ${shadowSm};
 `;

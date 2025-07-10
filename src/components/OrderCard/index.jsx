@@ -4,13 +4,13 @@ import Badge from "../Badge";
 import { Bottom, Container, RowBetween, Text } from "./styles";
 import Header from "./Header";
 import { FaMapMarkerAlt, FaAddressCard, FaMapMarkedAlt } from "react-icons/fa";
-import { FaBuildingWheat, FaCalendarCheck, FaMoneyBills, FaRegCalendarCheck, FaRegCalendarDays, FaTruck, FaTruckFast } from "react-icons/fa6";
+import { FaBuildingWheat, FaMoneyBills, FaRegCalendarCheck, FaRegCalendarDays } from "react-icons/fa6";
 import { MdLocalShipping } from "react-icons/md";
 import { COLORS } from "../../styles/colors";
 import { options } from "./util";
 
 function OrderCard({ order, fullSize = false }) {
-  const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status } = order;
+  const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status, paymentType } = order;
   const { rsocial, document } = client;
   const destination = [city, department];
   const deliverDate = new Date(maxShipDate || finishDate);
@@ -24,6 +24,13 @@ function OrderCard({ order, fullSize = false }) {
     "CANCELADO": "danger",
     "ENTREGADO": "primary",
     "PAGADO": "orange"
+  }
+
+  const paymentMessage = {
+    "EFECTIVO": "Pagado en efectivo",
+    "TARJETA_ONLINE": "Pagado en la web",
+    "YAPE": "Pagado por Yape",
+    "TRANSFERENCIA": "Transferencia bancaria",
   }
 
   return (
@@ -83,7 +90,11 @@ function OrderCard({ order, fullSize = false }) {
                   weight={600}
                   notCapitalize
                 >
-                  Pago en efectivo
+                  {
+                    status === "PAGADO"
+                    ? paymentMessage[paymentType]
+                    : "Sin pagar"
+                  }
                 </Text>
               </FlexColumn>
             </RowBetween>

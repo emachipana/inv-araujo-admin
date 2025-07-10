@@ -1,12 +1,12 @@
 import styled from "@emotion/styled";
-import { FlexRow, shadowMd } from "../../styles/layout";
+import { FlexRow, shadowLg, shadowMd } from "../../styles/layout";
 import { COLORS } from "../../styles/colors";
 
 export const Container = styled.div`
   width: ${({ fullSize }) => fullSize ? "100%" : "250px"};
   height: ${({ fullSize }) => fullSize ? "auto" : "205px"};
   padding: ${({ fullSize }) => fullSize ? "1rem" : "0"};
-  ${({ fullSize }) => fullSize && `border: 1px solid ${COLORS.platinium};`}
+  border: 1px solid ${COLORS.platinium};
   border-radius: 0.8rem;
   background-color: white;
   box-shadow: ${shadowMd};
@@ -19,7 +19,8 @@ export const Container = styled.div`
   transition: .2s ease;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
+    box-shadow: ${shadowLg};
   }
 `;
 

@@ -42,7 +42,6 @@ function Order() {
     const fetch = async () => {
       try {
         const order = await apiFetch(`orders/${id}`);
-        console.log(order);
         const items = await apiFetch(`orderProducts/order/${order.data.id}`);
         setOrder(order.data);
         setOrderItems(items);

@@ -10,7 +10,7 @@ export const Container = styled.div`
   gap: 0.6rem;
   z-index: 50;
   transition: .3s ease-in;
-  box-shadow: 0px 10px 12px 2px rgba(0, 0, 0, .2);
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
   grid-area: aside;
   position: sticky;
   top: 70px;

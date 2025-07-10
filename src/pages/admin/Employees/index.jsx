@@ -11,14 +11,34 @@ import Modal from "../../../components/Modal";
 import EmployeeCard from "../../../components/EmployeeCard";
 import EmployeeForm from "../../../components/EmployeeForm";
 import { onSearchChange } from "../Products/handlers";
+import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { COLORS } from "../../../styles/colors";
+import Button from "../../../components/Button";
+import { IoIosPersonAdd } from "react-icons/io";
+import { HeaderPage, MenuSection } from "../InvitroOrders/styles";
+import DropDown from "../../../components/DropDown";
+import SelectButton from "../../../components/SelectButton";
+import { TbSitemapFilled } from "react-icons/tb";
+import SelectItem from "../../../components/SelectButton/SelectItem";
+import { filterBuilder } from "./filter";
+import apiFetch from "../../../services/apiFetch";
+import { useModal } from "../../../context/modal";
+import { useAuth } from "../../../context/auth";
+import Roles from "../../../components/Roles";
 
 function Employees() {
-  const [createModal, setCreateModal] = useState(false);
+  const [filters, setFilters] = useState({
+    sort: null,
+    role: {id: null, name: null}
+  });
+  const [search, setSearch] = useState(""); 
   const [isSearching, setIsSearching] = useState(false);
-  const [searchActive, setSearchActive] = useState(false); 
+  const [isGetting, setIsGetting] = useState(false); 
   const [type, setType] = useState(localStorage.getItem("employeesType") || "group");
-  const [searchValue, setSearchValue] = useState(""); 
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const { employees, isLoading, setIsLoading, loadEmployees, setEmployees, employeesBackup } = useAdmin();
+  const { employeesModal: createModal, setEmployeesModal: setCreateModal } = useModal();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
@@ -33,26 +53,112 @@ function Employees() {
     fetch();
   }, [loadEmployees, setIsLoading]);
 
+  useEffect(() => {
+    const fetch = async () => {
+      if(!filters.sort && !filters.role.id) return setEmployees(employeesBackup);
+
+      try {
+        setIsGetting(true);
+        const params = filterBuilder(filters);
+        const employees = await apiFetch(`employees${params}`);
+        setEmployees(employees);
+        setIsGetting(false);
+      }catch(error) {
+        toast.error(errorParser(error.message));
+        setIsGetting(false);
+      }
+    }
+
+    fetch();
+  }, [filters, setEmployees, employeesBackup, setIsGetting]);
+
   return (
     <>
-      <Title>Empleados</Title>
-      <Filter 
-        setModal={setCreateModal}
-        textButton="Nuevo empleado"
-        localStorageKey="employeesType"
-        setType={setType}
-        type={type}
-        isSearching={searchActive}
-        labelSearch="Buscar empleado..."
-        onSearchChange={(e) => onSearchChange(e, isSearching, setSearchValue, setIsSearching, setEmployees, "employees", employeesBackup)}
-        searchValue={searchValue}
-        setIsSearching={setSearchActive}
-        setSearch={setSearchValue}
-        reset={() => setEmployees(employeesBackup)}
-      />
+      <FlexRow
+        width="100%"
+        justify="space-between"
+      >
+        <FlexColumn>
+          <Title>Empleados</Title>
+          <Text
+            style={{marginTop: "-0.5rem"}}
+            color={COLORS.dim}
+          >
+            Gestiona todos los empleados de tu tienda
+          </Text>
+        </FlexColumn>
+        {
+          user.role.permissions.includes("EMPLOYEES_CREATE")
+          &&
+          <Button
+            onClick={() => setCreateModal(!createModal)}
+            fontSize={15}
+            Icon={IoIosPersonAdd}
+            iconSize={18}
+          >
+            Nuevo empleado
+          </Button>
+        }
+      </FlexRow>
+      <HeaderPage>
+        <Roles 
+          isBlocked={isSearching}
+          currentRole={filters.role?.name}
+          setFilters={setFilters}
+        />
+        <FlexRow
+          width="100%"
+          justify="space-between"
+        >
+          <Filter 
+            localStorageKey="employeesType"
+            setType={setType}
+            type={type}
+            isSearching={isSearching}
+            labelSearch="Buscar empleado..."
+            onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setEmployees, "employees", employeesBackup, setIsSearching)}
+            searchValue={search}
+            setIsSearching={setIsSearching}
+            resetFilters={() => setFilters(filters => ({...filters, sort: null }))}
+            reset={() => setSearch("")}
+          />
+          <DropDown
+            Button={SelectButton}
+            buttonData={{
+              Icon: TbSitemapFilled,
+              children: "Ordernar por",
+            }}
+            isOpen={isSortOpen}
+            setIsOpen={setIsSortOpen}
+          >
+            <MenuSection>
+              <SelectItem
+                minWidth={195}
+              >
+                Reciente a antiguo
+              </SelectItem>
+              <SelectItem
+                minWidth={195}
+              >
+                Antiguo a reciente
+              </SelectItem>
+              <SelectItem
+                minWidth={195}
+              >
+                Mayor consumo a menor
+              </SelectItem>
+              <SelectItem
+                minWidth={195}
+              >
+                Menor consumo a mayor
+              </SelectItem>
+            </MenuSection>
+          </DropDown>
+        </FlexRow>
+      </HeaderPage>
       <Section>
         {
-          isLoading || isSearching
+          isLoading || isGetting
           ? <Spinner color="secondary" />
           : (type === "group"
               ? employees.map((employee, index) => (

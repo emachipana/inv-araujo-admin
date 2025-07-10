@@ -3,12 +3,14 @@ import apiFetch from "../services/apiFetch";
 import { TOKEN_NAME } from "../config";
 import toast from "react-hot-toast";
 import { errorParser } from "../helpers/errorParser";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
@@ -17,23 +19,25 @@ const AuthProvider = ({ children }) => {
         if(!token) return setIsLoading(false);
 
         const user = await apiFetch("users/profile/info");
+        if(!user.data.employeeId) throw new Error("No tienes los permisos necesarios");
         setUser(user.data);
         setIsLoading(false);
       }catch(error) {
         const message = error.message;
         if(message.toLowerCase().includes("token expirado")) localStorage.removeItem(TOKEN_NAME);
         setIsLoading(false);
+        navigate("/login");
         if(message) setTimeout(() => toast.error(errorParser(message)), 500);
       }
     }
 
     fetch();
-  }, []);
+  }, [ navigate ]);
 
   const login = async (credentials, origin) => {
     const response = await apiFetch("auth/login", { body: credentials })
     const { token, user } = response.data;
-    if(origin === "admin" && user.role !== "ADMINISTRADOR") throw new Error("No tienes los permisos necesarios");
+    if(!user.employeeId) throw new Error("No tienes los permisos necesarios");
     localStorage.setItem(TOKEN_NAME, token);
     setUser(user);
 
@@ -43,6 +47,7 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem(TOKEN_NAME);
     setUser(null);
+    navigate("/login");
   }
 
   const updateUser = async (id, body) => {

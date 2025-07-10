@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
+import { useAuth } from "./auth";
 
 const AdminContext = createContext();
 
@@ -24,6 +25,7 @@ const AdminProvider = ({ children }) => {
   const [employeesBackup, setEmployeesBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [homeData, setHomeData] = useState({
     orders: {
       data: {ship: 0, pen: 0},
@@ -49,6 +51,8 @@ const AdminProvider = ({ children }) => {
     notifications: false,
   });
 
+  const { user } = useAuth();
+
   const markAsRead = async (id) => {
     if(!id) throw Error("Hubo un problema vuelve a intentarlo más tarde");
     const index = notifications.findIndex((noti) => noti.id === id);
@@ -68,13 +72,15 @@ const AdminProvider = ({ children }) => {
   }, [matcher.notifications]);
 
   const loadExpenses = useCallback(async () => {
+    if(!user.role.permissions.includes("PROFITS_WATCH")) return;
+
     if(matcher.expenses) return;
     setIsLoading(true);
     const expenses = await apiFetch("profits");
     setExpenses(expenses);
     setMatcher(matcher => ({...matcher, expenses: true}));
     setIsLoading(false);
-  }, [matcher.expenses]);
+  }, [matcher.expenses, user.role]);
 
   const loadClients = useCallback(async () => {
     if(matcher.clients) return;
@@ -119,10 +125,21 @@ const AdminProvider = ({ children }) => {
     if(matcher.home) return;
     await loadExpenses();
     setIsLoading(true);
-    const vitroOrdersData = await apiFetch("vitroOrders/data");
-    const ordersData = await apiFetch("orders/data");
-    const orders = await apiFetch("orders?size=5&sort=DESC");
-    const vitroOrders = await apiFetch("vitroOrders?size=5&sort=DESC");
+    let vitroOrdersData = {};
+    let ordersData = {};
+    let orders = {};
+    let vitroOrders = {};
+
+    if(user.role.permissions.includes("ORDERS_WATCH")) {
+      ordersData = await apiFetch("orders/data");
+      orders = await apiFetch("orders?size=5&sort=DESC");
+    }
+
+    if(user.role.permissions.includes("INVITRO_WATCH")) {
+      vitroOrdersData = await apiFetch("vitroOrders/data");
+      vitroOrders = await apiFetch("vitroOrders?size=5&sort=DESC");
+    }
+    
     setHomeData({
       orders: {
         data: ordersData.data,
@@ -154,7 +171,7 @@ const AdminProvider = ({ children }) => {
     if(matcher.vitroOrders) return;
     setIsLoading(true);
     const tubers = await apiFetch("tubers");
-    const vitroOrders = await apiFetch("vitroOrders?direction=DESC");
+    const vitroOrders = await apiFetch("vitroOrders?sort=DESC");
     setTubers(tubers);
     setVitroOrders(vitroOrders);        
     setVitroOrdersBack(vitroOrders);
@@ -174,11 +191,15 @@ const AdminProvider = ({ children }) => {
 
   const loadEmployees = useCallback(async () => {
     if(matcher.employees) return;
+    const rolesToFilter = ["CLIENTE", "ADMINISTRADOR"];
 
     setIsLoading(true);
     const employees = await apiFetch("employees");
-    setEmployees(employees.filter((emp) => emp.role !== "ADMINISTRADOR"));
-    setEmployeesBackup(employees.filter((emp) => emp.role !== "ADMINISTRADOR"));
+    const roles = await apiFetch("roles");
+    const employeesFiltered = employees.filter((emp) => !rolesToFilter.includes(emp.role.name));
+    setRoles(roles.filter(role => !rolesToFilter.includes(role.name)));
+    setEmployees(employeesFiltered);
+    setEmployeesBackup(employeesFiltered);
     setMatcher(matcher => ({...matcher, employees: true}));
     setIsLoading(false);
   }, [matcher.employees]);
@@ -219,6 +240,11 @@ const AdminProvider = ({ children }) => {
       imageId: image.id
     }});
     setCategories(categories => [...categories, newCategory.data]);
+  }
+
+  const addRole = async (body) => {
+    const newRole = await apiFetch("roles", { body });
+    setRoles(roles => [...roles, newRole.data]);
   }
 
   const updateProduct = async (id, body) => {
@@ -705,6 +731,8 @@ const AdminProvider = ({ children }) => {
         employees,
         employeesBackup,
         notifications,
+        roles,
+        setRoles,
         addEmployee,
         setEmployees,
         setEmployeesBackup,
@@ -783,6 +811,9 @@ const AdminProvider = ({ children }) => {
         setNotifications,
         markAsRead,
         setOrdersBackup,
+        setWarehouses,
+        setWarehousesBackup,
+        addRole,
       }}
     >
       { children }

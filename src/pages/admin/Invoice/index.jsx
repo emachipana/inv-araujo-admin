@@ -35,7 +35,6 @@ function Invoice() {
     const fetch = async () => {
       try {
         const invoice = await apiFetch(`invoices/${id}`);
-        console.log(invoice);
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {

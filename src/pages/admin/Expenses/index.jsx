@@ -6,9 +6,13 @@ import { Spinner } from "reactstrap";
 import Expense from "../../../components/Expense";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { FlexColumn, Text } from "../../../styles/layout";
+import { COLORS } from "../../../styles/colors";
+import { useAuth } from "../../../context/auth";
 
 function Expenses() {
   const { isLoading, setIsLoading, loadExpenses, expenses } = useAdmin(); 
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
@@ -25,7 +29,15 @@ function Expenses() {
 
   return (
     <>
-      <Title>Gastos</Title>
+      <FlexColumn gap={0.1}>
+        <Title>Gastos</Title>
+        <Text
+          style={{marginTop: "-0.5rem"}}
+          color={COLORS.dim}
+        >
+          Administra todos los gastos de tu tienda
+        </Text>
+      </FlexColumn>
       <Section>
         {
           isLoading
@@ -33,6 +45,7 @@ function Expenses() {
           : expenses?.map((expense, index) => (
               <Expense 
                 key={index}
+                ableToWatch={user.role.permissions.includes("EXPENSES_WATCH")}
                 {...expense}
               />
             ))

@@ -9,11 +9,13 @@ import { MdAddCircleOutline } from "react-icons/md";
 import Category from "../EditCategories/Category";
 import AddCategory from "../EditCategories/AddCategory";
 import AddVariety from "./AddVariety";
+import { useAuth } from "../../context/auth";
 
 function EditTubers() {
   const [currentAction, setCurrentAction] = useState("tubers");
   const [toEditVariety, setToEditVariety] = useState({ isActive: false, id: "", tuberId: "" });
   const { tubers, updateTuber, addTuber, deleteTuber, deleteVariety } = useAdmin();
+  const { user } = useAuth();
 
   const handleUpdateVariety = (id, tuberId) => {
     setCurrentAction("addVariety");
@@ -51,24 +53,32 @@ function EditTubers() {
         >
           Ver tubérculos
         </NewCategory>
-        <NewCategory
-          onClick={() => handleClick("addTuber")}
-          Icon={MdAddCircleOutline}
-          isActive={currentAction === "addTuber"}
-        >
-          Agregar tubérculo
-        </NewCategory>
-        <NewCategory
-          onClick={() => handleClick("addVariety")}
-          Icon={MdAddCircleOutline}
-          isActive={currentAction === "addVariety"}
-        >
-          {
-            toEditVariety.isActive
-            ? "Editar variedad"
-            : "Agregar variedad"
-          }
-        </NewCategory>
+        {
+          user.role.permissions.includes("TUBER_CREATE")
+          &&
+          <NewCategory
+            onClick={() => handleClick("addTuber")}
+            Icon={MdAddCircleOutline}
+            isActive={currentAction === "addTuber"}
+          >
+            Agregar tubérculo
+          </NewCategory>
+        }
+        {
+          user.role.permissions.includes("VARIETY_CREATE")
+          &&
+          <NewCategory
+            onClick={() => handleClick("addVariety")}
+            Icon={MdAddCircleOutline}
+            isActive={currentAction === "addVariety"}
+          >
+            {
+              toEditVariety.isActive
+              ? "Editar variedad"
+              : "Agregar variedad"
+            }
+          </NewCategory>
+        }
       </Navigation>
       <Section>
         {
@@ -88,6 +98,8 @@ function EditTubers() {
                       isFromTuber
                       forCategory={{updateCategory: updateTuber, deleteCategory: deleteTuber}}
                       forSubCategory={{updateSubCategory: handleUpdateVariety, deleteSubCategory: deleteVariety}}
+                      ableToEdit={user.role.permissions.includes("TUBER_UPDATE")}
+                      ableToDelete={user.role.permissions.includes("TUBER_DELETE")}
                     >
                       { tuber.name }
                     </Category>

@@ -12,15 +12,17 @@ import Input from "../Input";
 import { errorParser } from "../../helpers/errorParser";
 import { Spinner } from "reactstrap";
 import { onDocChange } from "../VitroForm/handlers";
+import Select from "../Input/Select";
 
 function EmployeeForm({ initialValues = {
   rsocial: "",
   document: "",
   email: "",
   phone: "",
+  roleId: "",
 }, isToCreate, employeeId, setIsActive}) {
   const [isLoading, setIsLoading] = useState(false);
-  const { addEmployee, updateEmployee } = useAdmin();
+  const { addEmployee, updateEmployee, roles } = useAdmin();
   // const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -35,6 +37,8 @@ function EmployeeForm({ initialValues = {
       toast.error(errorParser(error.message));
     }
   }
+
+  const roleOptions = roles.map(role => ({id: role.id, content: role.name}));
 
   return (
     <Formik
@@ -73,6 +77,16 @@ function EmployeeForm({ initialValues = {
             value={values.rsocial}
             handleChange={handleChange}
             handleBlur={handleBlur}
+          />
+          <Select 
+            id="roleId"
+            label="Rol"
+            error={errors.roleId}
+            touched={touched.roleId}
+            handleBlur={handleBlur}
+            handleChange={handleChange}
+            options={roleOptions}
+            value={values.roleId}
           />
           <Group>
             <Input 

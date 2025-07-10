@@ -128,7 +128,7 @@ function List() {
                   weight={500}
                   color={COLORS.dim}
                 >
-                  { capitalize(employee.role?.toLowerCase()) }
+                  { capitalize(employee.role.name.toLowerCase()) }
                 </Text>
               </td>
               <td>
