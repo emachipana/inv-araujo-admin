@@ -4,14 +4,17 @@ import { FlexColumn, FlexRow, Text } from "../../styles/layout";
 import { Container, Name } from "./styles";
 import { MdEmail } from "react-icons/md";
 import { FaPhone } from "react-icons/fa";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeCard({employee}) {
-  const { rsocial, document, role, email, phone } = employee;
-  // const navigate = useNavigate();
-  // onClick={() => navigate(`/empleados/${id}`)}
+  const { id, rsocial, document, role, email, phone } = employee;
+  const navigate = useNavigate();
+  const onClick = () => navigate(`/empleados/${id}`);
+
   return (
-    <Container>
+    <Container
+      onClick={onClick}
+    >
       <FlexColumn width="100%">
         <FlexRow
           width="100%"

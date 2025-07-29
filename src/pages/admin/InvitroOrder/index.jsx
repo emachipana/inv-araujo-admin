@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import OrderStateModal from "./OrderStateModal";
 import { MdPhotoSizeSelectActual } from "react-icons/md";
 import EvidenceModal from "../Order/EvidenceModal";
+import { useAuth } from "../../../context/auth";
 
 function InvitroOrder() {
   const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +42,9 @@ function InvitroOrder() {
   const { id } = useParams();
   const { deleteVitro, loadVitroOrders, updateVitro } = useAdmin();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const userPermissions = user.role.permissions;
 
   useEffect(() => {
     const fetch = async () => {
@@ -49,8 +53,10 @@ function InvitroOrder() {
         setIsLoading(true);
         const order = await apiFetch(`vitroOrders/${id}`);
         const items = await apiFetch(`orderVarieties/vitroOrder/${order.data.id}`);
-        const advances = await apiFetch(`advances/vitroOrder/${order.data.id}`);
-        setAdvances(advances);
+        if(userPermissions.includes("INVITRO_ADVANCE_WATCH")) {
+          const advances = await apiFetch(`advances/vitroOrder/${order.data.id}`);
+          setAdvances(advances);
+        }
         setOrderItems(items);
         setOrder(order.data);
         setIsLoading(false);
@@ -61,7 +67,7 @@ function InvitroOrder() {
     }
 
     fetch();
-  }, [ id, loadVitroOrders ]);
+  }, [ id, loadVitroOrders, userPermissions ]);
 
   const options = {
     day: "numeric",
@@ -85,33 +91,45 @@ function InvitroOrder() {
           ? <Title>El pedido invitro no existe</Title>
           : <>
               <Title capitalize>{ order.client.rsocial.toLowerCase() }</Title>
-              <FlexRow>
-                <NewCategory
-                  Icon={FaMoneyBillWheat}
-                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                  onClick={() => setAdvanceModal(!advanceModal)}
-                >
-                  Adelantos
-                </NewCategory>
-                <NewCategory
-                  Icon={FaFileCircleCheck}
-                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                  onClick={() => setStateModal(!stateModal)}
-                >
-                  Estado
-                </NewCategory>
-                {
-                  (order.employee || order.evidence)
-                  &&
-                  <NewCategory
-                    Icon={MdPhotoSizeSelectActual}
-                    style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                    onClick={() => setEvidenceModal(!evidenceModal)}
-                  >
-                    Evidencia
-                  </NewCategory>
-                }
-              </FlexRow>
+              {
+                (userPermissions.includes("INVITRO_ADVANCE_WATCH") || userPermissions.includes("INVITRO_UPDATE"))
+                &&
+                <FlexRow>
+                  {
+                    userPermissions.includes("INVITRO_ADVANCE_WATCH")
+                    &&
+                    <NewCategory
+                      Icon={FaMoneyBillWheat}
+                      style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                      onClick={() => setAdvanceModal(!advanceModal)}
+                    >
+                      Adelantos
+                    </NewCategory>
+                  }
+                  {
+                    userPermissions.includes("INVITRO_UPDATE")
+                    &&
+                    <NewCategory
+                      Icon={FaFileCircleCheck}
+                      style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                      onClick={() => setStateModal(!stateModal)}
+                    >
+                      Estado
+                    </NewCategory>
+                  }
+                  {
+                    (order.employee || order.evidence)
+                    &&
+                    <NewCategory
+                      Icon={MdPhotoSizeSelectActual}
+                      style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                      onClick={() => setEvidenceModal(!evidenceModal)}
+                    >
+                      Evidencia
+                    </NewCategory>
+                  }
+                </FlexRow>
+              }
               <Section>
                 <Card>
                   <Wrapper>
@@ -247,39 +265,51 @@ function InvitroOrder() {
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper isButtons>
-                    <Button
-                      Icon={FaFileInvoice}
-                      fontSize={15}
-                      iconSize={17}
-                      color={order.invoice ? "primary" : "secondary"}
-                      onClick={() => handleClick(order, navigate, setInvoiceModal)}
-                      disabled={orderItems.length <= 0}
-                    >
-                      {
-                        order.invoice 
-                        ? "Ver comprobante"
-                        : "Comprobante"
-                      }
-                    </Button>
-                    <Button
-                      Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
-                      color="warning"
-                      onClick={() => navigate("edit")}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => setDeleteModal(!deleteModal)}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                      disabled={order.status === "ENTREGADO" || order.invoice?.isGenerated}
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      (userPermissions.includes("INVOICES_WATCH") || userPermissions.includes("INVOICES_CREATE"))
+                      &&
+                      <Button
+                        Icon={FaFileInvoice}
+                        fontSize={15}
+                        iconSize={17}
+                        color={order.invoice ? "primary" : "secondary"}
+                        onClick={() => handleClick(order, navigate, setInvoiceModal)}
+                        disabled={orderItems.length <= 0}
+                      >
+                        {
+                          order.invoice 
+                          ? "Ver comprobante"
+                          : "Comprobante"
+                        }
+                      </Button>
+                    }
+                    {
+                      userPermissions.includes("INVITRO_UPDATE")
+                      &&
+                      <Button
+                        Icon={FaEdit}
+                        fontSize={15}
+                        iconSize={18}
+                        color="warning"
+                        onClick={() => navigate("edit")}
+                      >
+                        Editar
+                      </Button>
+                    }
+                    {
+                      userPermissions.includes("INVITRO_DELETE")
+                      &&
+                      <Button
+                        onClick={() => setDeleteModal(!deleteModal)}
+                        Icon={FaTrashAlt}
+                        fontSize={15}
+                        iconSize={16}
+                        color="danger"
+                        disabled={order.status === "ENTREGADO" || order.invoice?.isGenerated}
+                      >
+                        Eliminar
+                      </Button>
+                    }
                   </Wrapper>
                 </Card>
                 <Card>
@@ -310,17 +340,21 @@ function InvitroOrder() {
                         ))
                       }
                       {
-                        (order.status === "PENDIENTE" && !order.invoice?.isGenerated)
+                        userPermissions.includes("INVITRO_ITEM_CREATE")
                         &&
-                        <Button
-                          style={{marginTop: "1rem"}}
-                          fontSize={16}
-                          iconSize={18}
-                          Icon={PiPlantFill}
-                          onClick={() => setItemModal(!itemModal)}
-                        >
-                          Agregar variedad
-                        </Button>
+                        (
+                          (order.status === "PENDIENTE" && !order.invoice?.isGenerated)
+                          &&
+                          <Button
+                            style={{marginTop: "1rem"}}
+                            fontSize={16}
+                            iconSize={18}
+                            Icon={PiPlantFill}
+                            onClick={() => setItemModal(!itemModal)}
+                          >
+                            Agregar variedad
+                          </Button>
+                        )
                       }
                     </FlexColumn>
                   </FlexColumn>

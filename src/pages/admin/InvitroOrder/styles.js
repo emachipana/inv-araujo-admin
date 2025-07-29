@@ -5,12 +5,12 @@ import { shadowSm } from "../../../styles/layout";
 export const Variety = styled.div`
   width: 100%;
   display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1rem;
+  align-items: ${({ align }) => align || "center"};
+  flex-direction: ${({ direction }) => direction || "column"};
+  justify-content: ${({ justify }) => justify || "center"};
+  gap: ${({ gap }) => gap || 1}rem;
   padding: 0.5rem 1rem;
-  border-radius: 1rem;
+  border-radius: ${({ radius }) => radius || "1rem"};
   border: 2px dashed ${COLORS.taupe};
   box-shadow: ${shadowSm};
   cursor: pointer;

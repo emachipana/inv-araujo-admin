@@ -6,7 +6,7 @@ import { errorParser } from "../../helpers/errorParser";
 export const onDocTypeChange = (event, setFieldValue, setDocType, fieldDoc) => {
   const value = event.target.value;
   setFieldValue(fieldDoc, value);
-  setDocType((value * 1) === 1 ? "DNI" : "RUC");
+  setDocType(value);
 }
 
 export const onDocChange = async (event, setFieldValue, docType) => {

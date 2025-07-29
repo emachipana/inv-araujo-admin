@@ -19,6 +19,7 @@ import Client from "./Client";
 import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
 import { departments, provinces } from "../../data/places";
+import { useAuth } from "../../context/auth";
 
 function VitroForm({ initialValues = {
   documentType: "",
@@ -32,6 +33,7 @@ function VitroForm({ initialValues = {
   finishDate: "",
   status: "",
   shippingType: "",
+  warehouseId: "",
 }, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "", invoice = null, evidence = null, employee = null }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
   const [currentDep, setCurrentDep] = useState(initialDep);
@@ -41,14 +43,20 @@ function VitroForm({ initialValues = {
 	const [search, setSearch] = useState("");
 	const [searchClients, setSearchClients] = useState({});
 	const [clientSelected, setClientSelected] = useState(clientId);
-  const { addVitro, updateVitro, clientsBackup, addClient, loadClients, isLoading: isClientsLoading, setIsLoading: setClientsLoading } = useAdmin();
+  const [shippingType, setShippingType] = useState("");
+  const [opWarehouses, setOpWarehouses] = useState([]);
+  const { addVitro, updateVitro, clientsBackup, addClient, warehousesBackup, loadWarehouses, loadClients, isLoading: isClientsLoading, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
+  const { user } = useAuth(); 
 
   useEffect(() => {
     const fetch = async () => {
       try {
         await loadClients();
+        await loadWarehouses();
+
         setSearchClients(clientsBackup);
+        setOpWarehouses(warehousesBackup.map((war) => ({id: war.id, content: war.name})))
       }catch(error) {
         toast.error(errorParser(error.message));
         setClientsLoading(false);
@@ -56,7 +64,7 @@ function VitroForm({ initialValues = {
     }
     
     fetch();
-  }, [ clientsBackup, loadClients, setClientsLoading ]);
+  }, [ clientsBackup, loadClients, setClientsLoading, warehousesBackup, loadWarehouses ]);
 
   const onSubmit = async (values) => {
     try {
@@ -75,8 +83,6 @@ function VitroForm({ initialValues = {
       if(currentAction === "Nuevo cliente" && isToCreate) {
         const clientBody = {
           ...values,
-          department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
-          city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
           documentType: values.documentType,
           email: values.email ? values.email : `${values.document}@inversiones.com`,
           createdBy: "ADMINISTRADOR",
@@ -86,6 +92,7 @@ function VitroForm({ initialValues = {
         vitroBody = {
           ...vitroBody,
           clientId: client.id,
+          operatorId: user.employeeId,
         }
       }
 
@@ -95,6 +102,7 @@ function VitroForm({ initialValues = {
         invoiceId: invoice ? invoice.id : null,
         imageId: evidence ? evidence.id : null,
         employeeId: employee ? employee.id : null,
+        operatorId: user.employeeId,
       };
 
       const vitroOrder = isToCreate ? await addVitro(vitroBody) : await updateVitro(vitroId, vitroBody);
@@ -112,6 +120,20 @@ function VitroForm({ initialValues = {
   today.setHours(12);
 
   const setCurrent = (_id, name) => setCurrentAction(name); 
+
+  const handleShippingTypeChange = (e, setFieldValue) => {
+    const type = e.target.value;
+    setShippingType(type);
+    setFieldValue("shippingType", type);
+
+    if(type === "ENVIO_AGENCIA") {
+      setFieldValue("warehouseId", 1);
+    }else if(type === "RECOJO_ALMACEN") {
+      setFieldValue("department", "3655");
+      setFieldValue("city", "3656");
+    }
+      
+  }
 
   return (
     <Formik
@@ -232,35 +254,6 @@ function VitroForm({ initialValues = {
                     handleChange={handleChange}
                   />
                 </Group>
-                {
-                  isToCreate
-                  &&
-                  <Group>
-                    <Select
-                      labelSize={17}
-                      id="department"
-                      label="Departamento"
-                      error={errors.department}
-                      touched={touched.department}
-                      value={values.department}
-                      options={optionsDep}
-                      handleBlur={handleBlur}
-                      handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
-                    />
-                    <Select
-                      labelSize={17}
-                      disabled={!currentDep}
-                      id="city"
-                      label="Ciudad"
-                      options={optionsProv}
-                      error={errors.city}
-                      touched={touched.city}
-                      value={values.city}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                    />
-                  </Group>
-                }
               </>
             : <>
                 <Products>
@@ -284,8 +277,7 @@ function VitroForm({ initialValues = {
                             id={client.id}
                             rsocial={client.rsocial}
                             document={client.document}
-                            department={client.department}
-                            city={client.city}
+                            documentType={client.documentType}
 														clientSelected={clientSelected}
 														setClientSelected={setClientSelected}
 														key={index}
@@ -306,50 +298,8 @@ function VitroForm({ initialValues = {
           >
             Pedido
           </Text>
-          {
-            ((currentAction === "Cliente registrado") || !isToCreate)
-            &&
-            <Group>
-              <Select
-                disabled={!clientSelected}
-                labelSize={17}
-                id="department"
-                label="Departamento"
-                error={errors.department}
-                touched={touched.department}
-                value={values.department || clientSelected.department}
-                options={optionsDep}
-                handleBlur={handleBlur}
-                handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
-              />
-              <Select
-                labelSize={17}
-                disabled={!currentDep}
-                id="city"
-                label="Ciudad"
-                options={optionsProv}
-                error={errors.city}
-                touched={touched.city}
-                value={values.city}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-              />
-            </Group>
-          }
           <Group>
-            <Input
-              id="initDate"
-              labelSize={17}
-              label="Fecha pedido"
-              type="date"
-              max={formatDate(today)}
-              error={errors.initDate}
-              touched={touched.initDate}
-              value={values.initDate}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-           <Select
+            <Select
               labelSize={17}
               id="shippingType"
               label="Tipo de entrega"
@@ -366,6 +316,60 @@ function VitroForm({ initialValues = {
                   content: "Envío a agencia"
                 }
               ]}
+              handleBlur={handleBlur}
+              handleChange={(e) => handleShippingTypeChange(e, setFieldValue)}
+            />
+            {
+              shippingType && shippingType === "RECOJO_ALMACEN"
+              ? <Select
+                  id="warehouseId"
+                  label="Almacén"
+                  error={errors.warehouseId}
+                  touched={touched.warehouseId}
+                  handleBlur={handleBlur}
+                  handleChange={handleChange}
+                  options={opWarehouses}
+                  value={values.warehouseId}
+                />
+              : <Select
+                  disabled={!shippingType}
+                  labelSize={17}
+                  id="department"
+                  label="Departamento"
+                  error={errors.department}
+                  touched={touched.department}
+                  value={values.department}
+                  options={optionsDep}
+                  handleBlur={handleBlur}
+                  handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
+                />
+            }
+          </Group>
+          <Group>
+            {
+              (shippingType && shippingType === "ENVIO_AGENCIA")
+              && <Select
+                  labelSize={17}
+                  disabled={!currentDep}
+                  id="city"
+                  label="Ciudad"
+                  options={optionsProv}
+                  error={errors.city}
+                  touched={touched.city}
+                  value={values.city}
+                  handleBlur={handleBlur}
+                  handleChange={handleChange}
+                />
+            }
+            <Input
+              id="initDate"
+              labelSize={17}
+              label="Fecha pedido"
+              type="date"
+              max={formatDate(today)}
+              error={errors.initDate}
+              touched={touched.initDate}
+              value={values.initDate}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />

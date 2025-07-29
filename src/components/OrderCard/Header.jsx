@@ -4,11 +4,11 @@ import { COLORS } from "../../styles/colors";
 import { options } from "./util";
 import { FaRegCalendarDays } from "react-icons/fa6";
 
-function Header({ name, date }) {
+function Header({ name, date, isVitro, isInvoice }) {
   const parsedDate = new Date(date);
 
   return (
-    <Section>
+    <Section isVitro={isVitro} isInvoice={isInvoice}>
       <Text
         color={COLORS.white}
         size="17px"

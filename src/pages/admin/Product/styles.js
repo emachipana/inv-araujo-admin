@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../../styles/layout";
+import { shadowMd, shadowSm } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { css } from "@emotion/react";
 
@@ -21,7 +21,8 @@ export const Card = styled.div`
   width: ${({ position, width }) => width ? width : (position === "first" ? 42 : 58)}%;
   background-color: white;
   border-radius: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  border: 1px solid ${COLORS.platinium};
   padding: 1rem;
   display: flex;
   flex-direction: column;

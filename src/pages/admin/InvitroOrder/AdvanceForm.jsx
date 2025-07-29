@@ -12,6 +12,7 @@ import { TiCancel } from "react-icons/ti";
 import { formatDate } from "../../../components/VitroForm/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
 
 function AdvanceForm({
   initialValues = {
@@ -29,12 +30,14 @@ function AdvanceForm({
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const { addAdvance, editAdvance } = useAdmin();
+  const { user } = useAuth();
 
   const onSubmit = async (values) => {
     try {
       const body = {
         ...values,
-        vitroOrderId
+        vitroOrderId,
+        employeeId: user.employeeId,
       }
 
       setIsLoading(true);

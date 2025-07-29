@@ -26,7 +26,7 @@ export const Container = styled.div`
 
 export const Section = styled.section`
   width: 100%;
-  background-color: ${COLORS.persian};
+  background-color: ${({ isVitro, isInvoice, isWarehouse }) => isVitro ? COLORS.persian : isInvoice ? COLORS.gray : isWarehouse ? COLORS.orange : COLORS.blue};
   display: flex;
   flex-direction: column;
   align-items: flex-start;

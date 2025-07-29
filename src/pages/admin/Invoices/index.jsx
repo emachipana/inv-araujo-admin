@@ -5,8 +5,6 @@ import Type from "./Type";
 import { Section } from "../Products/styles";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
-import List from "./List";
-import Invoice from "../../../components/OrderCard/Invoice";
 import Modal from "../../../components/Modal";
 import InvoiceForm from "../../../components/InvoiceForm";
 import { onSearchChange } from "../Products/handlers";
@@ -28,6 +26,7 @@ import Pagination from "../../../components/Pagination";
 import { RiFilterOffFill } from "react-icons/ri";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
+import OrderCard from "../../../components/OrderCard";
 
 function Invoices() {
   const [filters, setFilters] = useState({
@@ -196,20 +195,19 @@ function Invoices() {
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : (type === "group"
-              ? invoices.content?.map((invoice, index) => (
-                  <Invoice 
-                    key={index}
-                    id={invoice.id}
-                    rsocial={invoice.rsocial}
-                    date={invoice.issueDate}
-                    type={invoice.invoiceType}
-                    document={invoice.document}
-                    total={invoice.total}
-                  />
-                ))
-              : <List />
-            )
+          : invoices.content?.map((invoice, index) => (
+              <OrderCard 
+                key={index}
+                order={{
+                  ...invoice,
+                  client: {rsocial: invoice.rsocial, document: invoice.document, documentType: invoice.documentType},
+                  date: invoice.issueDate,
+                  status: invoice.invoiceType
+                }}
+                fullSize={type === "list"}
+                isInvoice
+              />
+            ))
         }
       </Section>
       <Pagination 

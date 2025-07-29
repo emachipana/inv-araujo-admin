@@ -18,6 +18,11 @@ import { TbSitemapFilled } from "react-icons/tb";
 import SelectItem from "../../../components/SelectButton/SelectItem";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
+import { Section } from "../Products/styles";
+import { Spinner } from "reactstrap";
+import Modal from "../../../components/Modal";
+import WarehouseForm from "../../../components/WarehouseForm";
+import WarehouseCard from "../../../components/WarehouseCard";
 
 function Warehouses() {
   const [filters, setFilters] = useState({
@@ -143,6 +148,30 @@ function Warehouses() {
           </DropDown>
         </FlexRow>
       </HeaderPage>
+      <Section>
+        {
+          isLoading
+          ? <Spinner color="secondary" />
+          : warehouses.map((warehouse, index) => (
+              <WarehouseCard
+                key={index}
+                name={`Almacén ${warehouse.name}`}
+                location={`${warehouse.province}, ${warehouse.department}`}
+              />
+            ))
+        }
+      </Section>
+      <Modal
+        isActive={createModal}
+        setIsActive={setCreateModal}
+        size="md"
+        align="flex-start"
+      >
+        <WarehouseForm
+          isToCreate
+          setIsActive={setCreateModal}
+        />
+      </Modal>
     </>
   );
 }

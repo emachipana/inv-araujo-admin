@@ -10,6 +10,7 @@ import { closeEdit, handleChange, handleBlur, setupEdit, onSave } from "./handle
 import SubCategory from "./SubCategory";
 import { errorParser } from "../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/auth";
 
 function Category({ id, children, isFromTuber, subCategories = [], forCategory, forSubCategory, ableToEdit, ableToDelete }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +21,7 @@ function Category({ id, children, isFromTuber, subCategories = [], forCategory, 
     error: "",
     touched: false
   });
+  const { user } = useAuth();
 
   const onDelete = async () => {
     try {
@@ -74,7 +76,7 @@ function Category({ id, children, isFromTuber, subCategories = [], forCategory, 
                       onClick={() => onSave(
                         category,
                         id,
-                        { name: category.value },
+                        { name: category.value, employeeId: user.employeeId },
                         setIsToEdit,
                         setCategory,
                         forCategory.updateCategory,

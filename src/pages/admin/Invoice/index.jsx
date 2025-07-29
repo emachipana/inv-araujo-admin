@@ -26,6 +26,7 @@ function Invoice() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
+  const [invoiceItems, setInvoiceItems] = useState([]);
   const [invoice, setInvoice] = useState({});
   const { id } = useParams("");
   const { deleteInvoice, generateDoc } = useAdmin();
@@ -35,6 +36,8 @@ function Invoice() {
     const fetch = async () => {
       try {
         const invoice = await apiFetch(`invoices/${id}`);
+        const items = await apiFetch(`invoiceItems/invoice/${invoice.data.id}`);
+        setInvoiceItems(items);
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
@@ -289,7 +292,7 @@ function Invoice() {
                       gap={1}
                     >
                       {
-                        invoice.items?.map((item, index) => (
+                        invoiceItems?.map((item, index) => (
                           <Item
                             key={index}
                             item={item}

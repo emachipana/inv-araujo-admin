@@ -13,10 +13,12 @@ import { Spinner } from "reactstrap";
 import { COLORS } from "../../../styles/colors";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
 
 function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem, orderItems, setOrderItems }) {
   const [currentVariety, setCurrentVariety] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
   const { tubers, addItem, editItem } = useAdmin();
 
   let initialValues = {
@@ -42,6 +44,7 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
+      values.employeeId = user.employeeId;
       const {orderVariety, newVitroOrder} = item ? await editItem(item.id, values, setOrderItems) : await addItem(values);
       if(!item) setOrderItems([orderVariety, ...orderItems]);
       setVitroOrder(newVitroOrder);

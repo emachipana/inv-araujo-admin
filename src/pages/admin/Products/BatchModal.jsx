@@ -15,6 +15,7 @@ import Product from "./Product";
 import { onSearchChange } from "../Order/handlers";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/auth";
 
 function BatchModal({isActive, setIsActive}) {
   const [productId, setProductId] = useState(null);
@@ -25,6 +26,7 @@ function BatchModal({isActive, setIsActive}) {
   const [search, setSearch] = useState("");
   const { loadWarehouses, warehousesBackup, backup, isLoading, newBatch } = useAdmin();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     const init = async () => {
@@ -59,7 +61,7 @@ function BatchModal({isActive, setIsActive}) {
   }
 
   const onSubmit = async (values) => {
-    const body = {...values, productId};
+    const body = {...values, productId, employeeId: user.employeeId};
     
     try {
       setIsSaving(true);

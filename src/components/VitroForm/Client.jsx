@@ -6,15 +6,14 @@ import { ClientSection } from "./styles";
 import { COLORS } from "../../styles/colors";
 import { TextDescription } from "../Product/styles";
 
-function Client({ id, rsocial, document, department, city, setClientSelected, clientSelected }) {
+function Client({ id, rsocial, document, documentType, setClientSelected, clientSelected }) {
   const handleChange = () => {
     setClientSelected(id);
   }
 
   return (
     <Fragment>
-      <ClientSection
-      >
+      <ClientSection>
         <Input 
           type="radio"
           id={id}
@@ -31,15 +30,15 @@ function Client({ id, rsocial, document, department, city, setClientSelected, cl
               lines={1}
               style={{textTransform: "capitalize"}}
               weight={600}
-            >
-              { document } - {rsocial.toLowerCase()}
+            > 
+              { rsocial.toLowerCase() }
             </TextDescription>
             <Text
               size={14}
               color={COLORS.dim}
               weight={600}
             >
-              Destino habitual: {city}, {department}
+              { documentType }: { document }
             </Text>
           </FlexColumn>
         </ProductSection>

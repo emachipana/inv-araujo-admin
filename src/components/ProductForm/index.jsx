@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { Form } from "../../styles/layout";
 import { errorParser } from "../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/auth";
 
 function ProductForm({ initialValues = {
   name: "",
@@ -27,10 +28,12 @@ function ProductForm({ initialValues = {
   const [isLoading, setIsLoading] = useState(false);
   const { categories, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
+      values.employeeId = user.employeeId;
       const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
       navigate(`/productos/${product.id}`);

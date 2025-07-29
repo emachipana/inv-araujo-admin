@@ -8,10 +8,13 @@ import { FaBuildingWheat, FaMoneyBills, FaRegCalendarCheck, FaRegCalendarDays } 
 import { MdLocalShipping } from "react-icons/md";
 import { COLORS } from "../../styles/colors";
 import { options } from "./util";
+import { BsFillPersonVcardFill } from "react-icons/bs";
+import { PiInvoiceFill } from "react-icons/pi";
+import { IoDocumentText } from "react-icons/io5";
 
-function OrderCard({ order, fullSize = false }) {
-  const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status, paymentType } = order;
-  const { rsocial, document } = client;
+function OrderCard({ order, fullSize = false, isInvoice = false }) {
+  const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status, paymentType, serie, address, isSended } = order;
+  const { rsocial, document, documentType } = client;
   const destination = [city, department];
   const deliverDate = new Date(maxShipDate || finishDate);
   const initDateParsed = new Date(date || initDate);
@@ -23,7 +26,9 @@ function OrderCard({ order, fullSize = false }) {
     "PENDIENTE": "warning",
     "CANCELADO": "danger",
     "ENTREGADO": "primary",
-    "PAGADO": "orange"
+    "PAGADO": "orange",
+    "BOLETA": "blue",
+    "FACTURA": "orange"
   }
 
   const paymentMessage = {
@@ -35,7 +40,7 @@ function OrderCard({ order, fullSize = false }) {
 
   return (
     <Container 
-      onClick={() => navigate(`/${isVitro ? "invitro" : "pedidos"}/${id}`)}
+      onClick={() => navigate(`/${isVitro ? "invitro" : isInvoice ? "comprobantes" : "pedidos"}/${id}`)}
       fullSize={fullSize}
     >
       {
@@ -59,16 +64,23 @@ function OrderCard({ order, fullSize = false }) {
                     { rsocial.replaceAll('"', "").toLowerCase() }
                   </Text>
                   <FlexRow>
-                    <FaAddressCard 
-                      size={18}
-                      color={COLORS.taupe}
-                    />
+                    {
+                      isInvoice
+                      ? <PiInvoiceFill
+                          size={18}
+                          color={COLORS.taupe}
+                        />
+                      : <FaAddressCard
+                          size={18}
+                          color={COLORS.taupe}
+                        />
+                    }
                     <Text
                       color={COLORS.taupe}
                       weight={600}
                       notCapitalize
                     >
-                      { document }
+                      { isInvoice ? serie : document }
                     </Text>
                   </FlexRow>
                 </FlexColumn>
@@ -78,7 +90,10 @@ function OrderCard({ order, fullSize = false }) {
                   { status }
                 </Badge>
               </FlexRow>
-              <FlexColumn gap={0.1}>
+              <FlexColumn 
+                gap={0.1}
+                align="flex-end"
+              >
                 <Text
                   size="18px"
                   weight={700}
@@ -91,33 +106,45 @@ function OrderCard({ order, fullSize = false }) {
                   notCapitalize
                 >
                   {
-                    status === "PAGADO"
-                    ? paymentMessage[paymentType]
-                    : "Sin pagar"
+                    isInvoice
+                    ? `#${id}`
+                    : status === "PAGADO"
+                      ? paymentMessage[paymentType]
+                      : "Sin pagar"
                   }
                 </Text>
               </FlexColumn>
             </RowBetween>
             <RowBetween>
-              <FlexColumn>
+              <FlexColumn align="center">
                 <FlexRow>
-                  <FaMapMarkerAlt 
-                    color={COLORS.taupe}
-                  />
+                  {
+                    isInvoice
+                    ? <BsFillPersonVcardFill
+                        color={COLORS.taupe}
+                      />
+                    : <FaMapMarkerAlt 
+                        color={COLORS.taupe}
+                      />
+                  }
                   <Text
                     color={COLORS.taupe}
                     weight={600}
                   >
-                    Destino
+                    {
+                      isInvoice
+                      ? documentType
+                      : "Destino"
+                    }
                   </Text>
                 </FlexRow>
                 <Text
                   weight={700}
                 >
-                  { destination.join(", ") }
+                  { isInvoice ? document : destination.join(", ") }
                 </Text>
               </FlexColumn>
-              <FlexColumn>
+              <FlexColumn align="center">
                 <FlexRow>
                   <FaRegCalendarDays 
                     color={COLORS.taupe}
@@ -126,7 +153,11 @@ function OrderCard({ order, fullSize = false }) {
                     color={COLORS.taupe}
                     weight={600}
                   >
-                    Fecha pedido
+                    {
+                      isInvoice
+                      ? "Fecha emisión"
+                      : "Fecha pedido"
+                    }
                   </Text>
                 </FlexRow>
                 <Text
@@ -135,57 +166,85 @@ function OrderCard({ order, fullSize = false }) {
                   { initDateParsed.toLocaleDateString("es-ES", options) }
                 </Text>
               </FlexColumn>
-              <FlexColumn>
+              <FlexColumn align="center">
                 <FlexRow>
-                  <FaRegCalendarCheck
-                    color={COLORS.taupe}
-                  />
+                  {
+                    isInvoice
+                    ? <FaMapMarkedAlt
+                        color={COLORS.taupe}
+                      />
+                    : <FaRegCalendarCheck
+                        color={COLORS.taupe}
+                      />
+                  }
                   <Text
                     color={COLORS.taupe}
                     weight={600}
                   >
-                    Fecha entrega
+                    {
+                      isInvoice
+                      ? "Dirección"
+                      : "Fecha entrega"
+                    }
                   </Text>
                 </FlexRow>
                 <Text
                   weight={700}
                 >
                   {
-                    isVitro && !finishDate
-                    ? "Por asignar"
-                    : deliverDate.toLocaleDateString("es-ES", options)
+                    isInvoice
+                    ? address
+                    : isVitro && !finishDate
+                      ? "Por asignar"
+                      : deliverDate.toLocaleDateString("es-ES", options)
                   }
                 </Text>
               </FlexColumn>
-              <FlexColumn>
+              <FlexColumn align="center">
                 <FlexRow>
-                  <FaMapMarkedAlt
-                    color={COLORS.taupe}
-                  />
+                  {
+                    isInvoice
+                    ? <IoDocumentText
+                        color={COLORS.taupe}
+                      />
+                    : <FaMapMarkedAlt
+                        color={COLORS.taupe}
+                      />
+                  }
                   <Text
                     color={COLORS.taupe}
                     weight={600}
                   >
-                    Tipo entrega
+                    {
+                      isInvoice
+                      ? "Estado"
+                      : "Tipo entrega"
+                    }
                   </Text>
                 </FlexRow>
                 <Badge
-                  color={shippingType === "RECOJO_ALMACEN" ? "purple" : "blue"}
+                  color={isInvoice ? (isSended ? "primary" : "danger") : shippingType === "RECOJO_ALMACEN" ? "purple" : "blue"}
                 >
                   <FlexRow>
-                    { 
-                      shippingType === "ENVIO_AGENCIA"
-                      ? <MdLocalShipping
-                          size={15} 
-                        />
-                      : <FaBuildingWheat
-                          size={15}
-                        />
-                    }
-                    { 
-                      shippingType === "RECOJO_ALMACEN"
-                      ? "Recojo en almacén"
-                      : "Envío por agencia"
+                    {
+                      isInvoice
+                      ? isSended ? "Emitido" : "Sin emitir"
+                      : <>
+                          {
+                            shippingType === "ENVIO_AGENCIA"
+                            ? <MdLocalShipping
+                                size={15} 
+                              />
+                            : <FaBuildingWheat
+                                size={15}
+                            />
+                          }
+                          {
+                            shippingType === "RECOJO_ALMACEN"
+                              ? "Recojo en almacén"
+                              : "Envío por agencia"
+                          }
+                      </>
                     }
                   </FlexRow>
                 </Badge>
@@ -193,9 +252,11 @@ function OrderCard({ order, fullSize = false }) {
             </RowBetween>
           </>
         : <>
-            <Header 
+            <Header
               name={ rsocial.replaceAll('"', "")}
               date={date}
+              isVitro={isVitro}
+              isInvoice={isInvoice}
             />
             <RowBetween
               style={{padding: "0.5rem 1rem"}}
@@ -204,20 +265,30 @@ function OrderCard({ order, fullSize = false }) {
                 align="center"
               >
                 <FlexRow>
-                  <FaMapMarkerAlt 
-                    color={COLORS.taupe}
-                  />
+                  {
+                    isInvoice
+                    ? <BsFillPersonVcardFill 
+                        color={COLORS.taupe}
+                      />
+                    : <FaMapMarkerAlt 
+                        color={COLORS.taupe}
+                      />
+                  }
                   <Text
                     color={COLORS.taupe}
                     weight={600}
                   >
-                    Destino
+                    {
+                      isInvoice
+                      ? documentType
+                      : "Destino"
+                    }
                   </Text>
                 </FlexRow>
                 <Text
                   weight={700}
                 >
-                  { destination[0] }
+                  { isInvoice ? document : destination[0] }
                 </Text>
               </FlexColumn>
               <FlexColumn
@@ -245,7 +316,11 @@ function OrderCard({ order, fullSize = false }) {
               <Text
                 color={COLORS.dim}
               >
-                Estado
+                {
+                  isInvoice
+                  ? "Tipo"
+                  : "Estado"
+                }
               </Text>
               <Badge
                 color={badgeColor[status] || "secondary"}

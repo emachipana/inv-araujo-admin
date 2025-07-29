@@ -32,6 +32,7 @@ import { useAuth } from "./context/auth";
 import { ModalProvider } from "./context/modal";
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import Employee from "./pages/admin/Employee";
 
 function AuthenticatedApp() {
   const { user } = useAuth();
@@ -65,8 +66,12 @@ function AuthenticatedApp() {
                   <>
                     <Route path="/invitro" element={<InvitroOrders />} />
                     <Route path="/invitro/:id" element={<InvitroOrder />} />
-                    <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
                   </>
+                }
+                {
+                  user.role.permissions.includes("INVITRO_UPDATE")
+                  &&
+                  <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
                 }
                 {
                   user.role.permissions.includes("ORDERS_WATCH")
@@ -114,7 +119,10 @@ function AuthenticatedApp() {
                 {
                   user.role.permissions.includes("EMPLOYEES_WATCH")
                   &&
-                  <Route path="/empleados" element={<Employees />} />
+                  <>
+                    <Route path="/empleados" element={<Employees />} />
+                    <Route path="/empleados/:id" element={<Employee />} />
+                  </>
                 }
                 {
                   user.role.permissions.includes("WAREHOUSES_WATCH")

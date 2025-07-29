@@ -8,12 +8,15 @@ import { validate } from "./validate";
 import { onSubmit } from "./handlers";
 import TextArea from "../Input/TextArea";
 import { FlexColumn, Image, Text } from "../../styles/layout";
+import { useAuth } from "../../context/auth";
 
 function AddCategory({ setCurrentAction, to, addCategory }) {
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
 
-  const values = {name: "", description: "", file: ""};
+  const { user } = useAuth();
+
+  const values = {name: "", description: "", file: "", employeeId: user.employeeId};
 
   const onInputFileChange = (e, setFieldValue) => {
     const file = e.currentTarget.files[0];
@@ -26,11 +29,16 @@ function AddCategory({ setCurrentAction, to, addCategory }) {
     if(file) reader.readAsDataURL(file);
   }
 
+  const handleSubmit = async (values) => {
+    values.employeeId = user.employeeId;
+    await onSubmit(values, setIsLoading, addCategory, setCurrentAction, to);
+  }
+
   return (
     <Formik
       initialValues={values}
       validate={(values) => validate(values, to === "tubers" ? "tubers" : "categories")}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, to)}
+      onSubmit={handleSubmit}
     >
       {({
         values,

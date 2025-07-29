@@ -237,7 +237,8 @@ const AdminProvider = ({ children }) => {
     const newCategory = await apiFetch("categories", { body: {
       name: body.name,
       description: body.description,
-      imageId: image.id
+      imageId: image.id,
+      employeeId: body.employeeId
     }});
     setCategories(categories => [...categories, newCategory.data]);
   }
@@ -271,7 +272,16 @@ const AdminProvider = ({ children }) => {
     return newProduct.data;
   }
 
+  const addWarehouse = async (body) => {
+    body.employeeId = user.employeeId;
+    const newWarehouse = await apiFetch("warehouses", { body });
+    setWarehouses(warehouses => [...warehouses, newWarehouse.data]);
+    setWarehousesBackup(warehouses => [...warehouses, newWarehouse.data]);
+    return newWarehouse.data;
+  }
+
   const addBanner = async (body) => {
+    body.employeeId = user.employeeId;
     const newBanner = await apiFetch("offers", { body });
     setBanners(banners => [...banners, newBanner.data]);
     return newBanner.data;
@@ -285,6 +295,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const addOrder = async (body) => {
+    body.operatorId = user.employeeId;
     const newOrder = await apiFetch("orders?alert=false", { body });
     setOrders(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
     setOrdersBackup(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
@@ -292,6 +303,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const addClient = async (body) => {
+    body.employeeId = user.employeeId;
     const newClient = await apiFetch("clients", { body });
     setClients(clients => ({...clients, content: [newClient.data, ...clients.content]}));
     setClientsBackup(clients => ({...clients, content: [newClient.data, ...clients.content]}));
@@ -299,6 +311,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const addInvoice = async (body) => {
+    body.employeeId = user.employeeId;
     const newInvoice = await apiFetch("invoices", { body });
     setInvoices(invoices => [newInvoice.data, ...invoices]);
     setInvoicesBackup(invoices => [newInvoice.data, ...invoices]);
@@ -330,7 +343,8 @@ const AdminProvider = ({ children }) => {
     const image = await uploadImage(file);
     const body = {
       productId: product.id,
-      imageId: image.id
+      imageId: image.id,
+      employeeId: user.employeeId
     }
     const newProductImage = await apiFetch("productImages", { body });
     const images = product.images ? [...product.images, newProductImage.data] : [newProductImage.data];
@@ -340,7 +354,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const deleteProductImage = async (imageId, product) => {
-    await apiFetch(`productImages/${imageId}`, { method: "DELETE" });
+    await apiFetch(`productImages/${imageId}?employeeId=${user.employeeId}`, { method: "DELETE" });
     const images = product.images.filter(image => image.id !== imageId);
     const updatedProduct = {...product, images};
     setProduct(product.id, updatedProduct);
@@ -348,6 +362,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateTuber = async (id, body) => {
+    body.employeeId = user.employeeId;
     const newTuber = await apiFetch(`tubers/${id}`, { body, method: "PUT" });
     const tempTubers = tubers;
     const index = tubers.findIndex(tuber => tuber.id === id);
@@ -362,11 +377,13 @@ const AdminProvider = ({ children }) => {
   }
 
   const addTuber = async (body) => {
+    body.employeeId = user.employeeId;
     const newTuber = await apiFetch("tubers", { body });
     setTubers(tubers => [...tubers, newTuber.data]);
   }
 
   const addVariety = async (body) => {
+    body.employeeId = user.employeeId;
     const { tuberId } = body;
     const newVariety = await apiFetch("varieties", { body });
     const tuber = tubers.find(tuber => tuber.id === (tuberId * 1));
@@ -378,6 +395,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateVariety = async (body) => {
+    body.employeeId = user.employeeId;
     const { id, ...toUpdate } = body;
     await apiFetch(`varieties/${id}`, { body: toUpdate, method: "PUT" });
     const tubers = await apiFetch("tubers");
@@ -423,12 +441,13 @@ const AdminProvider = ({ children }) => {
 
   const updateInvoice = async (id, body) => {
     const { comment, issueDate, address } = body;
-    const updatedInvoice = await apiFetch(`invoices/${id}`, { body: { comment, issueDate, address }, method: "PUT" });
+    const updatedInvoice = await apiFetch(`invoices/${id}`, { body: { comment, issueDate, address, employeeId: user.employeeId }, method: "PUT" });
     setInvoice(id, updatedInvoice.data);
     return updatedInvoice.data;
   }
 
   const updateBanner = async (id, body) => {
+    body.employeeId = user.employeeId;
     const updatedBanner = await apiFetch(`offers/${id}`, { body, method: "PUT" });
     setBanner(id, updatedBanner.data);
     return updatedBanner.data;
@@ -495,12 +514,14 @@ const AdminProvider = ({ children }) => {
 
   const addExpenseItem = async (body) => {
     const { profitId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch("expenses", { body });
     return getExpense(profitId);
   }
 
   const addInvoiceItem = async (body) => {
     const { invoiceId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch("invoiceItems", { body });
     return getInvoice(invoiceId);
   }
@@ -522,18 +543,20 @@ const AdminProvider = ({ children }) => {
 
   const editExpenseItem = async (id, body) => {
     const { profitId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch(`expenses/${id}`, { body, method: "PUT" });
     return getExpense(profitId);
   }
 
   const editInvoiceItem = async (id, body) => {
     const { invoiceId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
     return getInvoice(invoiceId);
   }
 
   const generateDoc = async (invoiceId) => {
-    await apiFetch(`invoices/generatePDF/${invoiceId}`, { method: "POST" });
+    await apiFetch(`invoices/generatePDF/${invoiceId}?employeeId=${user.employeeId}`, { method: "POST" });
     return getInvoice(invoiceId);
   }
 
@@ -542,8 +565,8 @@ const AdminProvider = ({ children }) => {
     return getInvoice(invoiceId);
   }
 
-  const deleteItem = async (id, vitroOrderId, setItems) => {
-    await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
+  const deleteItem = async (id, vitroOrderId, setItems, employeeId) => {
+    await apiFetch(`orderVarieties/${id}?employeeId=${employeeId}`, { method: "DELETE" });
 
     setItems((items) => [...items.filter((item) => item.id !== id)]);
 
@@ -556,11 +579,12 @@ const AdminProvider = ({ children }) => {
   }
 
   const deleteInvoiceItem = async (id, invoiceId) => {
-    await apiFetch(`invoiceItems/${id}`, { method: "DELETE" });
+    await apiFetch(`invoiceItems/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
     return getInvoice(invoiceId);
   }
 
   const updateOrder = async (id, body) => {
+    body.operatorId = user.employeeId;
     const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
     setOrder(id, updatedOrder.data);
     return updatedOrder.data;
@@ -644,6 +668,7 @@ const AdminProvider = ({ children }) => {
 
   const addOrderItem = async (body) => {
     const { orderId } = body;
+    body.employeeId = user.employeeId;
     const orderItem = await apiFetch("orderProducts", { body });
     const newOrder = await apiFetch(`orders/${orderId}`);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
@@ -653,19 +678,20 @@ const AdminProvider = ({ children }) => {
 
   const addBannerItem = async (body) => {
     const { offerId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch("offerProducts", { body });
     return getBanner(offerId);
   }
 
   const deleteOrderItem = async (id, orderId, setItems) => {
-    await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
+    await apiFetch(`orderProducts/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
     setItems((items) => [...items.filter((item) => item.id !== id)]);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
     return getOrder(orderId);
   }
 
   const deleteBannerItem = async (id, banner) => {
-    await apiFetch(`offerProducts/${id}`, { method: "DELETE" });
+    await apiFetch(`offerProducts/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
     if(banner.items.length <= 1 && banner.isUsed) {
       const body = {
         ...banner,
@@ -680,6 +706,7 @@ const AdminProvider = ({ children }) => {
 
   const editOrderItem = async (id, body, setItems) => {
     const { orderId } = body;
+    body.employeeId = user.employeeId;
     const orderItem = await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
     const newOrder = await apiFetch(`orders/${orderId}`);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
@@ -743,6 +770,7 @@ const AdminProvider = ({ children }) => {
         setVitroOrders,
         setCategories,
         setProducts,
+        addWarehouse,
         updateCategory,
         deleteCategory,
         addCategory,

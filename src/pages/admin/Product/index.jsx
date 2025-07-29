@@ -18,6 +18,7 @@ import ImageModal from "./ImageModal";
 import ImageCard from "./ImageCard";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
@@ -28,6 +29,7 @@ function Product() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { deleteProduct } = useAdmin();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
@@ -43,6 +45,8 @@ function Product() {
 
     fetch();
   }, [ id ]);
+
+  const permissions = user.role.permissions;
 
   return (
     isLoading
@@ -106,7 +110,7 @@ function Product() {
                         Estado
                       </Text>
                       <Badge color={product.isActive ? "primary" : "danger"}>
-                        { product.isActive ? "activo" : "inactivo" }
+                        { product.isActive ? "Activo" : "Inactivo" }
                       </Badge>
                     </FlexColumn>
                   </Wrapper>
@@ -211,37 +215,49 @@ function Product() {
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper isButtons>
-                    <Button
-                      Icon={BiSolidOffer}
-                      fontSize={15}
-                      iconSize={19}
-                      color="secondary"
-                      onClick={() => setDiscountModal(!discountModal)}
-                    >
-                      {
-                        product.discount
-                        ? "Editar dscto."
-                        : "Crear dscto."
-                      }
-                    </Button>
-                    <Button
-                      Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
-                      color="warning"
-                      onClick={() => navigate("edit")}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => setDeleteModal(!deleteModal)}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      (permissions.includes("PRODUCTS_DISCOUNT_CREATE") || permissions.includes("PRODUCTS_DISCOUNT_UPDATE"))
+                      &&
+                      <Button
+                        Icon={BiSolidOffer}
+                        fontSize={15}
+                        iconSize={19}
+                        color="secondary"
+                        onClick={() => setDiscountModal(!discountModal)}
+                      >
+                        {
+                          product.discount
+                          ? "Editar dscto."
+                          : "Crear dscto."
+                        }
+                      </Button>
+                    }
+                    {
+                      permissions.includes("PRODUCTS_UPDATE")
+                      &&
+                      <Button
+                        Icon={FaEdit}
+                        fontSize={15}
+                        iconSize={18}
+                        color="warning"
+                        onClick={() => navigate("edit")}
+                      >
+                        Editar
+                      </Button>
+                    }
+                    {
+                      permissions.includes("PRODUCTS_DELETE")
+                      &&
+                      <Button
+                        onClick={() => setDeleteModal(!deleteModal)}
+                        Icon={FaTrashAlt}
+                        fontSize={15}
+                        iconSize={16}
+                        color="danger"
+                      >
+                        Eliminar
+                      </Button>
+                    }
                   </Wrapper>
                 </Card>
                 <Card>
@@ -253,14 +269,18 @@ function Product() {
                       Imagenes
                     </Text>
                     <Wrapper wrap="true">
-                      <AddCard
-                        onClick={() => setImageModal(!imageModal)}
-                      >
-                        <AiTwotoneFileAdd 
-                          size={70}
-                          color={COLORS.dim}
-                        />
-                      </AddCard>
+                      {
+                        permissions.includes("PRODUCTS_IMAGE_CREATE")
+                        &&
+                        <AddCard
+                          onClick={() => setImageModal(!imageModal)}
+                        >
+                          <AiTwotoneFileAdd 
+                            size={70}
+                            color={COLORS.dim}
+                          />
+                        </AddCard>
+                      }
                       {
                         product?.images.map((image, index) => (
                           <ImageCard
