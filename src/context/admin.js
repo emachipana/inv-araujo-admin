@@ -243,6 +243,33 @@ const AdminProvider = ({ children }) => {
     setCategories(categories => [...categories, newCategory.data]);
   }
 
+  const orderAtAgency = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      ...body,
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`orders/${orderId}/agency`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+
+  const orderDelivered = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+    const orderBody = {
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`orders/${orderId}/delivered`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+    
+
   const addRole = async (body) => {
     const newRole = await apiFetch("roles", { body });
     setRoles(roles => [...roles, newRole.data]);
@@ -842,6 +869,8 @@ const AdminProvider = ({ children }) => {
         setWarehouses,
         setWarehousesBackup,
         addRole,
+        orderAtAgency,
+        orderDelivered
       }}
     >
       { children }

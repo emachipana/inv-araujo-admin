@@ -73,6 +73,7 @@ function OrderForm({ initialValues = {
         city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
         date: values.initDate,
         shippingType: values.shippingType,
+        createdBy: "ADMINISTRADOR"
       }
 
       setIsLoading(true);

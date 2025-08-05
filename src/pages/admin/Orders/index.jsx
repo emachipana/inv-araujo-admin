@@ -247,8 +247,8 @@ function Orders() {
       </Section>
       <Pagination 
         currentPage={orders.number}
-        // totalPages={orders.totalPages}
-        totalPages={200}
+        totalPages={orders.totalPages}
+        // totalPages={200}
         setFilters={setFilters}
         isLoading={isLoading || isGetting}
       />

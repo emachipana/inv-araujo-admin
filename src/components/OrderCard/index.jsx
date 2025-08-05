@@ -11,6 +11,7 @@ import { options } from "./util";
 import { BsFillPersonVcardFill } from "react-icons/bs";
 import { PiInvoiceFill } from "react-icons/pi";
 import { IoDocumentText } from "react-icons/io5";
+import { FaShippingFast } from "react-icons/fa";
 
 function OrderCard({ order, fullSize = false, isInvoice = false }) {
   const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status, paymentType, serie, address, isSended } = order;
@@ -80,7 +81,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                       weight={600}
                       notCapitalize
                     >
-                      { isInvoice ? serie : document }
+                      { isInvoice ? `${serie}-${id}` : document }
                     </Text>
                   </FlexRow>
                 </FlexColumn>
@@ -107,7 +108,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                 >
                   {
                     isInvoice
-                    ? `#${id}`
+                    ? "Contado"
                     : status === "PAGADO"
                       ? paymentMessage[paymentType]
                       : "Sin pagar"
@@ -134,7 +135,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     {
                       isInvoice
                       ? documentType
-                      : "Destino"
+                      : "Entrega"
                     }
                   </Text>
                 </FlexRow>
@@ -270,7 +271,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     ? <BsFillPersonVcardFill 
                         color={COLORS.taupe}
                       />
-                    : <FaMapMarkerAlt 
+                    : <FaShippingFast 
                         color={COLORS.taupe}
                       />
                   }
@@ -281,15 +282,23 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     {
                       isInvoice
                       ? documentType
-                      : "Destino"
+                      : "Entrega"
                     }
                   </Text>
                 </FlexRow>
-                <Text
-                  weight={700}
-                >
-                  { isInvoice ? document : destination[0] }
-                </Text>
+                {
+                  isInvoice
+                  ? <Text
+                      weight={700}
+                    >
+                      { document }
+                    </Text>
+                  : <Badge
+                      color={isInvoice ? (isSended ? "primary" : "danger") : shippingType === "RECOJO_ALMACEN" ? "purple" : "blue"}
+                    >
+                      {shippingType === "RECOJO_ALMACEN" ? "Recojo en almacén" : "Envío por agencia"}
+                    </Badge>
+                }
               </FlexColumn>
               <FlexColumn
                 align="center"

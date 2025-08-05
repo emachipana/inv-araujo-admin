@@ -11,6 +11,7 @@ export const COLORS = {
   orange_card_hover: "#FFBE85",
   white: "#F5F5F5",
   blue: "#4173E6",
+  blue_hover: "#3682D6",
   blue_light: "#D6E2FF",
   blue_medium: "#5D87EA",
   blue_card_hover: "#99B8FF",
@@ -34,6 +35,7 @@ export const COLORS = {
   emerald: "#00CC76",
   emerald_medium: "#00E083",
   purple: "#7E57C2",
+  purple_hover: "#6C44B1",
   purple_light: "#E8E1F7",
   purple_card_hover: "#C1AEEA"
 }
