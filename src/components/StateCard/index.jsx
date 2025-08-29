@@ -4,15 +4,16 @@ import { IoIosTime } from "react-icons/io";
 import { MdCancel, MdOutlineWallet } from "react-icons/md";
 import { FaCheckCircle, FaShippingFast } from "react-icons/fa";
 import { FlexColumn, Text } from "../../styles/layout";
+import { PiPlantFill } from "react-icons/pi";
 
-function StateCard({ status }) {
+function StateCard({ status, isVitro = false }) {
   const color = {
     PENDIENTE: {
       main: COLORS.yellow_light,
       sec: COLORS.yellow_hover,
       icon: IoIosTime,
-      title: "Pendiente",
-      text: "Esperando el pago del pedido"
+      title: isVitro ? "En producción" : "Pendiente",
+      text: isVitro ? "El pedido se encuentra en producción" : "Esperando el pago del pedido"
     },
     PAGADO: {
       main: COLORS.blue_light,
@@ -41,6 +42,13 @@ function StateCard({ status }) {
       icon: MdCancel,
       title: "Cancelado",
       text: "Proceso finalizado, el pedido fue cancelado"
+    },
+    TERMINADO: {
+      main: COLORS.blue_light,
+      sec: COLORS.blue,
+      icon: PiPlantFill,
+      title: "Terminado",
+      text: "Se completó la producción del pedido"
     }
   };
 

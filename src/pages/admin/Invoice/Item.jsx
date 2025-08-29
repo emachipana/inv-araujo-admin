@@ -11,7 +11,7 @@ import { Spinner } from "reactstrap";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 
-function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
+function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit, isRelatedToProduct, setItems }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteInvoiceItem } = useAdmin();
   const { id, name, price, quantity, subTotal } = item;
@@ -19,7 +19,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedInvoice = await deleteInvoiceItem(id, invoiceId);
+      const updatedInvoice = await deleteInvoiceItem(id, invoiceId, setItems);
       setInvoice(updatedInvoice);
       setIsDeleting(false);
     }catch(error) {
@@ -95,7 +95,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
         </FlexColumn>
       </Wrapper>
       {
-        !isInvoiceGenerated
+        (!isInvoiceGenerated && !isRelatedToProduct)
         &&
         <FlexRow gap={1}>
           <Button

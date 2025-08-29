@@ -25,6 +25,8 @@ import { MdCancel, MdLocalShipping, MdLooksOne } from "react-icons/md";
 import EvidenceModal from "./EvidenceModal";
 import { CancelWrapper, Point } from "./styles";
 import { PiWarehouseFill } from "react-icons/pi";
+import CancelRequestModal from "./CancelRequestModal";
+import ShippingModal from "./ShippingModal";
 
 function Order() {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,9 +38,11 @@ function Order() {
   const [orderItems, setOrderItems] = useState([]);
   const [itemModal, setItemModal] = useState(false);
   const [evidenceModal, setEvidenceModal] = useState(false);
+  const [cancelRequestModal, setCancelRequestModal] = useState(false);
+  const [shippingTypeModal, setShippingTypeModal] = useState(false);
   const [item, setItem] = useState(null);
   const [order, setOrder] = useState({});
-  const { deleteOrder, setOrder: setOrderSecond } = useAdmin();
+  const { deleteOrder } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -48,11 +52,8 @@ function Order() {
         const order = await apiFetch(`orders/${id}`);
         const items = await apiFetch(`orderProducts/order/${order.data.id}`);
         const cancelRequests = await apiFetch(`cancel-order/order/${order.data.id}`);
-        const pendingRequest = cancelRequests.find(req => req.accepted === false && req.rejected === false);
         setCancelRequests(cancelRequests);
-        setPendingRequest(!!pendingRequest);
         setOrder(order.data);
-        console.log(order.data);
         setOrderItems(items);
         setIsLoading(false);
       }catch(error) {
@@ -63,6 +64,11 @@ function Order() {
 
     fetch();
   }, [ id ]);
+
+  useEffect(() => {
+    const pendingRequest = cancelRequests.find(req => req.accepted === false && req.rejected === false);
+    setPendingRequest(!!pendingRequest);
+  }, [ cancelRequests ]);
 
   const handleEdit = async (item) => {
     setItem(item);
@@ -75,11 +81,6 @@ function Order() {
     month: "short",
     year: "numeric",
     timeZone: "UTC"
-  }
-
-  const updateOrder = async (id, body) => {
-    const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
-    setOrderSecond(id, updatedOrder.data);
   }
 
   return (
@@ -107,7 +108,7 @@ function Order() {
               </FlexRow>
               <FlexRow>
                 {
-                  !pendingRequest
+                  (!pendingRequest && order.total > 0)
                   &&
                   <NewCategory
                     Icon={FaFileCircleCheck}
@@ -123,7 +124,7 @@ function Order() {
                   <NewCategory
                     Icon={order.shippingType === "ENVIO_AGENCIA" ? MdLocalShipping : PiWarehouseFill}
                     style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                    onClick={() => setStateModal(!stateModal)}
+                    onClick={() => setShippingTypeModal(!shippingTypeModal)}
                   >
                     Datos de { order.shippingType === "ENVIO_AGENCIA" ? "envío" : "recojo" }
                   </NewCategory>
@@ -146,7 +147,7 @@ function Order() {
                     <NewCategory
                       Icon={pendingRequest ? MdLooksOne : MdCancel}
                       style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
-                      onClick={() => setStateModal(!stateModal)}
+                      onClick={() => setCancelRequestModal(!cancelRequestModal)}
                     >
                       Solicitudes de cancelación
                     </NewCategory>
@@ -205,7 +206,15 @@ function Order() {
                         Estado
                       </Text>
                       <Badge color={
-                        order.status === "PENDIENTE" ? "warning" : (order.status === "ENTREGADO" ? "primary" : (order.status === "ENVIADO" ? "purple" : "danger"))
+                        order.status === "PENDIENTE"
+                        ? "warning" 
+                        : order.status === "ENTREGADO"
+                        ? "primary"
+                        : order.status === "ENVIADO"
+                        ? "purple"
+                        : order.status === "CANCELADO"
+                        ? "danger"
+                        : "blue"
                       }>
                         { order.status }
                       </Badge>
@@ -250,7 +259,7 @@ function Order() {
                     justify="space-around"
                   >
                     {
-                      order.status !== "CANCELADO"
+                      (order.status !== "CANCELADO" && order.status !== "PENDIENTE")
                       &&
                       <Button
                         Icon={FaFileInvoice}
@@ -268,16 +277,16 @@ function Order() {
                       </Button>
                     }
                     {
-                      order.status === "PENDIENTE"
+                      order.createdBy === "ADMINISTRADOR"
                       &&
                       <Button
                         Icon={FaEdit}
                         fontSize={14}
                         iconSize={16}
                         color="warning"
-                        onClick={() => navigate("edit")}
+                        onClick={() => navigate(`/clientes/${order.client.id}/edit`)}
                       >
-                        Editar pedido
+                        Editar datos de cliente
                       </Button>
                     }
                     {
@@ -363,16 +372,13 @@ function Order() {
                 setIsActive={setDeleteModal}
                 title="¿Eliminar pedido?"
               />
-              <InvoiceModal 
-                address={`${order.city}, ${order.department}`}
-                document={order.client.document}
-                documentType={order.client.documentType}
+              <InvoiceModal
+                invoiceDetail={order.client.invoiceDetail || {}}
                 isActive={invoiceModal}
-                order={order}
-                rsocial={order.client.rsocial}
                 setIsActive={setInvoiceModal}
-                updateOrder={updateOrder}
-                items={orderItems.map(item => ({ name: item.product.name, price: item.price, quantity: item.quantity }))}
+                isAbleToEdit={order.client.createdBy === "ADMINISTRADOR"}
+                clientId={order.client.id}
+                orderId={order.id}
               />
               <OrderStateModal 
                 isActive={stateModal}
@@ -382,6 +388,17 @@ function Order() {
                 products={orderItems}
               />
               {
+                cancelRequests.length > 0
+                &&
+                <CancelRequestModal 
+                  isActive={cancelRequestModal}
+                  setIsActive={setCancelRequestModal}
+                  requests={cancelRequests}
+                  setRequests={setCancelRequests}
+                  setOrder={setOrder}
+                />
+              }
+              {
                 order.evidence
                 &&
                 <EvidenceModal 
@@ -390,6 +407,12 @@ function Order() {
                   order={order}
                 />
               }
+              <ShippingModal 
+                isActive={shippingTypeModal}
+                setIsActive={setShippingTypeModal}
+                order={order}
+                setOrder={setOrder}
+              />
             </>
         }
       </>

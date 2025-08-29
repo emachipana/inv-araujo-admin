@@ -12,19 +12,24 @@ export const onDocTypeChange = (event, setFieldValue, setDocType, fieldDoc) => {
 export const onDocChange = async (event, setFieldValue, docType) => {
   const value = event.target.value;
   setFieldValue("document", value);
+  setFieldValue("rsocial", "");
 
-  if(!isNaN(value * 1)) {
-    if(docType === "RUC" && value.length === 11) {
-      const info = await getDoc("ruc", value);
-      if(info.razonSocial) return setFieldValue("rsocial", info.razonSocial);
-      toast.error(info.message);
+  try {
+    if(!isNaN(value * 1)) {
+      if(docType === "RUC" && value.length === 11) {
+        const info = await getDoc("ruc", value);
+        if(info.razonSocial) return setFieldValue("rsocial", info.razonSocial);
+        toast.error(info.message);
+      }
+  
+      if(docType === "DNI" && value.length === 8) {
+        const info = await getDoc("dni", value);
+        if(!info.success) return toast.error(info.message);
+        setFieldValue("rsocial", `${info.nombres} ${info.apellidoPaterno} ${info.apellidoMaterno}`);
+      }
     }
-
-    if(docType === "DNI" && value.length === 8) {
-      const info = await getDoc("dni", value);
-      if(!info.success) return toast.error(info.message);
-      setFieldValue("rsocial", `${info.nombres} ${info.apellidoPaterno} ${info.apellidoMaterno}`);
-    }
+  }catch(e) {
+    toast.error(errorParser(e.message));
   }
 }
 
@@ -45,12 +50,14 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
     if(value.length >= 3) {
       setIsGetting(true);
       const clients = await apiFetch(`clients/search?param=${value}`);
-      setSearchClients(clients);
+      const filteredClients = {...clients, content: clients.content?.filter((client) => client.createdBy === "ADMINISTRADOR")};
+      setSearchClients(filteredClients);
       setIsGetting(false);
       return;
     }
 
-    setSearchClients(clientsBackup);
+    const filteredClients = {...clientsBackup, content: clientsBackup.content?.filter((client) => client.createdBy === "ADMINISTRADOR")};
+    setSearchClients(filteredClients);
   }catch(error) {
     setIsGetting(false);
     toast.error(errorParser(error.message));

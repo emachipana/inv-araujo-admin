@@ -98,7 +98,7 @@ export const NotificationItemContainer = styled.div`
   align-items: center;
   cursor: pointer;
   padding: 0.5rem 0.7rem;
-  width: 300px;
+  width: 330px;
   transition: background-color .2s ease;
   position: relative;
   gap: 0.5rem;

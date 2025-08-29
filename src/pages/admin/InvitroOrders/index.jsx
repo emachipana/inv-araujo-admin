@@ -18,7 +18,7 @@ import { COLORS } from "../../../styles/colors";
 import { HeaderPage, MenuSection } from "./styles";
 import DropDown from "../../../components/DropDown";
 import SelectButton from "../../../components/SelectButton";
-import { FaCalendar } from "react-icons/fa6";
+import { FaCalendar, FaEye } from "react-icons/fa6";
 import SelectItem from "../../../components/SelectButton/SelectItem";
 import { filterBuilder } from "./filter";
 import apiFetch from "../../../services/apiFetch";
@@ -28,6 +28,8 @@ import { RiFilterOffFill } from "react-icons/ri";
 import { sortData } from "./data";
 import { useAuth } from "../../../context/auth";
 import { useModal } from "../../../context/modal";
+import ProductionModal from "./ProductionModal";
+import { FaSadCry } from "react-icons/fa";
 
 function InvitroOrders() {
   const [filters, setFilters] = useState({
@@ -36,6 +38,7 @@ function InvitroOrders() {
     range: null,
     page: 0,
   });
+  const [productionModal, setProductionModal] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
@@ -43,7 +46,7 @@ function InvitroOrders() {
   const [isRangeDateOpen, setIsRangeDateOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const { vitroOrders, isLoading, 
-    loadVitroOrders, setIsLoading, setVitroOrders, vitroOrdersBack } = useAdmin();
+    loadVitroOrders, setIsLoading, setVitroOrders, vitroOrdersBack, productionSummary } = useAdmin();
   const {user} = useAuth();
   const { vitroModal, setVitroModal } = useModal();
 
@@ -110,14 +113,29 @@ function InvitroOrders() {
         {
           user.role.permissions.includes("INVITRO_CREATE")
           &&
-          <Button
-            onClick={() => setVitroModal(!vitroModal)}
-            fontSize={15}
-            Icon={PiPlantFill}
-          iconSize={18}
-          >
-            Nuevo pedido
-          </Button>
+          <FlexRow>
+            {
+              productionSummary?.length > 0
+              &&
+              <Button
+                onClick={() => setProductionModal(true)}
+                fontSize={15}
+                Icon={FaEye}
+                iconSize={18}
+                color="secondary"
+              >
+                Producción pendiente
+              </Button>
+            }
+            <Button
+              onClick={() => setVitroModal(!vitroModal)}
+              fontSize={15}
+              Icon={PiPlantFill}
+              iconSize={18}
+            >
+              Nuevo pedido
+            </Button>
+          </FlexRow>
         }
       </FlexRow>
       <HeaderPage>
@@ -236,30 +254,53 @@ function InvitroOrders() {
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : vitroOrders.content?.map((order, index) => (
-              <OrderCard
-                key={index}
-                order={order}
-                fullSize={type === "list"}
-              />
-            ))
+          : vitroOrders.content?.length <= 0
+            ? <FlexRow
+                style={{margin: "1rem"}}
+              >
+                <FaSadCry />
+                <Text
+                  size={17}
+                  weight={600}
+                >
+                  No se econtraron pedidos invitro
+                </Text>
+              </FlexRow>
+            : vitroOrders.content?.map((order, index) => (
+                <OrderCard
+                  key={index}
+                  order={order}
+                  fullSize={type === "list"}
+                  isVitro
+                />
+              ))
         }
       </Section>
-      <Pagination
-        currentPage={vitroOrders.number}
-        totalPages={vitroOrders.totalPages}
-        // totalPages={100}
-        setFilters={setFilters}
-        isLoading={isLoading || isGetting}
-      />
+      {
+        vitroOrders.content?.length > 0
+        &&
+        <Pagination
+          currentPage={vitroOrders.number}
+          totalPages={vitroOrders.totalPages}
+          // totalPages={100}
+          setFilters={setFilters}
+          isLoading={isLoading || isGetting}
+        />
+      }
       <Modal
         align="start"
         size="md"
         isActive={vitroModal}
         setIsActive={setVitroModal}
       >
-        <VitroForm isToCreate />
+        <VitroForm 
+          setIsActive={setVitroModal}
+        />
       </Modal>
+      <ProductionModal 
+        isActive={productionModal}
+        setIsActive={setProductionModal}
+      />
     </>
   );
 }

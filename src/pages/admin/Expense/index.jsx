@@ -16,6 +16,7 @@ import toast from "react-hot-toast";
 
 function Expense() {
   const [isLoading, setIsLoading] = useState(true);
+  const [expenses, setExpenses] = useState([]);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const { id } = useParams();
@@ -25,7 +26,9 @@ function Expense() {
     const fetch = async () => {
       try {
         const expense = await apiFetch(`profits/${id}`);
+        const expenses = await apiFetch(`expenses/profit/${id}`);
         setExpense(expense.data);
+        setExpenses(expenses);
         setIsLoading(false);
       }catch(error) {
         toast.error(errorParser(error.message));
@@ -114,13 +117,14 @@ function Expense() {
                       gap={1}
                     >
                       {
-                        expense.expenses?.map((item, index) => (
+                        expenses?.map((item, index) => (
                           <Item 
                             key={index}
                             handleEdit={() => handleEdit(item)}
                             item={item}
                             profitId={expense.id}
                             setExpense={setExpense}
+                            setExpenses={setExpenses}
                           />
                         ))
                       }
@@ -144,6 +148,7 @@ function Expense() {
                 profitId={expense.id}
                 setExpense={setExpense}
                 setItem={setItem}
+                setExpenses={setExpenses}
               />
             </>
         }

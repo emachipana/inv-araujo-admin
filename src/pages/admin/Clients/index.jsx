@@ -7,8 +7,6 @@ import { COLORS } from "../../../styles/colors";
 import apiFetch from "../../../services/apiFetch";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
-import Button from "../../../components/Button";
-import { IoPersonAdd } from "react-icons/io5";
 import { HeaderPage, MenuSection } from "../InvitroOrders/styles";
 import Filter from "../../../components/Filter";
 import { onSearchChange } from "../Products/handlers";
@@ -18,8 +16,11 @@ import { TbSitemapFilled } from "react-icons/tb";
 import SelectItem from "../../../components/SelectButton/SelectItem";
 import { filterBuilder } from "./filter";
 import Pagination from "../../../components/Pagination";
-import { useModal } from "../../../context/modal";
-import { useAuth } from "../../../context/auth";
+import ClientCard from "../../../components/ClientCard";
+import { Spinner } from "reactstrap";
+import Button from "../../../components/Button";
+import { RiFilterOffFill } from "react-icons/ri";
+import { FaSadCry } from "react-icons/fa";
 
 function Clients() {
   const [filters, setFilters] = useState({
@@ -32,8 +33,6 @@ function Clients() {
   const { isLoading, setIsLoading, loadClients, clients, setClients, clientsBackup } = useAdmin();
   const [type, setType] = useState(localStorage.getItem("clientType") || "group");
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const { clientsModal: createModal, setClientsModal: setCreateModal } = useModal();
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
@@ -96,18 +95,6 @@ function Clients() {
             Gestiona todos los clientes de tu tienda
           </Text>
         </FlexColumn>
-        {
-          user.role.permissions.includes("CLIENTS_CREATE")
-          &&
-          <Button
-            onClick={() => setCreateModal(!createModal)}
-            fontSize={15}
-            Icon={IoPersonAdd}
-            iconSize={18}
-          >
-            Nuevo cliente
-          </Button>
-        }
       </FlexRow>
       <HeaderPage>
         <FlexRow
@@ -126,59 +113,101 @@ function Clients() {
             resetFilters={() => setFilters(filters => ({...filters, sort: null, page: 0 }))}
             reset={() => setSearch("")}
           />
-          <DropDown
-            Button={SelectButton}
-            buttonData={{
-              Icon: TbSitemapFilled,
-              children: sortData[filters.sort] || "Ordernar por",
-              isActive: !!filters.sort,
-            }}
-            isOpen={isSortOpen}
-            setIsOpen={setIsSortOpen}
-          >
-            <MenuSection>
-              <SelectItem
-                minWidth={195}
-                onClick={() => onClickSort("NEW_TO_OLD")}
-                isActive={filters.sort === "NEW_TO_OLD"}
-              >
-                Reciente a antiguo
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-                onClick={() => onClickSort("OLD_TO_NEW")}
-                isActive={filters.sort === "OLD_TO_NEW"}
-              >
-                Antiguo a reciente
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-                onClick={() => onClickSort("HIGHEST_CONSUMPTION")}
-                isActive={filters.sort === "HIGHEST_CONSUMPTION"}
-              >
-                Mayor consumo a menor
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-                onClick={() => onClickSort("LOWEST_CONSUMPTION")}
-                isActive={filters.sort === "LOWEST_CONSUMPTION"}
+          <FlexRow>
+            <DropDown
+              Button={SelectButton}
+              buttonData={{
+                Icon: TbSitemapFilled,
+                children: sortData[filters.sort] || "Ordernar por",
+                isActive: !!filters.sort,
+              }}
+              isOpen={isSortOpen}
+              setIsOpen={setIsSortOpen}
+            >
+              <MenuSection>
+                <SelectItem
+                  minWidth={195}
+                  onClick={() => onClickSort("NEW_TO_OLD")}
+                  isActive={filters.sort === "NEW_TO_OLD"}
                 >
-                Menor consumo a mayor
-              </SelectItem>
-            </MenuSection>
-          </DropDown>
+                  Reciente a antiguo
+                </SelectItem>
+                <SelectItem
+                  minWidth={195}
+                  onClick={() => onClickSort("OLD_TO_NEW")}
+                  isActive={filters.sort === "OLD_TO_NEW"}
+                >
+                  Antiguo a reciente
+                </SelectItem>
+                <SelectItem
+                  minWidth={195}
+                  onClick={() => onClickSort("HIGHEST_CONSUMPTION")}
+                  isActive={filters.sort === "HIGHEST_CONSUMPTION"}
+                >
+                  Mayor consumo a menor
+                </SelectItem>
+                <SelectItem
+                  minWidth={195}
+                  onClick={() => onClickSort("LOWEST_CONSUMPTION")}
+                  isActive={filters.sort === "LOWEST_CONSUMPTION"}
+                  >
+                  Menor consumo a mayor
+                </SelectItem>
+              </MenuSection>
+            </DropDown>
+            {
+              filters.sort
+              && 
+              <Button
+                onClick={() => setFilters(filters => ({...filters, sort: null, page: 0}))}
+                Icon={RiFilterOffFill}
+                fontSize={14}
+                color="danger"
+                iconSize={14}
+                style={{padding: "0.25rem 0.5rem"}}
+              >
+                Limpiar
+              </Button>
+            }
+          </FlexRow>
         </FlexRow>
       </HeaderPage>
       <Section>
-      
+        {
+          isLoading || isGetting
+          ? <Spinner color="secondary" />
+          : clients.content?.length <= 0
+            ? <FlexRow
+                style={{margin: "1rem"}}
+              >
+                <FaSadCry />
+                <Text
+                  size={17}
+                  weight={600}
+                >
+                  No se econtraron clientes
+                </Text>
+              </FlexRow>
+            : clients.content?.map((client, index) => (
+                <ClientCard 
+                  key={index}
+                  client={client}
+                  fullSize={type === "list"}
+                />
+              ))
+          }
       </Section>
-      <Pagination 
-        currentPage={clients.number}
-        totalPages={clients.totalPages}
-        // totalPages={5}
-        setFilters={setFilters}
-        isLoading={isLoading || isGetting}
-      />
+      {
+        clients.content?.length > 0
+        &&
+        <Pagination 
+          currentPage={clients.number}
+          totalPages={clients.totalPages}
+          // totalPages={5}
+          setFilters={setFilters}
+          isLoading={isLoading || isGetting}
+        />
+      }
     </>
   );
 }

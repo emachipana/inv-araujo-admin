@@ -6,9 +6,9 @@ import { ClientSection } from "./styles";
 import { COLORS } from "../../styles/colors";
 import { TextDescription } from "../Product/styles";
 
-function Client({ id, rsocial, document, documentType, setClientSelected, clientSelected }) {
+function Client({ id, rsocial, document, documentType, phone, setClientSelected, clientSelected }) {
   const handleChange = () => {
-    setClientSelected(id);
+    setClientSelected({id, rsocial, document, documentType, phone});
   }
 
   return (

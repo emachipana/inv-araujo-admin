@@ -27,6 +27,7 @@ import { RiFilterOffFill } from "react-icons/ri";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
 import OrderCard from "../../../components/OrderCard";
+import { FaSadCry } from "react-icons/fa";
 
 function Invoices() {
   const [filters, setFilters] = useState({
@@ -195,34 +196,53 @@ function Invoices() {
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : invoices.content?.map((invoice, index) => (
-              <OrderCard 
-                key={index}
-                order={{
-                  ...invoice,
-                  client: {rsocial: invoice.rsocial, document: invoice.document, documentType: invoice.documentType},
-                  date: invoice.issueDate,
-                  status: invoice.invoiceType
-                }}
-                fullSize={type === "list"}
-                isInvoice
-              />
-            ))
+          : invoices.content?.length <= 0
+            ? <FlexRow
+                style={{margin: "1rem"}}
+              >
+                <FaSadCry />
+                <Text
+                  size={17}
+                  weight={600}
+                >
+                  No se econtraron comprobantes
+                </Text>
+              </FlexRow>
+            : invoices.content?.map((invoice, index) => (
+                <OrderCard 
+                  key={index}
+                  order={{
+                    ...invoice,
+                    client: {rsocial: invoice.rsocial, document: invoice.document, documentType: invoice.documentType},
+                    date: invoice.issueDate,
+                    status: invoice.invoiceType
+                  }}
+                  fullSize={type === "list"}
+                  isInvoice
+                />
+              ))
         }
       </Section>
-      <Pagination 
-        currentPage={invoices.number}
-        totalPages={invoices.totalPages}
-        // totalPages={7}
-        setFilters={setFilters}
-        isLoading={isLoading || isGetting}
-      />
+      {
+        invoices.content?.length > 0
+        && 
+        <Pagination
+          currentPage={invoices.number}
+          totalPages={invoices.totalPages}
+          // totalPages={7}
+          setFilters={setFilters}
+          isLoading={isLoading || isGetting}
+        />
+      }
       <Modal
         size="md"
         isActive={createModal}
         setIsActive={setCreateModal}
       >
-        <InvoiceForm isToCreate />
+        <InvoiceForm 
+          isToCreate 
+          setIsActive={setCreateModal} 
+        />
       </Modal>
     </>
   );

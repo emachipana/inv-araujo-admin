@@ -32,6 +32,7 @@ function Select({ id, label, value, labelSize, fontSize, handleChange, options =
                 value={item.id}
                 key={index}
                 disabled={item.disabled}
+                selected={item.id === value}
               >
                 { item.content }
               </option>

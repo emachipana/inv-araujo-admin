@@ -14,12 +14,20 @@ import { COLORS } from "../../../styles/colors";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/auth";
+import apiFetch from "../../../services/apiFetch";
 
 function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, setItem, orderItems, setOrderItems }) {
   const [currentVariety, setCurrentVariety] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const { tubers, addItem, editItem } = useAdmin();
+
+  const dateOptions = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC"
+  }
 
   let initialValues = {
     vitroOrderId: vitroOrder.id,
@@ -44,6 +52,13 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
+      const quantity = !item ? values.quantity : values.quantity - item.quantity;
+      const checkAvailability = await apiFetch(`vitroOrders/availableByMonth?date=${vitroOrder.finishDate}&quantity=${quantity}`);
+      if(!checkAvailability.data.isAvailable) {
+        toast.error(checkAvailability.data.message);
+        return setIsLoading(false);
+      }
+
       values.employeeId = user.employeeId;
       const {orderVariety, newVitroOrder} = item ? await editItem(item.id, values, setOrderItems) : await addItem(values);
       if(!item) setOrderItems([orderVariety, ...orderItems]);
@@ -109,15 +124,18 @@ function ItemModal({ isActive, setIsActive, item, vitroOrder, setVitroOrder, set
           <Form onSubmit={handleSubmit}>
             <Title>{ item ? "Editar variedad" : "Agregar variedad" }</Title>
             {
-              vitroOrder.finishDate && !item
-              &&
               <Text
-                size={13}
-                color={COLORS.red}
+                size={15}
+                weight={600}
+                color={COLORS.dim}
                 align="start"
                 style={{alignSelf: "flex-start"}}
               >
-                *Debes cambiar la fecha de entrega si agregas una variedad
+                Fecha de entrega programada:
+                {" "}
+                <span style={{color: COLORS.blue}}>
+                  { new Date(vitroOrder.finishDate).toLocaleDateString("es-PE", dateOptions) }
+                </span>
               </Text>
             }
             <Select

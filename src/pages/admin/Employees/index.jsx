@@ -25,6 +25,7 @@ import apiFetch from "../../../services/apiFetch";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
 import Roles from "../../../components/Roles";
+import { FaSadCry } from "react-icons/fa";
 
 function Employees() {
   const [filters, setFilters] = useState({
@@ -160,15 +161,27 @@ function Employees() {
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : (type === "group"
-              ? employees.map((employee, index) => (
-                <EmployeeCard 
-                  key={index}
-                  employee={employee}
-                />
-              ))
-              : <List />
-            )
+          : employees.length <= 0
+            ? <FlexRow
+                style={{margin: "1rem"}}
+              >
+                <FaSadCry />
+                <Text
+                  size={17}
+                  weight={600}
+                >
+                  No se econtraron empleados
+                </Text>
+              </FlexRow>
+            : (type === "group"
+                ? employees.map((employee, index) => (
+                  <EmployeeCard 
+                    key={index}
+                    employee={employee}
+                  />
+                ))
+                : <List />
+              )
         }
       </Section>
       <Modal

@@ -39,8 +39,7 @@ function EditInvoice() {
               <InvoiceForm 
                 initialValues={{
                   ...invoice,
-                  documentType: invoice.documentType === "DNI" ? 1 : 2,
-                  invoiceType: invoice.invoiceType === "BOLETA" ? 1 : 2
+                  issueDate: invoice.issueDate.split("T")[0]
                 }}
                 invoiceId={invoice.id}
                 initDocType={invoice.documentType}

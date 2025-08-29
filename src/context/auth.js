@@ -19,7 +19,7 @@ const AuthProvider = ({ children }) => {
         if(!token) return setIsLoading(false);
 
         const user = await apiFetch("users/profile/info");
-        if(!user.data.employeeId) throw new Error("No tienes los permisos necesarios");
+        if(user.data.role.name !== "ADMINISTRADOR") throw new Error("No tienes los permisos necesarios");
         setUser(user.data);
         setIsLoading(false);
       }catch(error) {
@@ -34,10 +34,10 @@ const AuthProvider = ({ children }) => {
     fetch();
   }, [ navigate ]);
 
-  const login = async (credentials, origin) => {
+  const login = async (credentials) => {
     const response = await apiFetch("auth/login", { body: credentials })
     const { token, user } = response.data;
-    if(!user.employeeId) throw new Error("No tienes los permisos necesarios");
+    if(user.role.name !== "ADMINISTRADOR") throw new Error("No tienes los permisos necesarios");
     localStorage.setItem(TOKEN_NAME, token);
     setUser(user);
 

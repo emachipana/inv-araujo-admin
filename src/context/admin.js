@@ -26,6 +26,9 @@ const AdminProvider = ({ children }) => {
   const [expenses, setExpenses] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [productionSummary, setProductionSummary] = useState([]);
+  const [messages, setMessages] = useState({});
+  const [messagesBackup, setMessagesBackup] = useState({});
   const [homeData, setHomeData] = useState({
     orders: {
       data: {ship: 0, pen: 0},
@@ -70,6 +73,15 @@ const AdminProvider = ({ children }) => {
     setNotifications(notifications.data?.reverse());
     setMatcher(matcher => ({...matcher, notifications: true}));
   }, [matcher.notifications]);
+
+  const loadMessages = useCallback(async () => {
+    if(matcher.messages) return;
+    const messages = await apiFetch("messages");
+    setMessages(messages);
+    setMessagesBackup(messages);
+    setIsLoading(false);
+    setMatcher(matcher => ({...matcher, messages: true}));
+  }, [matcher.messages]);
 
   const loadExpenses = useCallback(async () => {
     if(!user.role.permissions.includes("PROFITS_WATCH")) return;
@@ -132,12 +144,12 @@ const AdminProvider = ({ children }) => {
 
     if(user.role.permissions.includes("ORDERS_WATCH")) {
       ordersData = await apiFetch("orders/data");
-      orders = await apiFetch("orders?size=5&sort=DESC");
+      orders = await apiFetch("orders?size=5&direction=DESC&sortby=date");
     }
 
     if(user.role.permissions.includes("INVITRO_WATCH")) {
       vitroOrdersData = await apiFetch("vitroOrders/data");
-      vitroOrders = await apiFetch("vitroOrders?size=5&sort=DESC");
+      vitroOrders = await apiFetch("vitroOrders?size=5&direction=DESC&sortby=initDate");
     }
     
     setHomeData({
@@ -171,10 +183,12 @@ const AdminProvider = ({ children }) => {
     if(matcher.vitroOrders) return;
     setIsLoading(true);
     const tubers = await apiFetch("tubers");
-    const vitroOrders = await apiFetch("vitroOrders?sort=DESC");
+    const vitroOrders = await apiFetch("vitroOrders");
+    const productionSummary = await apiFetch("vitroOrders/productionSummary");
     setTubers(tubers);
     setVitroOrders(vitroOrders);        
     setVitroOrdersBack(vitroOrders);
+    setProductionSummary(productionSummary.data);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
     setIsLoading(false);
   }, [matcher.vitroOrders]);
@@ -223,6 +237,14 @@ const AdminProvider = ({ children }) => {
     setCategories([...newCategories]);
   }
 
+  const deleteMessage = async (id) => {
+    await apiFetch(`messages/${id}`, { method: "DELETE" });
+    const newMessages = messages.content.filter(message => message.id !== id);
+    const backupUpdatedMessages = messagesBackup.content.filter(message => message.id !== id);
+    setMessages({...messages, content: [...newMessages]});
+    setMessagesBackup({...messagesBackup, content: [...backupUpdatedMessages]});
+  }
+
   const uploadImage = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
@@ -256,6 +278,20 @@ const AdminProvider = ({ children }) => {
     
     return updatedOrder.data;
   }
+  
+  const vitroOrderAtAgency = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      ...body,
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`vitroOrders/${orderId}/agency`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
 
   const orderDelivered = async (orderId, body) => {
     const image = await uploadImage(body.file);
@@ -269,6 +305,18 @@ const AdminProvider = ({ children }) => {
     return updatedOrder.data;
   }
     
+  const vitroOrderDelivered = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`vitroOrders/${orderId}/delivered`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
 
   const addRole = async (body) => {
     const newRole = await apiFetch("roles", { body });
@@ -340,8 +388,8 @@ const AdminProvider = ({ children }) => {
   const addInvoice = async (body) => {
     body.employeeId = user.employeeId;
     const newInvoice = await apiFetch("invoices", { body });
-    setInvoices(invoices => [newInvoice.data, ...invoices]);
-    setInvoicesBackup(invoices => [newInvoice.data, ...invoices]);
+    setInvoices(invoices => ({...invoices, content: [newInvoice.data, ...invoices.content]}));
+    setInvoicesBackup(invoices => ({...invoices, content: [newInvoice.data, ...invoices.content]}));
     return newInvoice.data;
   }
 
@@ -441,23 +489,24 @@ const AdminProvider = ({ children }) => {
 
   const deleteVitro  = async (id) => {
     await apiFetch(`vitroOrders/${id}`, { method: "DELETE" });
-    const vitro = vitroOrdersBack.find(vitroO => vitroO.id === id);
-    if(!!vitro.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
-    const updatedOrders = vitroOrders.filter(order => order.id !== id);
-    const updatedBackup = vitroOrdersBack.filter(order => order.id !== id);
-    setVitroOrders([...updatedOrders]);
-    setVitroOrdersBack([...updatedBackup]);
+    const vitro = vitroOrdersBack.content.find(vitro => vitro.id === id);
+    if(!vitro) return;
+
+    const updatedOrders = vitroOrders.content.filter(order => order.id !== id);
+    const updatedBackup = vitroOrdersBack.content.filter(order => order.id !== id);
+    setVitroOrders({...vitroOrders, content: [...updatedOrders]});
+    setVitroOrdersBack({...vitroOrdersBack, content: [...updatedBackup]});
   }
 
   const deleteOrder = async (id) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
-    const order = ordersBackup.find(orderF => orderF.id === id);
+    const order = ordersBackup.content.find(orderF => orderF.id === id);
     if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
     setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
-    const updatedOrders = orders.filter(order => order.id !== id);
-    const updatedBackup = ordersBackup.filter(order => order.id !== id); 
-    setOrders([...updatedOrders]);
-    setOrdersBackup([...updatedBackup]);
+    const updatedOrders = orders.content.filter(order => order.id !== id);
+    const updatedBackup = ordersBackup.content.filter(order => order.id !== id); 
+    setOrders({...orders, content: [...updatedOrders]});
+    setOrdersBackup({...ordersBackup, content: [...updatedBackup]});
   }
 
   const updateVitro = async (id, body) => {
@@ -467,9 +516,8 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateInvoice = async (id, body) => {
-    const { comment, issueDate, address } = body;
-    const updatedInvoice = await apiFetch(`invoices/${id}`, { body: { comment, issueDate, address, employeeId: user.employeeId }, method: "PUT" });
-    setInvoice(id, updatedInvoice.data);
+    const updatedInvoice = await apiFetch(`invoices/${id}`, { body, method: "PUT" });
+    setMatcher(matcher => ({...matcher, invoices: false}));
     return updatedInvoice.data;
   }
 
@@ -514,14 +562,16 @@ const AdminProvider = ({ children }) => {
   }
 
   const setInvoice = (id, invoice) => {
-    const tempInvoices = invoices;
-    const tempBackup = invoicesBackup;
+    if(!matcher.invoices) return invoice;
+
+    const tempInvoices = invoices.content;
+    const tempBackup = invoicesBackup.content;
     const index = tempInvoices.findIndex(invoice => invoice.id === id);
     const indexBackup = tempBackup.findIndex(invoice => invoice.id === id);
     tempInvoices[index] = invoice;
     tempBackup[indexBackup] = invoice;
-    setInvoices([...tempInvoices]);
-    setInvoicesBackup([...tempBackup]);
+    setInvoices({...invoices, content: [...tempInvoices]});
+    setInvoicesBackup({...invoicesBackup, content: [...tempBackup]});
   }
 
   const setBanner = (id, banner) => {
@@ -541,16 +591,20 @@ const AdminProvider = ({ children }) => {
 
   const addExpenseItem = async (body) => {
     const { profitId } = body;
-    body.employeeId = user.employeeId;
-    await apiFetch("expenses", { body });
-    return getExpense(profitId);
+    const expense = await apiFetch("expenses", { body });
+    const updatedProfit = await apiFetch(`profits/${profitId}`);
+    setMatcher(matcher => ({...matcher, expenses: false}));
+
+    return {expense: expense.data, updatedProfit: updatedProfit.data};
   }
 
   const addInvoiceItem = async (body) => {
     const { invoiceId } = body;
-    body.employeeId = user.employeeId;
-    await apiFetch("invoiceItems", { body });
-    return getInvoice(invoiceId);
+    const invoiceItem = await apiFetch("invoiceItems", { body });
+    const updatedInvoice = await apiFetch(`invoices/${invoiceId}`);
+    setMatcher(matcher => ({...matcher, invoices: false}));
+
+    return {updatedInvoice: updatedInvoice.data, invoiceItem: invoiceItem};
   }
  
   const editItem = async (id, body, setItems) => {
@@ -568,22 +622,40 @@ const AdminProvider = ({ children }) => {
     return {orderVariety: updatedVariety.data, newVitroOrder};
   }
 
-  const editExpenseItem = async (id, body) => {
+  const editExpenseItem = async (id, body, setExpenses) => {
     const { profitId } = body;
-    body.employeeId = user.employeeId;
-    await apiFetch(`expenses/${id}`, { body, method: "PUT" });
-    return getExpense(profitId);
+    const updatedExpense = await apiFetch(`expenses/${id}`, { body, method: "PUT" });
+    const updatedProfit = await apiFetch(`profits/${profitId}`);
+    setMatcher(matcher => ({...matcher, expenses: false}));
+
+    setExpenses((expenses) => {
+      const index = expenses.findIndex((expense) => expense.id === updatedExpense.data.id);
+      expenses[index] = updatedExpense.data;
+
+      return [...expenses];
+    });
+
+    return {expense: updatedExpense.data, updatedProfit: updatedProfit.data};
   }
 
-  const editInvoiceItem = async (id, body) => {
+  const editInvoiceItem = async (id, body, setItems) => {
     const { invoiceId } = body;
-    body.employeeId = user.employeeId;
-    await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
-    return getInvoice(invoiceId);
+    const newItem = await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
+    const updatedInvoice = await apiFetch(`invoices/${invoiceId}`);
+    setMatcher(matcher => ({...matcher, invoices: false}));
+
+    setItems((items) => {
+      const index = items.findIndex((item) => item.id === newItem.data.id);
+      items[index] = newItem.data;
+
+      return [...items];
+    });
+
+    return {updatedInvoice: updatedInvoice.data, invoiceItem: newItem.data};
   }
 
   const generateDoc = async (invoiceId) => {
-    await apiFetch(`invoices/generatePDF/${invoiceId}?employeeId=${user.employeeId}`, { method: "POST" });
+    await apiFetch(`invoices/sendToSunat/${invoiceId}`, { method: "POST" });
     return getInvoice(invoiceId);
   }
 
@@ -600,13 +672,17 @@ const AdminProvider = ({ children }) => {
     return getVitroOrder(vitroOrderId);
   }
 
-  const deleteExpenseItem = async (id, profitId) => {
+  const deleteExpenseItem = async (id, profitId, setItems) => {
     await apiFetch(`expenses/${id}`, { method: "DELETE" });
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
+    setMatcher(matcher => ({...matcher, expenses: false}));
     return getExpense(profitId);
   }
 
-  const deleteInvoiceItem = async (id, invoiceId) => {
+  const deleteInvoiceItem = async (id, invoiceId, setItems) => {
     await apiFetch(`invoiceItems/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
+    setMatcher(matcher => ({...matcher, invoices: false}));
     return getInvoice(invoiceId);
   }
 
@@ -625,10 +701,10 @@ const AdminProvider = ({ children }) => {
 
   const deleteInvoice = async (id) => {
     await apiFetch(`invoices/${id}`, { method: "DELETE" });
-    const updatedInvoices = invoices.filter(invoice => invoice.id !== id);
-    const updatedBack = invoicesBackup.filter(invoice => invoice.id !== id);
-    setInvoices([...updatedInvoices]);
-    setInvoicesBackup([...updatedBack]);
+    const updatedInvoices = invoices.content.filter(invoice => invoice.id !== id);
+    const updatedBack = invoicesBackup.content.filter(invoice => invoice.id !== id);
+    setInvoices({...invoices, content: [...updatedInvoices]});
+    setInvoicesBackup({...invoicesBackup, content: [...updatedBack]});
   }
 
   const addAdvance = async (body) => {
@@ -786,6 +862,11 @@ const AdminProvider = ({ children }) => {
         employeesBackup,
         notifications,
         roles,
+        productionSummary,
+        messages,
+        messagesBackup,
+        loadMessages,
+        setProductionSummary,
         setRoles,
         addEmployee,
         setEmployees,
@@ -824,6 +905,7 @@ const AdminProvider = ({ children }) => {
         deleteItem,
         updateVitro,
         updateInvoice,
+        deleteMessage,
         updateBanner,
         addOrder,
         deleteOrder,
@@ -870,7 +952,11 @@ const AdminProvider = ({ children }) => {
         setWarehousesBackup,
         addRole,
         orderAtAgency,
-        orderDelivered
+        orderDelivered,
+        vitroOrderAtAgency,
+        vitroOrderDelivered,
+        setMessages,
+        setMessagesBackup
       }}
     >
       { children }

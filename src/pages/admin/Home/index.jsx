@@ -21,6 +21,7 @@ import ActionCard from "../../../components/ActionCard";
 import { useModal } from "../../../context/modal";
 import { Carousel } from 'primereact/carousel';
 import ActionCards from "./ActionCards";
+import { FaBoxOpen, FaPlantWilt } from "react-icons/fa6";
 
 Chart.register(
   CategoryScale,
@@ -86,8 +87,6 @@ function Home() {
   ];
   const filteredPermissions = user.role.permissions.filter(p => createPermissions.includes(p));
 
-  console.log(filteredPermissions);
-
   return (
     <>
       <FlexColumn gap={0.1}>
@@ -114,7 +113,6 @@ function Home() {
                       user.role.permissions.includes("PRODUCTS_CREATE") && { type: "PRODUCTS_CREATE", navigateTo: "/productos", setModal: setProductsModal },
                       user.role.permissions.includes("INVOICES_CREATE") && { type: "INVOICES_CREATE", navigateTo: "/comprobantes", setModal: setInvoicesModal },
                       user.role.permissions.includes("EMPLOYEES_CREATE") && { type: "EMPLOYEES_CREATE", navigateTo: "/empleados", setModal: setEmployeesModal },
-                      user.role.permissions.includes("WAREHOUSES_CREATE") && { type: "WAREHOUSES_CREATE", navigateTo: "/almacenes", setModal: setWarehousesModal },
                       user.role.permissions.includes("BANNERS_CREATE") && { type: "BANNERS_CREATE", navigateTo: "/banners", setModal: setBannersModal },
                       user.role.permissions.includes("EXPENSES_CREATE") && { type: "EXPENSES_CREATE", navigateTo: "/gastos", setModal: () => {} },
                       user.role.permissions.includes("CLIENTS_CREATE") && { type: "CLIENTS_CREATE", navigateTo: "/clientes", setModal: setClientsModal },
@@ -321,129 +319,153 @@ function Home() {
                       size={15}
                       color={COLORS.dim}
                     >
-                      Pedidos
+                      Resumen de los últimos 5 pedidos invitro
                     </Text>
                   </FlexColumn>
-                  <Table
-                    css={TableStyle}
-                    hover
-                  >
-                    <thead>
-                      <tr>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Nombre
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Entrega
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Total
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Fecha entrega
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Estado
-                          </Text>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        homeData.vitroOrders.content?.map((order, index) => {
-                          const date = new Date(order.finishDate);
-                          const options = {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            timeZone: "UTC"
-                          }
+                  {
+                    homeData.vitroOrders.content.length > 0
+                    ? <Table
+                        css={TableStyle}
+                        hover
+                      >
+                        <thead>
+                          <tr>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Nombre
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Entrega
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Total
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Fecha Entrega
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Estado
+                              </Text>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {
+                            homeData.vitroOrders.content?.map((order, index) => {
+                              const date = new Date(order.finishDate);
+                              const options = {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                timeZone: "UTC"
+                              }
 
-                          return (
-                            <tr 
-                              key={index}
-                              onClick={() => navigate(`/invitro/${order.id}`)}
-                            >
-                              <td>
-                                <Text
-                                  size={15}
-                                  style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
-                                  color={COLORS.dim}
+                              return (
+                                <tr 
+                                  key={index}
+                                  onClick={() => navigate(`/invitro/${order.id}`)}
                                 >
-                                  { order.client?.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.dim}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.persian}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  S/. { order.total?.toFixed(2) }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.dim}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  { !order.finishDate ? "Por asignar" : date.toLocaleDateString("es-ES", options) }
-                                </Text>
-                              </td>
-                              <td>
-                                <Badge
-                                  color={order.status === "PENDIENTE" ? "warning" : "primary"}
-                                >
-                                  { order.status }
-                                </Badge>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      }
-                    </tbody>
-                  </Table>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
+                                      color={COLORS.dim}
+                                    >
+                                      { order.client?.rsocial.split(" ").slice(0, 2).join(" ").toLowerCase() }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.dim}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.persian}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      S/. { order.total?.toFixed(2) }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.dim}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      { !order.finishDate ? "Por asignar" : date.toLocaleDateString("es-ES", options) }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Badge
+                                      color={order.status === "PENDIENTE" ? "warning" : "primary"}
+                                    >
+                                      { order.status }
+                                    </Badge>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          }
+                        </tbody>
+                      </Table>
+                    : <FlexColumn
+                        width="100%"
+                        style={{padding: "1rem"}}
+                        align="center"
+                      >
+                        <FaPlantWilt 
+                          size={28}
+                          color={COLORS.persian}
+                        />
+                        <Text
+                          size={18}
+                          weight={700}
+                          color={COLORS.dim}
+                        >
+                          Aún no tienes pedidos
+                        </Text>
+                      </FlexColumn>
+                  }
                   <Button 
-                    style={{alignSelf: "center", marginTop: "1rem"}}
+                    style={{alignSelf: "center", marginTop: homeData.vitroOrders.content.length > 0 ? "1rem" : "0"}}
                     color="secondary"
-                    fontSize={16}
+                    fontSize={15}
                     onClick={() => navigate("/invitro")}
                   >
-                    Ver todos
+                    {
+                      homeData.vitroOrders.content.length > 0
+                      ? "Ver todos"
+                      : "Registrar un pedido"
+                    }
                   </Button>
                 </Section>
               </Container>
@@ -475,129 +497,163 @@ function Home() {
                       size={15}
                       color={COLORS.dim}
                     >
-                      Pedidos
+                      Resumen de los últimos 5 pedidos
                     </Text>
                   </FlexColumn>
-                  <Table
-                    css={TableStyle}
-                    hover
-                  >
-                    <thead>
-                      <tr>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Nombre
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Entrega
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Total
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Fecha entrega
-                          </Text>
-                        </th>
-                        <th>
-                          <Text
-                            color={COLORS.gray}
-                            weight={600}
-                          >
-                            Estado
-                          </Text>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {
-                        homeData.orders.content?.map((order, index) => {
-                          const date = new Date(order.maxShipDate);
-                          const options = {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                            timeZone: "UTC"
-                          }
+                  {
+                    homeData.orders.content.length > 0
+                    ? <Table
+                        css={TableStyle}
+                        hover
+                      >
+                        <thead>
+                          <tr>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Nombre
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Entrega
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Total
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Fecha
+                              </Text>
+                            </th>
+                            <th>
+                              <Text
+                                color={COLORS.gray}
+                                weight={600}
+                              >
+                                Estado
+                              </Text>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {
+                            homeData.orders.content?.map((order, index) => {
+                              const date = new Date(order.date);
+                              const options = {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                                timeZone: "UTC"
+                              }
 
-                          return (
-                            <tr 
-                              key={index}
-                              onClick={() => navigate(`/pedidos/${order.id}`)}
-                            >
-                              <td>
-                                <Text
-                                  size={15}
-                                  style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
-                                  color={COLORS.dim}
+                              return (
+                                <tr 
+                                  key={index}
+                                  onClick={() => navigate(`/pedidos/${order.id}`)}
                                 >
-                                  { order.client?.rsocial.split(" ").slice(0, 3).join(" ").toLowerCase().replaceAll('"', "") }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.dim}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.persian}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  S/. { order.total?.toFixed(1) }
-                                </Text>
-                              </td>
-                              <td>
-                                <Text
-                                  size={15}
-                                  color={COLORS.dim}
-                                  style={{whiteSpace: "nowrap"}}
-                                >
-                                  { date.toLocaleDateString("es-ES", options) }
-                                </Text>
-                              </td>
-                              <td>
-                                <Badge
-                                  color={order.status === "PENDIENTE" ? "warning" : "primary"}
-                                >
-                                  { order.status }
-                                </Badge>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      }
-                    </tbody>
-                  </Table>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      style={{textTransform: "capitalize", whiteSpace: "nowrap"}}
+                                      color={COLORS.dim}
+                                    >
+                                      { order.client?.rsocial.split(" ").slice(0, 3).join(" ").toLowerCase().replaceAll('"', "") }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.dim}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      { order.shippingType === "ENVIO_AGENCIA" ? "Traslado a agencia" : "Recojo en almacén" }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.persian}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      S/. { order.total?.toFixed(1) }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Text
+                                      size={15}
+                                      color={COLORS.dim}
+                                      style={{whiteSpace: "nowrap"}}
+                                    >
+                                      { date.toLocaleDateString("es-ES", options) }
+                                    </Text>
+                                  </td>
+                                  <td>
+                                    <Badge
+                                      color={
+                                        order.status === "PENDIENTE"
+                                        ? "warning"
+                                        : order.status === "PAGADO"
+                                          ? "blue"
+                                          : order.status === "ENVIADO"
+                                            ? "orange"
+                                            : order.status === "ENTREGADO"
+                                              ? "primary"
+                                              : "danger"
+                                      }
+                                    >
+                                      { order.status }
+                                    </Badge>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          }
+                        </tbody>
+                      </Table>
+                    : <FlexColumn
+                        width="100%"
+                        style={{padding: "1rem"}}
+                        align="center"
+                      >
+                        <FaBoxOpen 
+                          size={28}
+                          color={COLORS.persian}
+                        />
+                        <Text
+                          size={18}
+                          weight={700}
+                          color={COLORS.dim}
+                        >
+                          Aún no tienes pedidos
+                        </Text>
+                      </FlexColumn>
+                  }
                   <Button 
-                    style={{alignSelf: "center", marginTop: "1rem"}}
+                    style={{alignSelf: "center", marginTop: homeData.orders.content.length > 0 ? "1rem" : "0"}}
                     color="secondary"
-                    fontSize={16}
+                    fontSize={15}
                     onClick={() => navigate("/pedidos")}
                   >
-                    Ver todos
+                    {
+                      homeData.orders.content.length > 0
+                      ? "Ver todos"
+                      : "Registrar un pedido"
+                    }
                   </Button>
                 </Section>
                 <Group width={25}>

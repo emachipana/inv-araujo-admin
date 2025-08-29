@@ -64,26 +64,6 @@ function DocModal({ isActive, setIsActive, pdfUrl, setInvoice, invoiceId }) {
             Ver en navegador
           </a>
         </Button>
-        <Button
-          color="danger"
-          fontSize={15}
-          iconSize={17}
-          Icon={toDelete || isDeleting ? null : HiDocumentMinus}
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-        >
-          {
-            toDelete
-            ? (isDeleting
-                ? <>
-                    <Spinner size="sm" />
-                    Anulando...
-                  </>
-                : "Haga click nuevamente"
-              )
-            : "Anular"
-          }
-        </Button>
       </FlexRow>
       <Doc>
         {isLoading && (

@@ -17,7 +17,13 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
     if(value.length >= 3) {
       setIsGetting(true);
       const searched = await apiFetch(`${from}/search?param=${value}`);
-      setSearched(searched);
+      if(from === "employees") {
+        const rolesToFilter = ["ADMINISTRADOR"];
+        const employeesFiltered = searched.filter((emp) => !rolesToFilter.includes(emp.role.name));
+        setSearched(employeesFiltered);
+      }else {
+        setSearched(searched);
+      }
       setIsGetting(false);
       return;
     }

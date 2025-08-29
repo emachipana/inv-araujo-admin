@@ -20,7 +20,6 @@ import { FaBasketShopping } from "react-icons/fa6";
 import { HeaderPage, MenuSection } from "../InvitroOrders/styles";
 import DropDown from "../../../components/DropDown";
 import SelectButton from "../../../components/SelectButton";
-import { FaCalendar } from "react-icons/fa";
 import SelectItem from "../../../components/SelectButton/SelectItem";
 import { TbSitemapFilled } from "react-icons/tb";
 import { sortData } from "../InvitroOrders/data";
@@ -28,6 +27,7 @@ import { RiFilterOffFill } from "react-icons/ri";
 import Pagination from "../../../components/Pagination";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
+import { FaSadCry } from "react-icons/fa";
 
 function Orders() {
   const [filters, setFilters] = useState({
@@ -39,7 +39,6 @@ function Orders() {
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
-  const [isRangeDateOpen, setIsRangeDateOpen] = useState(false);
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
   const { orders, isLoading, setIsLoading, loadOrders, setOrders, ordersBackup } = useAdmin();
@@ -83,13 +82,6 @@ function Orders() {
 
     setFilters({...filters, sort: name, page: 0});
     setIsSortOpen(false);
-  }
-
-  const onClickRange = (name) => {
-    if(filters.range === name) return;
-
-    setFilters({...filters, range: name, page: 0});
-    setIsRangeDateOpen(false);
   }
 
   return (
@@ -143,37 +135,6 @@ function Orders() {
             resetFilters={() => setFilters(filters => ({...filters, status: {id: null, name: null}, sort: null, range: null, page: 0 }))}
           />
           <FlexRow gap={1}>
-            <DropDown
-              Button={SelectButton}
-              buttonData={{
-                Icon: FaCalendar,
-                children: `${sortData[filters.range] || "Rango de fechas"}`,
-                isActive: !!filters.range,
-              }}
-              isOpen={isRangeDateOpen}
-              setIsOpen={setIsRangeDateOpen}
-            >
-              <MenuSection>
-                <SelectItem
-                  onClick={() => onClickRange("TODAY")}
-                  isActive={filters.range === "TODAY"}
-                >
-                  Hoy
-                </SelectItem>
-                <SelectItem
-                  onClick={() => onClickRange("TOMORROW")}
-                  isActive={filters.range === "TOMORROW"}
-                >
-                  Mañana
-                </SelectItem>
-                <SelectItem
-                  onClick={() => onClickRange("THIS_MONTH")}
-                  isActive={filters.range === "THIS_MONTH"}
-                >
-                  Este mes
-                </SelectItem>
-              </MenuSection>
-            </DropDown>
             <DropDown
               Button={SelectButton}
               buttonData={{
@@ -236,29 +197,46 @@ function Orders() {
         {
           isLoading || isGetting
           ? <Spinner color="secondary" />
-          : orders.content?.map((order, index) => (
-              <OrderCard
-                key={index}
-                order={order}
-                fullSize={type === "list"}
-              />
-            ))
+          : orders.content?.length <= 0
+            ? <FlexRow
+                style={{margin: "1rem"}}
+              >
+                <FaSadCry />
+                <Text
+                  size={17}
+                  weight={600}
+                >
+                  No se econtraron pedidos
+                </Text>
+              </FlexRow> 
+            : orders.content?.map((order, index) => (
+                <OrderCard
+                  key={index}
+                  order={order}
+                  fullSize={type === "list"}
+                />
+              ))
         }
       </Section>
-      <Pagination 
-        currentPage={orders.number}
-        totalPages={orders.totalPages}
-        // totalPages={200}
-        setFilters={setFilters}
-        isLoading={isLoading || isGetting}
-      />
+      {
+        orders.content?.length > 0
+        &&
+        <Pagination 
+          currentPage={orders.number}
+          totalPages={orders.totalPages}
+          setFilters={setFilters}
+          isLoading={isLoading || isGetting}
+        />
+      }
       <Modal
         align="start"
         size="md"
         isActive={createModal}
         setIsActive={setCreateModal}
       >
-        <OrderForm isToCreate />
+        <OrderForm
+          setIsActive={setCreateModal}
+        />
       </Modal>
     </>
   );

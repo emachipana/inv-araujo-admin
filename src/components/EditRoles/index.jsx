@@ -25,7 +25,7 @@ const getPermissionText = (permissionKey) => {
 };
 
 function EditRoles() {
-  const { roles, addRole, updateRole, deleteRole } = useAdmin();
+  const { roles, addRole, deleteRole } = useAdmin();
   const [currentAction, setCurrentAction] = useState("roles");
 
   return (

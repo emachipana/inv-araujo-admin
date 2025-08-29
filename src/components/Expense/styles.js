@@ -1,11 +1,12 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../styles/layout";
+import { shadowMd, shadowSm } from "../../styles/layout";
 import { COLORS } from "../../styles/colors";
 
 export const Container = styled.div`
   width: 420px;
   background-color: white;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  border: 1px solid ${COLORS.platinium};
   border-radius: 1rem;
   cursor: pointer;
   display: flex;

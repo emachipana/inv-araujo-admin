@@ -56,6 +56,8 @@ function Invoice() {
     timeZone: "UTC"
   }
 
+  console.log(invoice);
+
   const issueDate = new Date(invoice.issueDate);
 
   const handleEditItem = (item) => {
@@ -119,9 +121,9 @@ function Invoice() {
                         color={COLORS.dim}
                       >
                         { 
-                          !invoice.serie
+                          !invoice.isSended
                           ? "No emitido"
-                          : invoice.serie
+                          : `${invoice.serie}-${invoice.id}`
                         }
                       </Text>
                     </FlexColumn>
@@ -185,15 +187,11 @@ function Invoice() {
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Items
+                        Estado
                       </Text>
-                      <Text
-                        weight={600}
-                        size={15}
-                        color={COLORS.dim}
-                      >
-                        { invoice.items?.length }
-                      </Text>
+                      <Badge color={invoice.isSended ? "primary" : "danger"}>
+                        { invoice.isSended ? "Emitido" : "Sin emitir" }
+                      </Badge>
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper>
@@ -215,31 +213,17 @@ function Invoice() {
                         }
                       </Text>
                     </FlexColumn>
-                    <FlexColumn gap={0.3}>
-                      <Text weight={700}>
-                        Comentario
-                      </Text>
-                      <Text
-                        align="start"
-                        weight={600}
-                        size={15}
-                        color={COLORS.dim}
-                      >
-                        { 
-                          !invoice.comment
-                          ? "Nulo"
-                          : invoice.comment
-                        }
-                      </Text>
-                    </FlexColumn>
                   </Wrapper>
-                  <Wrapper isButtons>
+                  <Wrapper 
+                    isButtons
+                    justify="space-around"
+                  >
                     <Button
                       onClick={handleDocClick}
                       disabled={invoice.items?.length <= 0 || isGenerating}
                       Icon={isGenerating ? null : (invoice.isSended ? FaEye : FaFileInvoice)}
-                      fontSize={15}
-                      iconSize={17}
+                      fontSize={14}
+                      iconSize={16}
                       color={invoice.isSended ? "primary" : "secondary"}
                     >
                       { 
@@ -256,26 +240,32 @@ function Invoice() {
                       {" "}
                       { invoice.invoiceType.toLowerCase() }
                     </Button>
-                    <Button
-                      Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
-                      color="warning"
-                      onClick={() => navigate("edit")}
-                      disabled={invoice.isSended}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => setDeleteModal(!deleteModal)}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                      disabled={invoice.isSended}
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      (!invoice.isRelatedToOrder && !invoice.isSended)
+                      &&
+                      <>
+                        <Button
+                          Icon={FaEdit}
+                          fontSize={14}
+                          iconSize={16}
+                          color="warning"
+                          onClick={() => navigate("edit")}
+                          disabled={invoice.isSended}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          onClick={() => setDeleteModal(!deleteModal)}
+                          Icon={FaTrashAlt}
+                          fontSize={14}
+                          iconSize={16}
+                          color="danger"
+                          disabled={invoice.isSended}
+                        >
+                          Eliminar
+                        </Button>
+                      </>
+                    }
                   </Wrapper>
                 </Card>
                 <Card>
@@ -300,11 +290,13 @@ function Invoice() {
                             invoiceId={id}
                             isInvoiceGenerated={invoice.isSended}
                             setInvoice={setInvoice}
+                            isRelatedToProduct={invoice.isRelatedToOrder}
+                            setItems={setInvoiceItems}
                           />
                         ))
                       }
                       {
-                        !invoice.isSended
+                        (!invoice.isSended || invoice.isRelatedToOrder)
                         &&
                         <Button
                           style={{marginTop: "1rem"}}
@@ -335,6 +327,7 @@ function Invoice() {
                 setInvoice={setInvoice}
                 setIsActive={setItemModal}
                 setItem={setItem}
+                setItems={setInvoiceItems}
               />
               <DocModal 
                 setIsActive={setDocModal}

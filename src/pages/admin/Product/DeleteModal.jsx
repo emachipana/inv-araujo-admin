@@ -19,6 +19,7 @@ function DeleteModal({ id, isActive, setIsActive, handleDelete, navTo, title }) 
       await handleDelete(id);
       setIsLoading(false);
       navigate(`/${navTo}`);
+      setIsActive(false);
     }catch(error) {
       toast.error(errorParser(error.message));
       setIsLoading(false);

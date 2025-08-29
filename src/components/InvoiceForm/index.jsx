@@ -21,9 +21,8 @@ function InvoiceForm({ initialValues = {
   rsocial: "",
   document: "",
   issueDate: "",
-  comment: "",
   address: ""
-}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "", isGenerated }) {
+}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "", isGenerated, setIsActive }) {
   const [docType, setDocType] = useState(initDocType);
   const [invoiceType, setInvoiceType] = useState(initInvoiceType);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,9 +32,17 @@ function InvoiceForm({ initialValues = {
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const invoice = isToCreate ? await addInvoice(values) : await updateInvoice(invoiceId, values)
+      const issueDate = new Date(values.issueDate);
+
+      const body = {
+        ...values,
+        issueDate: issueDate.toISOString()
+      }
+
+      const invoice = isToCreate ? await addInvoice(body) : await updateInvoice(invoiceId, body);
       setIsLoading(false);
       navigate(`/comprobantes/${invoice.id}`);
+      if(isToCreate) setIsActive(false);
     }catch(error) {
       setIsLoading(false);
       toast.error(errorParser(error.message));
@@ -163,16 +170,6 @@ function InvoiceForm({ initialValues = {
               onKeyDown={(e) => e.preventDefault()}
             />
           </Group>
-          <Input
-            id="comment"
-            label="Comentario (*opcional)"
-            placeholder="Comentario"
-            error={errors.comment}
-            touched={touched.comment}
-            value={values.comment}
-            handleBlur={handleBlur}
-            handleChange={handleChange}
-          />
           <Button
             type="submit"
             iconSize={18}

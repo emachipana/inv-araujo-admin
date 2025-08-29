@@ -9,11 +9,9 @@ import Products from "./pages/admin/Products";
 import EditProduct from "./pages/admin/Product/Edit";
 import InvitroOrders from "./pages/admin/InvitroOrders";
 import InvitroOrder from "./pages/admin/InvitroOrder";
-import EditVitroOrder from "./pages/admin/InvitroOrder/Edit";
 import Orders from "./pages/admin/Orders";
 import Product from "./pages/admin/Product";
 import Order from "./pages/admin/Order";
-import EditOrder from "./pages/admin/Order/Edit";
 import Invoices from "./pages/admin/Invoices";
 import Invoice from "./pages/admin/Invoice";
 import EditInvoice from "./pages/admin/Invoice/Edit";
@@ -27,12 +25,12 @@ import Profile from "./pages/admin/Profile";
 import NotFound from "./pages/admin/NotFound";
 import Employees from "./pages/admin/Employees";
 import { WebSocketProvider } from "./context/websocket";
-import Warehouses from "./pages/admin/Warehouses";
 import { useAuth } from "./context/auth";
 import { ModalProvider } from "./context/modal";
 import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Employee from "./pages/admin/Employee";
+import Messages from "./pages/admin/Messages";
 
 function AuthenticatedApp() {
   const { user } = useAuth();
@@ -69,17 +67,11 @@ function AuthenticatedApp() {
                   </>
                 }
                 {
-                  user.role.permissions.includes("INVITRO_UPDATE")
-                  &&
-                  <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
-                }
-                {
                   user.role.permissions.includes("ORDERS_WATCH")
                   &&
                   <>
                     <Route path="/pedidos" element={<Orders />} />
                     <Route path="/pedidos/:id" element={<Order />} />
-                    <Route path="/pedidos/:id/edit" element={<EditOrder />} />
                   </>
                 }
                 {
@@ -125,9 +117,9 @@ function AuthenticatedApp() {
                   </>
                 }
                 {
-                  user.role.permissions.includes("WAREHOUSES_WATCH")
+                  user.role.permissions.includes("MESSAGES_WATCH")
                   &&
-                  <Route path="/almacenes" element={<Warehouses />} />
+                  <Route path="/mensajes" element={<Messages />} />
                 }
                 <Route path="*" element={<NotFound navTo="/" />} />
               </Routes>

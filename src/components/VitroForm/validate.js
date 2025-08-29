@@ -22,16 +22,22 @@ export const validate = (values, docType, action) => {
 
     if(!values.rsocial) errors.rsocial = "Este campo es obligatorio";
   
-    if(values.email) {
-      if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email.trim())) errors.email = "El formato es incorrecto";
+    if(!values.email) {
+      errors.email = "Este campo es obligatorio";
+    }else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email.trim())) {
+      errors.email = "El formato es incorrecto";
     }
   }
+
+  if(!values.quantity) {
+    errors.quantity = "Este campo es obligatorio";
+  }else if(isNaN(values.quantity * 1)) {
+    errors.quantity = "Solo se aceptan números";
+  }else if(values.quantity < 500) {
+    errors.quantity = "El mínimo es 500";
+  }
   
-  if(!values.department) errors.department = "Este campo es obligatorio";
-  if(!values.city) errors.city = "Este campo es obligatorio";
-  if(!values.initDate) errors.initDate = "Este campo es obligatorio";
-  if(!values.shippingType) errors.shippingType = "Este campo es obligatorio";
-  if(!values.warehouseId) errors.warehouseId = "Este campo es obligatorio";
+  if(!values.finishDate) errors.finishDate = "Este campo es obligatorio";
 
   return errors;
 }

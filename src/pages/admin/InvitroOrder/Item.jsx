@@ -11,7 +11,7 @@ import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/auth";
 
-function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated, setOrderItems }) {
+function Item({ item, vitroId, setVitro, handleEdit, setOrderItems, isAbleToEdit }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { deleteItem } = useAdmin();
   const { user } = useAuth();
@@ -96,7 +96,7 @@ function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGener
         </FlexColumn>
       </Wrapper>
       {
-        (orderStatus === "PENDIENTE" && !isInvoiceGenerated)
+        isAbleToEdit
         &&
         <FlexRow gap={1}>
           {

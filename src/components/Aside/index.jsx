@@ -4,11 +4,12 @@ import { BackDrop, Container } from "./styles";
 import { FaClipboardList } from "react-icons/fa";
 import { PiPottedPlantFill } from "react-icons/pi";
 import { GiShoppingBag, GiWallet } from "react-icons/gi";
-import { FaUserGroup, FaMoneyBillTransfer, FaWarehouse } from "react-icons/fa6";
+import { FaUserGroup, FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdDiscount } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 import { BsFillPersonBadgeFill } from "react-icons/bs";
 import { useAuth } from "../../context/auth";
+import { BiSolidMessageRoundedDetail } from "react-icons/bi";
 
 function Aside({ isOpen, setIsOpen }) {
   const { user } = useAuth();
@@ -62,6 +63,18 @@ function Aside({ isOpen, setIsOpen }) {
             isActive={pathname.includes("pedidos")}
           >
             Pedidos
+          </NavItem>
+        }
+        {
+          user.role.permissions.includes("MESSAGES_WATCH")
+          &&
+          <NavItem
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            redirectTo="/mensajes"
+            Icon={BiSolidMessageRoundedDetail}
+          >
+            Mensajes
           </NavItem>
         }
         {
@@ -125,18 +138,6 @@ function Aside({ isOpen, setIsOpen }) {
             Icon={BsFillPersonBadgeFill}
           >
             Empleados
-          </NavItem>
-        }
-        {
-          user.role.permissions.includes("WAREHOUSES_WATCH")
-          &&
-          <NavItem
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
-            redirectTo="/almacenes"
-            Icon={FaWarehouse}
-          >
-            Almacenes
           </NavItem>
         }
       </Container>

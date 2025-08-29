@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { shadowMd, shadowSm } from "../../styles/layout";
+import { shadowMd } from "../../styles/layout";
+import { COLORS } from "../../styles/colors";
 
 export const Container = styled.div`
   width: 100%;
@@ -52,7 +53,9 @@ export const Form = styled.form`
   border-radius: 1rem;
   gap: 1rem;
   padding: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  background-color: white;
+  border: 1px solid ${COLORS.platinium};
 
   @media screen and (max-width: 550px) {
     width: 80%;

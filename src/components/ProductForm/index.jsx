@@ -122,12 +122,12 @@ function ProductForm({ initialValues = {
             <Select
               id="unit"
               label="Unidad de medida"
-              error={errors.categoryId}
-              touched={touched.categoryId}
+              error={errors.unit}
+              touched={touched.unit}
               handleBlur={handleBlur}
               handleChange={handleChange}
               options={unitOptions}
-              value={values.categoryId}
+              value={values.unit}
             />
           </Group>
           <Group>

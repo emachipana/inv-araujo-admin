@@ -9,40 +9,32 @@ import { FlexRow, Form } from "../../../styles/layout";
 import { Group } from "../../../components/ProductForm/styles";
 import { Spinner } from "reactstrap";
 import { TiCancel } from "react-icons/ti";
-import { formatDate } from "../../../components/VitroForm/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/auth";
+import Select from "../../../components/Input/Select";
 
-function AdvanceForm({
-  initialValues = {
-    date: "",
-    amount: ""
-  },
-  isToCreate = true,
-  setIsActive,
-  id,
-  setVitroOrder,
-  vitroOrderId,
-  total, 
-  currentAdvance,
-  setAdvances,
-}) {
+function AdvanceForm({ setIsActive, setVitroOrder, vitroOrderId, total, setAdvances }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { addAdvance, editAdvance } = useAdmin();
+  const { addAdvance } = useAdmin();
   const { user } = useAuth();
+
+  const initialValues = {
+    paymentType: ""
+  }
 
   const onSubmit = async (values) => {
     try {
       const body = {
         ...values,
         vitroOrderId,
+        amount: total / 2,
         employeeId: user.employeeId,
       }
 
       setIsLoading(true);
-      const {advance, updatedVitroOrder} = isToCreate ? await addAdvance(body) : await editAdvance(id, body, setAdvances);
-      if(isToCreate) setAdvances((advances) => [advance, ...advances]);
+      const {advance, updatedVitroOrder} = await addAdvance(body);
+      setAdvances((advances) => [advance, ...advances]);
       setVitroOrder(updatedVitroOrder);
       setIsActive(false);
       setIsLoading(false);
@@ -52,12 +44,20 @@ function AdvanceForm({
     }
   }
 
-  const today = new Date();
-  today.setHours(12);
+  const paymentOptions = [
+    {
+      id: "TRANSFERENCIA",
+      content: "Transferencia bancaria"
+    },
+    {
+      id: "YAPE",
+      content: "Yape"
+    }
+  ];
 
   return (
     <Formik
-      validate={(values) => advanceValidate(values, total, currentAdvance)}
+      validate={advanceValidate}
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
@@ -72,28 +72,28 @@ function AdvanceForm({
       }) => (
         <Form onSubmit={handleSubmit}>
           <Group>
-            <Input 
-              id="date"
-              label="Fecha"
-              type="date"
-              max={formatDate(today)}
-              fontSize={15}
-              labelSize={16}
-              value={values.date}
-              error={errors.date}
-              touched={touched.date}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
-            <Input 
+            <Input
+              disabled={true}
               id="amount"
-              label="Monto"
+              label="Monto (50%)"
               placeholder="S/. 0.0"
               fontSize={15}
               labelSize={16}            
-              value={values.amount}
+              value={total / 2}
               error={errors.amount}
               touched={touched.amount}
+              handleBlur={handleBlur}
+              handleChange={handleChange}
+            />
+            <Select
+              id="paymentType"
+              label="Tipo de pago"
+              fontSize={15}
+              labelSize={16}
+              value={values.paymentType}
+              options={paymentOptions}
+              error={errors.paymentType}
+              touched={touched.paymentType}
               handleBlur={handleBlur}
               handleChange={handleChange}
             />
@@ -121,13 +121,9 @@ function AdvanceForm({
                 isLoading
                 ? <>
                     <Spinner size="sm" />
-                    {
-                      isToCreate
-                      ? "Registrando..."
-                      : "Editando..."
-                    }
+                    Registrando...
                   </>
-                : (isToCreate ? "Registrar": "Editar")
+                : "Registrar"
               }
             </Button>
           </FlexRow>

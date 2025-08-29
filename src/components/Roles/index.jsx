@@ -1,16 +1,10 @@
-import { FaRegEdit } from "react-icons/fa";
 import { Container } from "../Categories/styles";
-import NewCategory from "../Category/New";
 import Category from "../Category";
-import Modal from "../Modal";
-import { useState } from "react";
 import { useAdmin } from "../../context/admin";
 import { Spinner } from "reactstrap";
 import { capitalize } from "../../helpers/capitalize";
-import EditRoles from "../EditRoles";
 
 function Roles({ isBlocked, currentRole, setFilters }) {
-  const [editModal, setEditModal] = useState(false);
   const { roles, isLoading } = useAdmin();
 
   const setCurrentRole = (id, name) => {
@@ -25,13 +19,6 @@ function Roles({ isBlocked, currentRole, setFilters }) {
         isLoading
         ? <Spinner color="secondary" />
         : <>
-            <NewCategory
-              isBlocked={isBlocked}
-              Icon={FaRegEdit}
-              onClick={() => setEditModal(true)}
-            >
-              Editar roles
-            </NewCategory>
             <Category 
               isBlocked={isBlocked}
               name="Todo"
@@ -52,15 +39,6 @@ function Roles({ isBlocked, currentRole, setFilters }) {
             }
           </>
       }
-      <Modal
-        align="flex-start"
-        isActive={editModal}
-        setIsActive={setEditModal}
-        size="lg"
-        padding="1rem"
-      >
-        <EditRoles />
-      </Modal>
     </Container>
   );
 }

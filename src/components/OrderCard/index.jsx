@@ -4,22 +4,20 @@ import Badge from "../Badge";
 import { Bottom, Container, RowBetween, Text } from "./styles";
 import Header from "./Header";
 import { FaMapMarkerAlt, FaAddressCard, FaMapMarkedAlt } from "react-icons/fa";
-import { FaBuildingWheat, FaMoneyBills, FaRegCalendarCheck, FaRegCalendarDays } from "react-icons/fa6";
+import { FaBuildingWheat, FaCalendarCheck, FaMoneyBills, FaRegCalendarDays, FaSourcetree } from "react-icons/fa6";
 import { MdLocalShipping } from "react-icons/md";
 import { COLORS } from "../../styles/colors";
 import { options } from "./util";
 import { BsFillPersonVcardFill } from "react-icons/bs";
 import { PiInvoiceFill } from "react-icons/pi";
 import { IoDocumentText } from "react-icons/io5";
-import { FaShippingFast } from "react-icons/fa";
 
-function OrderCard({ order, fullSize = false, isInvoice = false }) {
-  const { id, date, initDate, city, department, total, client, maxShipDate, finishDate, shippingType, status, paymentType, serie, address, isSended } = order;
+function OrderCard({ order, fullSize = false, isInvoice = false, isVitro = false }) {
+  const { id, date, city, department, total, initDate, client, finishDate, shippingType, status, paymentType, serie, address, isSended } = order;
   const { rsocial, document, documentType } = client;
   const destination = [city, department];
-  const deliverDate = new Date(maxShipDate || finishDate);
   const initDateParsed = new Date(date || initDate);
-  const isVitro = !!initDate;
+  const finishDateParsed = new Date(finishDate);
 
   const navigate = useNavigate();
 
@@ -27,15 +25,15 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
     "PENDIENTE": "warning",
     "CANCELADO": "danger",
     "ENTREGADO": "primary",
-    "PAGADO": "orange",
+    "PAGADO": "blue",
     "BOLETA": "blue",
     "FACTURA": "orange"
   }
 
   const paymentMessage = {
     "EFECTIVO": "Pagado en efectivo",
-    "TARJETA_ONLINE": "Pagado en la web",
-    "YAPE": "Pagado por Yape",
+    "TARJETA_ONLINE": "Pagado con tarjeta",
+    "YAPE": "Pagado con Yape",
     "TRANSFERENCIA": "Transferencia bancaria",
   }
 
@@ -88,7 +86,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                 <Badge
                   color={badgeColor[status] || "secondary"}
                 >
-                  { status }
+                  { status === "PENDIENTE" && isVitro ? "EN PRODUCCIÓN" : status }
                 </Badge>
               </FlexRow>
               <FlexColumn 
@@ -109,9 +107,13 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                   {
                     isInvoice
                     ? "Contado"
-                    : status === "PAGADO"
-                      ? paymentMessage[paymentType]
-                      : "Sin pagar"
+                    : (
+                        isVitro
+                        ? (order.createdBy === "CLIENTE" ? "Tienda online" : "Plataforma (manual)")
+                        : order.paymentType
+                          ? paymentMessage[paymentType]
+                          : "Sin pagar"
+                      )
                   }
                 </Text>
               </FlexColumn>
@@ -135,14 +137,18 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     {
                       isInvoice
                       ? documentType
-                      : "Entrega"
+                      : "Destino"
                     }
                   </Text>
                 </FlexRow>
                 <Text
                   weight={700}
                 >
-                  { isInvoice ? document : destination.join(", ") }
+                  { 
+                    isInvoice 
+                    ? document 
+                    : !destination[0] ? "Por asignar" : destination.join(", ") 
+                  }
                 </Text>
               </FlexColumn>
               <FlexColumn align="center">
@@ -153,11 +159,12 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                   <Text
                     color={COLORS.taupe}
                     weight={600}
+                    notCapitalize
                   >
                     {
                       isInvoice
                       ? "Fecha emisión"
-                      : "Fecha pedido"
+                      : "Fecha de pedido"
                     }
                   </Text>
                 </FlexRow>
@@ -174,18 +181,19 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     ? <FaMapMarkedAlt
                         color={COLORS.taupe}
                       />
-                    : <FaRegCalendarCheck
-                        color={COLORS.taupe}
-                      />
+                    : isVitro 
+                      ? <FaCalendarCheck color={COLORS.taupe} />
+                      : <FaSourcetree color={COLORS.taupe} />
                   }
                   <Text
                     color={COLORS.taupe}
                     weight={600}
+                    notCapitalize
                   >
                     {
                       isInvoice
                       ? "Dirección"
-                      : "Fecha entrega"
+                      : isVitro ? "Fecha de entrega" : "Origen de pedido"
                     }
                   </Text>
                 </FlexRow>
@@ -195,9 +203,9 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                   {
                     isInvoice
                     ? address
-                    : isVitro && !finishDate
+                    : (isVitro && !finishDate)
                       ? "Por asignar"
-                      : deliverDate.toLocaleDateString("es-ES", options)
+                      : isVitro ? finishDateParsed.toLocaleDateString("es-ES", options) : order.createdBy === "CLIENTE" ? "Tienda online" : "Plataforma (manual)"
                   }
                 </Text>
               </FlexColumn>
@@ -215,11 +223,12 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                   <Text
                     color={COLORS.taupe}
                     weight={600}
+                    notCapitalize
                   >
                     {
                       isInvoice
                       ? "Estado"
-                      : "Tipo entrega"
+                      : "Tipo de entrega"
                     }
                   </Text>
                 </FlexRow>
@@ -241,9 +250,11 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                             />
                           }
                           {
-                            shippingType === "RECOJO_ALMACEN"
-                              ? "Recojo en almacén"
-                              : "Envío por agencia"
+                            !shippingType
+                              ? "Por asignar"
+                              : shippingType === "RECOJO_ALMACEN"
+                                ? "Recojo en almacén"
+                                : "Envío por agencia"
                           }
                       </>
                     }
@@ -255,7 +266,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
         : <>
             <Header
               name={ rsocial.replaceAll('"', "")}
-              date={date}
+              date={isVitro ? finishDate : date}
               isVitro={isVitro}
               isInvoice={isInvoice}
             />
@@ -271,7 +282,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                     ? <BsFillPersonVcardFill 
                         color={COLORS.taupe}
                       />
-                    : <FaShippingFast 
+                    : <FaMapMarkedAlt 
                         color={COLORS.taupe}
                       />
                   }
@@ -296,7 +307,7 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                   : <Badge
                       color={isInvoice ? (isSended ? "primary" : "danger") : shippingType === "RECOJO_ALMACEN" ? "purple" : "blue"}
                     >
-                      {shippingType === "RECOJO_ALMACEN" ? "Recojo en almacén" : "Envío por agencia"}
+                      {!shippingType ? "Por asignar" : (shippingType === "RECOJO_ALMACEN" ? "Recojo almacén" : "Envío agencia")}
                     </Badge>
                 }
               </FlexColumn>
@@ -332,9 +343,17 @@ function OrderCard({ order, fullSize = false, isInvoice = false }) {
                 }
               </Text>
               <Badge
-                color={badgeColor[status] || "secondary"}
+                color={
+                  (isVitro && order.isReady && order.status !== "ENTREGADO" && order.location !== "AGENCIA")
+                    ? "blue"
+                    : badgeColor[status] || "secondary"
+                }
               >
-                { status }
+                {
+                  isVitro && order.isReady && order.status !== "ENTREGADO" && order.location !== "AGENCIA"
+                    ? "TERMINADO"
+                    : (isVitro && status === "PENDIENTE" && order.totalAdvance > 0) ? "EN PRODUCCIÓN" : status
+                }
               </Badge>
             </Bottom>   
           </>

@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { errorParser } from "../../helpers/errorParser";
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { MdCancel } from "react-icons/md";
 
 function NotificationItem({ notification }) {
   const { id, type, message, isRead, redirectTo, createdAt } = notification;
@@ -55,6 +56,10 @@ function NotificationItem({ notification }) {
       icon: FaMessage,
       color: COLORS.persian,
     },
+    CANCEL_ORDER_REQUEST: {
+      icon: MdCancel,
+      color: COLORS.red,
+    }
   }
 
   const Icon = data[type].icon;

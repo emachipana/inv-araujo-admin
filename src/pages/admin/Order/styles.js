@@ -1,6 +1,6 @@
 import styled from "@emotion/styled";
 import { COLORS } from "../../../styles/colors";
-import { FlexColumn, FlexRow, shadowMd, shadowSm } from "../../../styles/layout";
+import { FlexColumn, shadowMd } from "../../../styles/layout";
 
 export const Products = styled.div`
   width: 100%;
