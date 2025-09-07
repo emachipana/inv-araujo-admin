@@ -83,7 +83,10 @@ function Banners() {
         isActive={modalCreate}
         setIsActive={setModalCreate}
       >
-        <BannerForm isToCreate />
+        <BannerForm 
+          isToCreate
+          setIsActive={setModalCreate}
+        />
       </Modal>
     </>
   );

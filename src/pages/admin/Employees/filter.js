@@ -1,4 +1,4 @@
-export const filterBuilder = (filters = { role: { id: null }, sort: null, page: 0 }) => {
+export const filterBuilder = (filters = { role: { id: null, name: null }, sort: null, page: 0 }) => {
   let filter = "";
 
   if(filters.role.id) filter += `?roleId=${filters.role.id}`;

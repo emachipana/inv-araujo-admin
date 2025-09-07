@@ -19,6 +19,7 @@ function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clie
   const [isLoading, setIsLoading] = useState(false);
   const [invoicePreference, setInvoicePreference] = useState(invoiceDetail.invoicePreference);
   const [docType, setDocType] = useState(invoiceDetail.documentType);
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const navigate = useNavigate();
 
   const initialValues = {
@@ -124,7 +125,7 @@ function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clie
               touched={touched.documentType}
               value={values.documentType}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
               options={[
                 {
                   id: "DNI",
@@ -146,10 +147,9 @@ function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clie
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
             />
             <Input
-              disabled={!isAbleToEdit || !docType}
               id="rsocial"
               label="Razón social"
               placeholder="Razón social"
@@ -158,9 +158,9 @@ function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clie
               value={values.rsocial}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded || !isAbleToEdit}
             />
             <Input
-              disabled={!isAbleToEdit || !docType}
               id="address"
               label="Dirección"
               placeholder="Dirección"
@@ -169,6 +169,7 @@ function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clie
               value={values.address}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={(isDocLoaded && invoicePreference === "FACTURA") || !isAbleToEdit}
             />
             <Button
               type="submit"

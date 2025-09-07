@@ -256,7 +256,10 @@ function Products() {
         isActive={productsModal}
         setIsActive={setProductsModal}
       >
-        <ProductForm isToCreate />
+        <ProductForm 
+          isToCreate
+          setIsActive={setProductsModal}
+        />
       </Modal>
       {
         productsBatchModal

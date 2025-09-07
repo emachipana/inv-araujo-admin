@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 import { BsFillPersonBadgeFill } from "react-icons/bs";
 import { useAuth } from "../../context/auth";
 import { BiSolidMessageRoundedDetail } from "react-icons/bi";
+import { RiRobot3Fill } from "react-icons/ri";
 
 function Aside({ isOpen, setIsOpen }) {
   const { user } = useAuth();
@@ -63,6 +64,16 @@ function Aside({ isOpen, setIsOpen }) {
             isActive={pathname.includes("pedidos")}
           >
             Pedidos
+          </NavItem>
+        }
+        {
+          <NavItem
+            isOpen={isOpen}
+            setIsOpen={setIsOpen}
+            redirectTo="/asistente"
+            Icon={RiRobot3Fill}
+          >
+            Asistente virtual
           </NavItem>
         }
         {
@@ -124,6 +135,7 @@ function Aside({ isOpen, setIsOpen }) {
             setIsOpen={setIsOpen}
             redirectTo="/clientes"
             Icon={FaUserGroup}
+            isActive={pathname.includes("clientes")}
           >
             Clientes
           </NavItem>
@@ -136,6 +148,7 @@ function Aside({ isOpen, setIsOpen }) {
             setIsOpen={setIsOpen}
             redirectTo="/empleados"
             Icon={BsFillPersonBadgeFill}
+            isActive={pathname.includes("empleados")}
           >
             Empleados
           </NavItem>

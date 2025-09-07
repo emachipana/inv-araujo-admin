@@ -31,6 +31,10 @@ import { PrimeReactProvider } from "primereact/api";
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Employee from "./pages/admin/Employee";
 import Messages from "./pages/admin/Messages";
+import VirtualAssistant from "./pages/admin/Assistant";
+import Client from "./pages/admin/Client";
+import EditClient from "./pages/admin/Client/Edit";
+import EditEmployee from "./pages/admin/Employee/Edit";
 
 function AuthenticatedApp() {
   const { user } = useAuth();
@@ -42,7 +46,7 @@ function AuthenticatedApp() {
         <ModalProvider>
           <PrimeReactProvider>
             <AdminNavbar setIsOpen={setIsOpen} />
-            <Aside 
+            <Aside
               isOpen={isOpen}
               setIsOpen={setIsOpen}
             />
@@ -105,7 +109,11 @@ function AuthenticatedApp() {
                 {
                   user.role.permissions.includes("CLIENTS_WATCH")
                   &&
-                  <Route path="/clientes" element={<Clients />} />
+                  <>
+                    <Route path="/clientes" element={<Clients />} />
+                    <Route path="/clientes/:id" element={<Client />} />
+                    <Route path="/clientes/:id/edit" element={<EditClient />} />
+                  </>
                 }
                 <Route path="/perfil" element={<Profile />} />
                 {
@@ -114,6 +122,7 @@ function AuthenticatedApp() {
                   <>
                     <Route path="/empleados" element={<Employees />} />
                     <Route path="/empleados/:id" element={<Employee />} />
+                    <Route path="/empleados/:id/edit" element={<EditEmployee />} />
                   </>
                 }
                 {
@@ -121,6 +130,7 @@ function AuthenticatedApp() {
                   &&
                   <Route path="/mensajes" element={<Messages />} />
                 }
+                <Route path="/asistente" element={<VirtualAssistant />} />
                 <Route path="*" element={<NotFound navTo="/" />} />
               </Routes>
             </Section>

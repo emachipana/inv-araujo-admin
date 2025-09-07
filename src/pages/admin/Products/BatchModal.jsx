@@ -68,6 +68,7 @@ function BatchModal({isActive, setIsActive}) {
       await newBatch(body);
       setIsSaving(false);
       navigate(`/productos/${productId}`);
+      onClose();
     }catch(e) {
       setIsSaving(false);
       toast.error(e.message);

@@ -12,11 +12,13 @@ import { COLORS } from "../../styles/colors";
 import { IoDocumentText } from "react-icons/io5";
 import Badge from "../Badge";
 import { FaUser } from "react-icons/fa6";
+import { useNavigate } from "react-router-dom";
 
 function ClientCard({ client, fullSize }) {
   const [user, setUser] = useState({});
   const [isGetting, setIsGetting] = useState(false);
-  const { userId, rsocial, documentType, document, consumption, phone, email, invoiceDetail, createdBy } = client;
+  const { id, userId, rsocial, documentType, document, consumption, phone, email, invoiceDetail, createdBy } = client;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
@@ -38,6 +40,7 @@ function ClientCard({ client, fullSize }) {
   return (
     <Container
       fullSize={fullSize}
+      onClick={() => navigate(`/clientes/${id}`)}
     >
       {
         fullSize

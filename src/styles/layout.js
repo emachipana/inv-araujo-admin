@@ -54,7 +54,7 @@ export const Section = styled.section`
   align-items: flex-start;
   justify-content: flex-start;
   gap: 1rem;
-  padding-bottom: 3rem;
+  // padding-bottom: 3rem;
   overflow: auto;
   position: relative;
 `;

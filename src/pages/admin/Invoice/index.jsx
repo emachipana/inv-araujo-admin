@@ -282,7 +282,16 @@ function Invoice() {
                       gap={1}
                     >
                       {
-                        invoiceItems?.map((item, index) => (
+                        invoiceItems?.length <= 0
+                        ? <Text
+                            align="center"
+                            weight={600}
+                            size={15}
+                            color={COLORS.dim}
+                          >
+                            Aún no hay items
+                          </Text>
+                        : invoiceItems?.map((item, index) => (
                           <Item
                             key={index}
                             item={item}
@@ -296,7 +305,7 @@ function Invoice() {
                         ))
                       }
                       {
-                        (!invoice.isSended || invoice.isRelatedToOrder)
+                        (!invoice.isRelatedToOrder && !invoice.isSended)
                         &&
                         <Button
                           style={{marginTop: "1rem"}}

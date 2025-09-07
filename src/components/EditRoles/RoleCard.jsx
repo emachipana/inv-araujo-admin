@@ -23,7 +23,7 @@ function RoleCard({category, permissions, selectedPermissions, setSelectedPermis
         <Checkbox
           id={`perm-${parentKey}`}
           checked={parentChecked || parentIndeterminate}
-          label={`${category.charAt(0).toUpperCase() + category.slice(1)}`}
+          label={`${category?.charAt(0).toUpperCase() + category?.slice(1)}`}
           style={{ fontWeight: 600 }}
           onClick={handleClick}
         />

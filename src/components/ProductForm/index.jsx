@@ -24,7 +24,7 @@ function ProductForm({ initialValues = {
   purchasePrice: "",
   unit: "",
   isActive: true
-}, isToCreate, productId }) {
+}, isToCreate, productId, setIsActive }) {
   const [isLoading, setIsLoading] = useState(false);
   const { categories, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
@@ -37,6 +37,7 @@ function ProductForm({ initialValues = {
       const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
       navigate(`/productos/${product.id}`);
+      setIsActive(false);
     }catch(error) {
       setIsLoading(false);
       toast.error(errorParser(error.message));

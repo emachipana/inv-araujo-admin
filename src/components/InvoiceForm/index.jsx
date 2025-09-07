@@ -27,6 +27,7 @@ function InvoiceForm({ initialValues = {
   const [invoiceType, setInvoiceType] = useState(initInvoiceType);
   const [isLoading, setIsLoading] = useState(false);
   const { addInvoice, updateInvoice } = useAdmin();
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -52,6 +53,10 @@ function InvoiceForm({ initialValues = {
   const onInvoiceChange = (event, setFieldValue) => {
     const value = event.target.value;
     setFieldValue("invoiceType", value);
+    setFieldValue("document", "");
+    setFieldValue("rsocial", "");
+    setFieldValue("address", "");
+    setIsDocLoaded(false);
     setInvoiceType(value);
   }
 
@@ -106,7 +111,7 @@ function InvoiceForm({ initialValues = {
               touched={touched.documentType}
               value={values.documentType}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
               options={[
                 {
                   id: "DNI",
@@ -130,10 +135,9 @@ function InvoiceForm({ initialValues = {
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
             />
             <Input
-              disabled={invoiceType === "FACTURA"}
               id="rsocial"
               label="Razón social"
               placeholder="Razón social"
@@ -142,11 +146,11 @@ function InvoiceForm({ initialValues = {
               value={values.rsocial}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded}
             />
           </Group>
           <Group>
             <Input
-              disabled={invoiceType === "FACTURA" || !invoiceType}
               id="address"
               label="Dirección"
               placeholder="Dirección"
@@ -155,6 +159,7 @@ function InvoiceForm({ initialValues = {
               value={values.address}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded && invoiceType === "FACTURA"}
             />
             <Input
               id="issueDate"

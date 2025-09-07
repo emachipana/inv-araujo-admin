@@ -293,7 +293,7 @@ function InvitroOrders() {
         isActive={vitroModal}
         setIsActive={setVitroModal}
       >
-        <VitroForm 
+        <VitroForm
           setIsActive={setVitroModal}
         />
       </Modal>

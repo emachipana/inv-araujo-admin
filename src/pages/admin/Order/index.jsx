@@ -290,7 +290,7 @@ function Order() {
                       </Button>
                     }
                     {
-                      ((order.status === "PENDIENTE" && order.createdBy !== "CLIENTE") || order.status === "CANCELADO")
+                      ((order.status === "PENDIENTE" && order.createdBy !== "CLIENTE" && orderItems.length <= 0))
                       &&
                       <Button
                         onClick={() => setDeleteModal(!deleteModal)}
@@ -319,7 +319,9 @@ function Order() {
                       gap={1}
                     >
                       {
-                        orderItems.map((item, index) => (
+                        orderItems.length <= 0
+                        ? <Text>Aún no hay productos</Text>
+                        : orderItems.map((item, index) => (
                           <Item
                             key={index}
                             handleEdit={handleEdit}

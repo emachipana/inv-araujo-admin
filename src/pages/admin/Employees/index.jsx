@@ -15,16 +15,11 @@ import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Button from "../../../components/Button";
 import { IoIosPersonAdd } from "react-icons/io";
-import { HeaderPage, MenuSection } from "../InvitroOrders/styles";
-import DropDown from "../../../components/DropDown";
-import SelectButton from "../../../components/SelectButton";
-import { TbSitemapFilled } from "react-icons/tb";
-import SelectItem from "../../../components/SelectButton/SelectItem";
+import { HeaderPage } from "../InvitroOrders/styles";
 import { filterBuilder } from "./filter";
 import apiFetch from "../../../services/apiFetch";
 import { useModal } from "../../../context/modal";
 import { useAuth } from "../../../context/auth";
-import Roles from "../../../components/Roles";
 import { FaSadCry } from "react-icons/fa";
 
 function Employees() {
@@ -36,10 +31,11 @@ function Employees() {
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false); 
   const [type, setType] = useState(localStorage.getItem("employeesType") || "group");
-  const [isSortOpen, setIsSortOpen] = useState(false);
   const { employees, isLoading, setIsLoading, loadEmployees, setEmployees, employeesBackup } = useAdmin();
   const { employeesModal: createModal, setEmployeesModal: setCreateModal } = useModal();
   const { user } = useAuth();
+
+  console.log(employees);
 
   useEffect(() => {
     const fetch = async () => {
@@ -102,60 +98,18 @@ function Employees() {
         }
       </FlexRow>
       <HeaderPage>
-        <Roles 
-          isBlocked={isSearching}
-          currentRole={filters.role?.name}
-          setFilters={setFilters}
+        <Filter 
+          localStorageKey="employeesType"
+          setType={setType}
+          type={type}
+          isSearching={isSearching}
+          labelSearch="Buscar empleado..."
+          onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setEmployees, "employees", employeesBackup, setIsSearching)}
+          searchValue={search}
+          setIsSearching={setIsSearching}
+          resetFilters={() => setFilters(filters => ({...filters, sort: null }))}
+          reset={() => setSearch("")}
         />
-        <FlexRow
-          width="100%"
-          justify="space-between"
-        >
-          <Filter 
-            localStorageKey="employeesType"
-            setType={setType}
-            type={type}
-            isSearching={isSearching}
-            labelSearch="Buscar empleado..."
-            onSearchChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setEmployees, "employees", employeesBackup, setIsSearching)}
-            searchValue={search}
-            setIsSearching={setIsSearching}
-            resetFilters={() => setFilters(filters => ({...filters, sort: null }))}
-            reset={() => setSearch("")}
-          />
-          <DropDown
-            Button={SelectButton}
-            buttonData={{
-              Icon: TbSitemapFilled,
-              children: "Ordernar por",
-            }}
-            isOpen={isSortOpen}
-            setIsOpen={setIsSortOpen}
-          >
-            <MenuSection>
-              <SelectItem
-                minWidth={195}
-              >
-                Reciente a antiguo
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-              >
-                Antiguo a reciente
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-              >
-                Mayor consumo a menor
-              </SelectItem>
-              <SelectItem
-                minWidth={195}
-              >
-                Menor consumo a mayor
-              </SelectItem>
-            </MenuSection>
-          </DropDown>
-        </FlexRow>
       </HeaderPage>
       <Section>
         {

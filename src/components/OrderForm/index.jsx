@@ -34,6 +34,7 @@ function OrderForm({ setIsActive }) {
   const [shippingType, setShippingType] = useState(null);
   const [pickupHours, setPickupHours] = useState([]);
   const [isLoadingHours, setIsLoadingHours] = useState(false);
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const { addOrder, loadClients, addClient, isLoading: isClientsLoading, clientsBackup, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
 
@@ -237,7 +238,7 @@ function OrderForm({ setIsActive }) {
                     touched={touched.documentType}
                     value={values.documentType}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
                     options={[
                       {
                         id: "DNI",
@@ -259,7 +260,7 @@ function OrderForm({ setIsActive }) {
                     touched={touched.document}
                     value={values.document}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocChange(e, setFieldValue, docType)}
+                    handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
                   />
                 </Group>
                 <Input
@@ -272,6 +273,7 @@ function OrderForm({ setIsActive }) {
                   value={values.rsocial}
                   handleBlur={handleBlur}
                   handleChange={handleChange}
+                  disabled={isDocLoaded}
                 />
                 <Group>
                   <Input

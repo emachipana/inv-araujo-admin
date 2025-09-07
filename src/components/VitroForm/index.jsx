@@ -31,6 +31,7 @@ function VitroForm({ setIsActive }) {
   const [minDate, setMinDate] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [isCheckingDate, setIsCheckingDate] = useState(false);
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const { addVitro, clientsBackup, addClient, loadClients, isLoading: isClientsLoading, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
 
@@ -192,7 +193,7 @@ function VitroForm({ setIsActive }) {
                     touched={touched.documentType}
                     value={values.documentType}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
                     options={[
                       {
                         id: "DNI",
@@ -214,7 +215,7 @@ function VitroForm({ setIsActive }) {
                     touched={touched.document}
                     value={values.document}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocChange(e, setFieldValue, docType)}
+                    handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
                   />
                 </Group>
                 <Input
@@ -227,6 +228,7 @@ function VitroForm({ setIsActive }) {
                   value={values.rsocial}
                   handleBlur={handleBlur}
                   handleChange={handleChange}
+                  disabled={isDocLoaded}
                 />
                 <Group>
                   <Input

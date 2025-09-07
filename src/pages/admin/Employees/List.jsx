@@ -59,15 +59,6 @@ function List() {
               Cargo
             </Text>
           </th>
-          <th>
-            <Text
-              weight={600}
-              color={COLORS.gray}
-              style={{whiteSpace: "nowrap"}}
-            >
-              Operaciones
-            </Text>
-          </th>
         </tr>
       </thead>
       <tbody>
@@ -128,16 +119,7 @@ function List() {
                   weight={500}
                   color={COLORS.dim}
                 >
-                  { capitalize(employee.role.name.toLowerCase()) }
-                </Text>
-              </td>
-              <td>
-                <Text
-                  size={15}
-                  weight={500}
-                  color={COLORS.dim}
-                >
-                  { 0 }
+                  { capitalize(employee?.role?.name?.toLowerCase()) }
                 </Text>
               </td>
             </tr>

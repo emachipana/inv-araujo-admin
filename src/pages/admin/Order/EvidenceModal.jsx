@@ -56,7 +56,7 @@ function EvidenceModal({isActive, setIsActive, order}) {
                     color={COLORS.dim}
                     weight={700}
                   >
-                    {order.receiverInfo?.trackingCode}
+                    {order.receiverInfo?.trackingCode || "Sin especificar"}
                   </Text>
                 </FlexColumn>
                 <FlexColumn
@@ -74,7 +74,7 @@ function EvidenceModal({isActive, setIsActive, order}) {
                     color={COLORS.dim}
                     weight={700}
                   >
-                    {order.receiverInfo?.code}
+                    {order.receiverInfo?.code || "Sin especificar"}
                   </Text>
                 </FlexColumn>
                 <FlexColumn

@@ -18,7 +18,7 @@ function BannerForm({ initialValues = {
   description: "",
   markedWord: "",
   used: false
-}, isToCreate, bannerId, width }) {
+}, isToCreate, bannerId, width, setIsActive }) {
   const [isLoading, setIsLoading] = useState(false);
   const { addBanner, updateBanner } = useAdmin();
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ function BannerForm({ initialValues = {
       const banner = isToCreate ? await addBanner(values) : await updateBanner(bannerId, values);
       setIsLoading(false);
       navigate(`/banners/${banner.id}`);
+      setIsActive(false);
     }catch(error) {
       setIsLoading(false);
       toast.error(errorParser(error.message));

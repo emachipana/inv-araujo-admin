@@ -13,6 +13,7 @@ import { errorParser } from "../../helpers/errorParser";
 import { Spinner } from "reactstrap";
 import { onDocChange } from "../VitroForm/handlers";
 import Select from "../Input/Select";
+import { useNavigate } from "react-router-dom";
 
 function EmployeeForm({ initialValues = {
   rsocial: "",
@@ -20,17 +21,19 @@ function EmployeeForm({ initialValues = {
   email: "",
   phone: "",
   roleId: "",
-}, isToCreate, employeeId, setIsActive}) {
+}, isToCreate, employeeId, setIsActive, isDocLoadedFromProps = false}) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isDocLoaded, setIsDocLoaded] = useState(isDocLoadedFromProps);
   const { addEmployee, updateEmployee, roles } = useAdmin();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      isToCreate ? await addEmployee(values) : await updateEmployee(employeeId, values);
+      console.log(employeeId);
+      const employee = isToCreate ? await addEmployee(values) : await updateEmployee(employeeId, values);
       setIsLoading(false);
-      // navigate(`/empleados/${employee.id}`);
+      navigate(`/empleados/${employee.id}`);
       setIsActive(false);
     }catch(error) {
       setIsLoading(false);
@@ -65,7 +68,7 @@ function EmployeeForm({ initialValues = {
             error={errors.document}
             touched={touched.document}
             value={values.document}
-            handleChange={(e) => onDocChange(e, setFieldValue, "DNI")}
+            handleChange={(e) => onDocChange(e, setFieldValue, "DNI", setIsDocLoaded)}
             handleBlur={(handleBlur)}
           />
           <Input 
@@ -77,28 +80,37 @@ function EmployeeForm({ initialValues = {
             value={values.rsocial}
             handleChange={handleChange}
             handleBlur={handleBlur}
+            disabled={isDocLoaded}
           />
-          <Select 
-            id="roleId"
-            label="Rol"
-            error={errors.roleId}
-            touched={touched.roleId}
-            handleBlur={handleBlur}
-            handleChange={handleChange}
-            options={roleOptions}
-            value={values.roleId}
-          />
-          <Group>
-            <Input 
-              id="email"
-              label="Correo"
-              placeholder="@correo.com"
-              error={errors.email}
-              touched={touched.email}
-              value={values.email}
-              handleChange={handleChange}
+          {
+            isToCreate
+            &&
+            <Select 
+              id="roleId"
+              label="Rol"
+              error={errors.roleId}
+              touched={touched.roleId}
               handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={roleOptions}
+              value={values.roleId}
             />
+          }
+          <Group>
+            {
+              isToCreate
+              &&
+              <Input 
+                id="email"
+                label="Correo"
+                placeholder="@correo.com"
+                error={errors.email}
+                touched={touched.email}
+                value={values.email}
+                handleChange={handleChange}
+                handleBlur={handleBlur}
+              />
+            }
             <Input 
               id="phone"
               label="Teléfono"

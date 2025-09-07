@@ -53,6 +53,14 @@ const AdminProvider = ({ children }) => {
     employees: false,
     notifications: false,
   });
+  const [chatMessages, setChatMessages] = useState([
+    { 
+      id: 1,
+      text: "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", 
+      sender: 'bot',
+      type: 'text'
+    }
+  ]);
 
   const { user } = useAuth();
 
@@ -210,8 +218,8 @@ const AdminProvider = ({ children }) => {
     setIsLoading(true);
     const employees = await apiFetch("employees");
     const roles = await apiFetch("roles");
-    const employeesFiltered = employees.filter((emp) => !rolesToFilter.includes(emp.role.name));
-    setRoles(roles.filter(role => !rolesToFilter.includes(role.name)));
+    const employeesFiltered = employees.filter((emp) => !rolesToFilter.includes(emp?.role?.name));
+    setRoles(roles.filter(role => !rolesToFilter.includes(role?.name)));
     setEmployees(employeesFiltered);
     setEmployeesBackup(employeesFiltered);
     setMatcher(matcher => ({...matcher, employees: true}));
@@ -833,7 +841,10 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateEmployee = async (employeeId, body) => {
-
+    const updatedEmployee = await apiFetch(`employees/${employeeId}`, { body, method: "PUT" });
+    setEmployees(employees => employees.map((employee) => employee.id === employeeId ? updatedEmployee.data : employee));
+    setEmployeesBackup(employees => employees.map((employee) => employee.id === employeeId ? updatedEmployee.data : employee));
+    return updatedEmployee.data;
   }
 
   return (
@@ -865,6 +876,8 @@ const AdminProvider = ({ children }) => {
         productionSummary,
         messages,
         messagesBackup,
+        chatMessages,
+        setChatMessages,
         loadMessages,
         setProductionSummary,
         setRoles,

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import apiFetch from "../../../services/apiFetch";
 import { toast } from "react-hot-toast";
@@ -10,17 +10,24 @@ import { Title } from "../styles";
 import { COLORS } from "../../../styles/colors";
 import { capitalize, capitalizeAll } from "../../../helpers/capitalize";
 import Button from "../../../components/Button";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaAngleLeft, FaAngleRight } from "react-icons/fa";
 import { Variety } from "../InvitroOrder/styles";
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { PageButton, PaginationContainer, PaginationContent } from "./styles";
+import DeleteModal from "../Product/DeleteModal";
+import { useAdmin } from "../../../context/admin";
 
 function Employee() {
   const [isLoading, setIsLoading] = useState(true);
+  const [deleteModal, setDeleteModal] = useState(false);
   const [employee, setEmployee] = useState({});
   const [operations, setOperations] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(3);
   const { id } = useParams();
   const navigate = useNavigate();
+  const { setMatcher } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -28,7 +35,7 @@ function Employee() {
         const employee = await apiFetch(`employees/${id}`);
         const operations = await apiFetch(`employees/operations/${id * 1}`);
         setEmployee(employee.data);
-        setOperations(operations);
+        setOperations(operations?.reverse());
         setIsLoading(false);
       }catch(error) {
         toast.error(errorParser(error.message));
@@ -39,6 +46,32 @@ function Employee() {
     fetch();
   }, [ id ]);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(operations.length / itemsPerPage);
+  
+  // Get current operations
+  const currentOperations = useMemo(() => {
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    return operations.slice(indexOfFirstItem, indexOfLastItem);
+  }, [operations, currentPage, itemsPerPage]);
+
+  // Go to previous page
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  // Go to next page
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
+  const deleteEmployee = async () => {
+    console.log(employee.id);
+    await apiFetch(`employees/${employee.id}`, { method: "DELETE" });
+    setMatcher((values) => ({ ...values, employees: false }));
+  }
+
   return (
     isLoading
     ? <Spinner color="secondary" />
@@ -47,7 +80,7 @@ function Employee() {
           !employee.id
           ? <Title>El empleado no existe</Title>
           : <>
-              <Title>{ capitalizeAll(employee.rsocial.toLowerCase()) }</Title>
+              <Title>{ capitalizeAll(employee.rsocial?.toLowerCase() || '') }</Title>
               <Section>
                 <Card>
                   <Wrapper>
@@ -104,7 +137,7 @@ function Employee() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { employee.role.name }
+                        { employee.role?.name || '' }
                       </Text>
                     </FlexColumn>
                   </Wrapper>
@@ -114,22 +147,26 @@ function Employee() {
                   >
                     <Button
                       Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
+                      fontSize={14}
+                      iconSize={15}
                       color="warning"
                       onClick={() => navigate("edit")}
                     >
-                      Editar
+                      Editar datos
                     </Button>
-                    <Button
-                      onClick={() => {}}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      operations.length <= 0
+                      &&
+                      <Button
+                        onClick={() => setDeleteModal(true)}
+                        Icon={FaTrashAlt}
+                        fontSize={14}
+                        iconSize={15}
+                        color="danger"
+                      >
+                        Eliminar empleado
+                      </Button>
+                    }
                   </Wrapper>
                 </Card>
                 <Card position="first">
@@ -145,7 +182,8 @@ function Employee() {
                       gap={1}
                     >
                       {
-                        operations.map((operation, index) => {
+                        currentOperations.length > 0
+                        ? currentOperations.map((operation, index) => {
                           const timeAgo = operation.createdAt ? formatDistanceToNow(new Date(operation.createdAt), { 
                             addSuffix: true,
                             locale: es
@@ -175,11 +213,52 @@ function Employee() {
                             </Variety>
                           );
                         })
+                        : <Text
+                            size={15}
+                            weight={600}
+                            color={COLORS.dim}
+                          >
+                            No hay operaciones
+                          </Text>
                       }
                     </FlexColumn>
+                    
+                    {operations.length > itemsPerPage && (
+                      <PaginationContainer>
+                        <PaginationContent>
+                          <PageButton
+                            onClick={goToPreviousPage} 
+                            disabled={currentPage === 1}
+                            aria-label="Página anterior"
+                          >
+                            <FaAngleLeft />
+                          </PageButton>
+                          
+                          <Text size={14} weight={500} color={COLORS.dim}>
+                            Página {currentPage} de {totalPages}
+                          </Text>
+                          
+                          <PageButton 
+                            onClick={goToNextPage} 
+                            disabled={currentPage === totalPages}
+                            aria-label="Siguiente página"
+                          >
+                            <FaAngleRight />
+                          </PageButton>
+                        </PaginationContent>
+                      </PaginationContainer>
+                    )}
                   </FlexColumn>
                 </Card>
               </Section>
+              <DeleteModal
+                id={employee.id}
+                isActive={deleteModal}
+                setIsActive={setDeleteModal}
+                handleDelete={deleteEmployee}
+                navTo="empleados"
+                title="¿Eliminar empleado?"
+              />
             </>
         }
       </>

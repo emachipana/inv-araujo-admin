@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { shadowMd, shadowSm } from "../../../styles/layout";
+import { shadowMd } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { css } from "@emotion/react";
 
@@ -75,7 +75,7 @@ export const Container = styled.div`
   background-color: white;
   padding: 1rem;
   border-radius: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
   margin: ${({ notAuto }) => notAuto ? "" : "auto"};
 `;
 

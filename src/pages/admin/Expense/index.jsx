@@ -117,7 +117,9 @@ function Expense() {
                       gap={1}
                     >
                       {
-                        expenses?.map((item, index) => (
+                        expenses.length <= 0
+                        ? <Text>Aún no hay gastos</Text>
+                        : expenses?.map((item, index) => (
                           <Item 
                             key={index}
                             handleEdit={() => handleEdit(item)}
