@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import apiFetch from "../../../services/apiFetch";
-import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
-import AlertError from "../../../components/AlertError";
 import ProductForm from "../../../components/ProductForm";
 import { Container } from "./styles";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function EditProduct() {
   const [isLoading, setIsLoading] = useState(true);
   const [product, setProduct] = useState({});
   const { id } = useParams();
-  const { setError, error } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -21,14 +20,13 @@ function EditProduct() {
         setProduct(product.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error.message);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -41,20 +39,12 @@ function EditProduct() {
               <ProductForm 
                 initialValues={{
                   ...product,
-                  categoryId: product.category.id,
+                  categoryId: product.categoryId,
                   isActive: product.active
                 }}
                 productId={product.id}
               />
             </Container>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

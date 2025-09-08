@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Container } from "../Product/styles";
 import InvoiceForm from "../../../components/InvoiceForm";
-import AlertError from "../../../components/AlertError";
 import { Title } from "../styles";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function EditInvoice() {
   const [isLoading, setIsLoading] = useState(true);
   const [invoice, setInvoice] = useState({});
   const { id } = useParams();
-  const { setError, error } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
@@ -21,14 +20,13 @@ function EditInvoice() {
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -41,8 +39,7 @@ function EditInvoice() {
               <InvoiceForm 
                 initialValues={{
                   ...invoice,
-                  documentType: invoice.documentType === "DNI" ? 1 : 2,
-                  invoiceType: invoice.invoiceType === "BOLETA" ? 1 : 2
+                  issueDate: invoice.issueDate.split("T")[0]
                 }}
                 invoiceId={invoice.id}
                 initDocType={invoice.documentType}
@@ -50,14 +47,6 @@ function EditInvoice() {
                 isGenerated={invoice.isGenerated}
               />
             </Container>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

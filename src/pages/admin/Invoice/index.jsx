@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
-import { Alert, Spinner } from "reactstrap";
+import { Spinner } from "reactstrap";
 import { Title } from "../styles";
 import { Card, Section, Wrapper } from "../Product/styles";
 import { FlexColumn, Text } from "../../../styles/layout";
@@ -11,12 +11,13 @@ import Badge from "../../../components/Badge";
 import Button from "../../../components/Button";
 import { FaEdit, FaFileInvoice, FaTrashAlt } from "react-icons/fa";
 import DeleteModal from "../Product/DeleteModal";
-import AlertError from "../../../components/AlertError";
 import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Item from "./Item";
 import { FaEye } from "react-icons/fa6";
 import DocModal from "./DocModal";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Invoice() {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,26 +26,28 @@ function Invoice() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
+  const [invoiceItems, setInvoiceItems] = useState([]);
   const [invoice, setInvoice] = useState({});
   const { id } = useParams("");
-  const { error, setError, deleteInvoice, generateDoc, info, setInfo } = useAdmin();
+  const { deleteInvoice, generateDoc } = useAdmin();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const invoice = await apiFetch(`invoices/${id}`);
+        const items = await apiFetch(`invoiceItems/invoice/${invoice.data.id}`);
+        setInvoiceItems(items);
         setInvoice(invoice.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   const options = {
     day: "numeric",
@@ -52,6 +55,8 @@ function Invoice() {
     year: "numeric",
     timeZone: "UTC"
   }
+
+  console.log(invoice);
 
   const issueDate = new Date(invoice.issueDate);
 
@@ -64,7 +69,7 @@ function Invoice() {
   const igv = (parseFloat(base) * 0.18).toFixed(2);
 
   const handleDocClick = async () => {
-    if(invoice.isGenerated) return setDocModal(true);
+    if(invoice.isSended) return setDocModal(true);
 
     try {
       const today = new Date();
@@ -77,9 +82,8 @@ function Invoice() {
       setInvoice(updatedInvoice);
       setIsGenerating(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsGenerating(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -91,15 +95,7 @@ function Invoice() {
           !invoice.rsocial
           ? <Title>El comprobante no existe</Title>
           : <>
-              <Alert
-                style={{width: "100%"}}
-                color="primary"
-                isOpen={info}
-                toggle={() => setInfo(false)}
-              >
-                La { invoice.invoiceType.toLowerCase() } se creo con éxito
-              </Alert>
-              <Title capitalize>{ invoice.rsocial.toLowerCase() }</Title>
+              <Title capitalize>{ invoice.rsocial.toLowerCase().replaceAll('"', "") }</Title>
               <Section>
                 <Card>
                   <Wrapper>
@@ -125,9 +121,9 @@ function Invoice() {
                         color={COLORS.dim}
                       >
                         { 
-                          !invoice.serie
+                          !invoice.isSended
                           ? "No emitido"
-                          : invoice.serie
+                          : `${invoice.serie}-${invoice.id}`
                         }
                       </Text>
                     </FlexColumn>
@@ -191,15 +187,11 @@ function Invoice() {
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
                       <Text weight={700}>
-                        Items
+                        Estado
                       </Text>
-                      <Text
-                        weight={600}
-                        size={15}
-                        color={COLORS.dim}
-                      >
-                        { invoice.items.length }
-                      </Text>
+                      <Badge color={invoice.isSended ? "primary" : "danger"}>
+                        { invoice.isSended ? "Emitido" : "Sin emitir" }
+                      </Badge>
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper>
@@ -221,35 +213,21 @@ function Invoice() {
                         }
                       </Text>
                     </FlexColumn>
-                    <FlexColumn gap={0.3}>
-                      <Text weight={700}>
-                        Comentario
-                      </Text>
-                      <Text
-                        align="start"
-                        weight={600}
-                        size={15}
-                        color={COLORS.dim}
-                      >
-                        { 
-                          !invoice.comment
-                          ? "Nulo"
-                          : invoice.comment
-                        }
-                      </Text>
-                    </FlexColumn>
                   </Wrapper>
-                  <Wrapper isButtons>
+                  <Wrapper 
+                    isButtons
+                    justify="space-around"
+                  >
                     <Button
                       onClick={handleDocClick}
-                      disabled={invoice.items.length <= 0 || isGenerating}
-                      Icon={isGenerating ? null : (invoice.isGenerated ? FaEye : FaFileInvoice)}
-                      fontSize={15}
-                      iconSize={17}
-                      color={invoice.isGenerated ? "primary" : "secondary"}
+                      disabled={invoice.items?.length <= 0 || isGenerating}
+                      Icon={isGenerating ? null : (invoice.isSended ? FaEye : FaFileInvoice)}
+                      fontSize={14}
+                      iconSize={16}
+                      color={invoice.isSended ? "primary" : "secondary"}
                     >
                       { 
-                        invoice.isGenerated
+                        invoice.isSended
                         ? "Ver" 
                         : (isGenerating
                             ? <>
@@ -262,26 +240,32 @@ function Invoice() {
                       {" "}
                       { invoice.invoiceType.toLowerCase() }
                     </Button>
-                    <Button
-                      Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
-                      color="warning"
-                      onClick={() => navigate("edit")}
-                      disabled={invoice.isGenerated}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => setDeleteModal(!deleteModal)}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                      disabled={invoice.isGenerated}
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      (!invoice.isRelatedToOrder && !invoice.isSended)
+                      &&
+                      <>
+                        <Button
+                          Icon={FaEdit}
+                          fontSize={14}
+                          iconSize={16}
+                          color="warning"
+                          onClick={() => navigate("edit")}
+                          disabled={invoice.isSended}
+                        >
+                          Editar
+                        </Button>
+                        <Button
+                          onClick={() => setDeleteModal(!deleteModal)}
+                          Icon={FaTrashAlt}
+                          fontSize={14}
+                          iconSize={16}
+                          color="danger"
+                          disabled={invoice.isSended}
+                        >
+                          Eliminar
+                        </Button>
+                      </>
+                    }
                   </Wrapper>
                 </Card>
                 <Card>
@@ -298,19 +282,30 @@ function Invoice() {
                       gap={1}
                     >
                       {
-                        invoice.items?.map((item, index) => (
+                        invoiceItems?.length <= 0
+                        ? <Text
+                            align="center"
+                            weight={600}
+                            size={15}
+                            color={COLORS.dim}
+                          >
+                            Aún no hay items
+                          </Text>
+                        : invoiceItems?.map((item, index) => (
                           <Item
                             key={index}
                             item={item}
                             handleEdit={handleEditItem}
                             invoiceId={id}
-                            isInvoiceGenerated={invoice.isGenerated}
+                            isInvoiceGenerated={invoice.isSended}
                             setInvoice={setInvoice}
+                            isRelatedToProduct={invoice.isRelatedToOrder}
+                            setItems={setInvoiceItems}
                           />
                         ))
                       }
                       {
-                        !invoice.isGenerated
+                        (!invoice.isRelatedToOrder && !invoice.isSended)
                         &&
                         <Button
                           style={{marginTop: "1rem"}}
@@ -341,6 +336,7 @@ function Invoice() {
                 setInvoice={setInvoice}
                 setIsActive={setItemModal}
                 setItem={setItem}
+                setItems={setInvoiceItems}
               />
               <DocModal 
                 setIsActive={setDocModal}
@@ -350,15 +346,6 @@ function Invoice() {
                 setInvoice={setInvoice}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError
-            from="invoice"
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

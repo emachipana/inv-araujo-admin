@@ -1,11 +1,12 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../styles/layout";
+import { shadowMd, shadowSm } from "../../styles/layout";
 import { COLORS } from "../../styles/colors";
 
 export const Container = styled.div`
   width: 420px;
   background-color: white;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  border: 1px solid ${COLORS.platinium};
   border-radius: 1rem;
   cursor: pointer;
   display: flex;
@@ -19,7 +20,7 @@ export const Container = styled.div`
 export const Card = styled.div`
   width: ${({ size }) => (size + 10) || 130}px;
   height: ${({ size }) => size || 120}px;
-  border-radius: 0.75rem;
+  border-radius: 0.8rem;
   background-color: ${({ color }) => color || COLORS.orange};
   display: flex;
   flex-direction: column;
@@ -29,4 +30,5 @@ export const Card = styled.div`
   color: white;
   position: relative;
   padding: 0.5rem;
+  box-shadow: ${shadowSm};
 `;

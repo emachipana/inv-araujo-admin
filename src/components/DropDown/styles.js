@@ -10,7 +10,7 @@ export const Container = styled.div`
 `;
 
 export const Section = styled.div`
-  min-height: 180px;
+  max-height: 400px;
   position: absolute;
   background-color: ${COLORS.white};
   border-radius: 10px;
@@ -18,5 +18,6 @@ export const Section = styled.div`
   right: ${({ right }) => right || null};
   box-shadow: 0px 0px 15px 2px rgba(0, 0, 0, .3);
   z-index: 45;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 `;

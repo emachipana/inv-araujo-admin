@@ -10,24 +10,22 @@ import Product from "./Product";
 import { filterProducts, onSearchChange } from "./handlers";
 import Button from "../../../components/Button";
 import { FaShoppingCart } from "react-icons/fa";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
-function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, item, setItem }) {
+function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, item, setItem, orderItems, setOrderItems }) {
   const [values, setValues] = useState({ productId: "", quantity: "" });
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { setError, backup, addOrderItem, editOrderItem, loadProducts, matcher } = useAdmin();
+  const { backup, addOrderItem, editOrderItem, loadProducts, isLoading: isProductsLoading } = useAdmin();
 
   useEffect(() => {
     const init = async () => {
-      if(!matcher.products) {
-        setIsLoading(true);
-        await loadProducts();
-        setIsLoading(false);
-      }
+      await loadProducts();
 
-      const filteredProducts = filterProducts(order.items, backup);
+      const filteredProducts = filterProducts(orderItems, backup);
       if(item) {
         setValues({
           productId: item.product.id,
@@ -39,7 +37,7 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
     }
 
     init();
-  }, [ backup, order, item, matcher.products, loadProducts ]);
+  }, [ backup, order, item, loadProducts, orderItems ]);
 
   const onClose = () => {
     setValues({productId: "", quantity: 1});
@@ -57,13 +55,13 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
         orderId: order.id
       }
 
-      const updatedOrder = isToEdit ? await editOrderItem(item.id, body) : await addOrderItem(body);
-      setOrder(updatedOrder);
+      const {newOrder, orderItem} = isToEdit ? await editOrderItem(item.id, body, setOrderItems) : await addOrderItem(body);
+      if(!isToEdit) setOrderItems([orderItem.data, ...orderItems]);
+      setOrder(newOrder);
       onClose();
       setIsSaving(false);
     }catch(error) {
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsSaving(false);
     }
   }
@@ -94,13 +92,13 @@ function ItemModal({ isActive, setIsActive, order, setOrder, isToEdit = false, i
               placeholder="Buscar un producto..."
               Icon={BiSearch}
               value={search}
-              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, order.items, setSearchProducts, backup, setError, isLoading)}
+              handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, orderItems, setSearchProducts, backup, isLoading)}
               style={{width: "60%"}}
             />
           }
           <List height={isToEdit ? "auto" : ""}>
             {
-              isLoading
+              isLoading || isProductsLoading
               ? <Spinner color="secondary" />
               : <>
                   {

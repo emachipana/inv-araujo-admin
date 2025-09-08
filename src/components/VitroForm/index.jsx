@@ -8,106 +8,139 @@ import { Group, Title } from "../ProductForm/styles";
 import Input from "../Input";
 import Select from "../Input/Select";
 import Button from "../Button";
-import { IoMdAddCircleOutline } from "react-icons/io";
+import { IoIosSad, IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
-import { formatDate, onDepChange, onDocChange, onDocTypeChange, onSearchChange } from "./handlers";
+import { onDocChange, onDocTypeChange, onSearchChange } from "./handlers";
 import Category from "../Category";
 import { COLORS } from "../../styles/colors";
 import { List, Products } from "../../pages/admin/Order/styles";
 import { BiSearch } from "react-icons/bi";
 import Client from "./Client";
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
+import apiFetch from "../../services/apiFetch";
 
-function VitroForm({ initialValues = {
-  documentType: "",
-  document: "",
-  rsocial: "",
-  phone: "",
-  department: "",
-  email: "",
-  city: "",
-  initDate: "",
-  finishDate: "",
-  status: ""
-}, isToCreate, vitroId, initialDocType = "", initialDep = "", clientId = "", invoice = null }) {
+function VitroForm({ setIsActive }) {
   const [currentAction, setCurrentAction] = useState("Nuevo cliente");
-  const [currentDep, setCurrentDep] = useState(initialDep);
-  const [docType, setDocType] = useState(initialDocType);
+  const [docType, setDocType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 	const [isGetting, setIsGetting] = useState(false);
 	const [search, setSearch] = useState("");
-	const [searchClients, setSearchClients] = useState([]);
-	const [clientSelected, setClientSelected] = useState(clientId);
-  const { setError, addVitro, updateVitro, departments, 
-    provinces, matcher, loadDepartments,
-    clientsBackup, addClient, loadClients } = useAdmin();
+	const [searchClients, setSearchClients] = useState({});
+	const [clientSelected, setClientSelected] = useState("");
+  const [minDate, setMinDate] = useState('');
+  const [quantity, setQuantity] = useState(0);
+  const [isCheckingDate, setIsCheckingDate] = useState(false);
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
+  const { addVitro, clientsBackup, addClient, loadClients, isLoading: isClientsLoading, setIsLoading: setClientsLoading } = useAdmin();
   const navigate = useNavigate();
+
+  const initialValues = {
+    documentType: "",
+    document: "",
+    rsocial: "",
+    phone: "",
+    email: "",
+    initDate: "",
+    finishDate: "",
+    quantity: "",
+  }
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.departments) await loadDepartments();
-        if(!matcher.clients) {
-          setIsLoading(true);
-          await loadClients();
-          setIsLoading(false);
-        }
+        await loadClients();
 
-        setSearchClients(clientsBackup);
+        const filteredClients = {...clientsBackup, content: clientsBackup.content?.filter((client) => client.createdBy === "ADMINISTRADOR")};
+        setSearchClients(filteredClients);
       }catch(error) {
-        setError(error.message);
-        console.error(error);
+        toast.error(errorParser(error.message));
+        setClientsLoading(false);
       }
     }
     
     fetch();
-  }, [ loadDepartments, matcher, setError, clientsBackup, loadClients ]);
+  }, [ clientsBackup, loadClients, setClientsLoading ]);
+
+  const calculateMinDate = (qty) => {
+    if (!qty || qty < 500) return null;
+    const today = new Date();
+    const monthsNeeded = Math.max(1, Math.ceil((qty - 1) / 8000));
+    const minDate = new Date(today.setMonth(today.getMonth() + monthsNeeded));
+    return minDate.toISOString().split('T')[0];
+  };
+
+  const onQuantityChange = (e, setFieldValue) => {
+    const value = e.target.value;
+    setFieldValue("quantity", value);
+    setQuantity(value);
+
+    if(isNaN(value * 1)) return;
+    setMinDate(calculateMinDate(value));
+    setFieldValue("finishDate", "");
+  }
+
+  const onDateChange = async (e, setFieldValue) => {
+    const value = e.target.value;
+    setFieldValue("finishDate", value);
+    setIsCheckingDate(true);
+
+    try {
+      const response = await apiFetch(`vitroOrders/availableByMonth?date=${value}&quantity=${quantity}`);
+      if(!response.data.isAvailable) {
+        setFieldValue("finishDate", "");
+        toast.error(response.data.message);
+        setIsCheckingDate(false);
+        return;
+      }
+
+      toast.success(response.data.message);
+      setIsCheckingDate(false);
+    }catch(e) {
+      toast.error(errorParser(e.message));
+      setIsCheckingDate(false);
+    }
+  }
 
   const onSubmit = async (values) => {
     try {
       if(currentAction === "Cliente registrado" && !clientSelected) return;
+      const now = new Date();
 
       let vitroBody = {
-        clientId: clientSelected,
-        department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
-        city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
-        initDate: values.initDate,
-        finishDate: values.finishDate
+        clientId: clientSelected.id,
+        initDate: now.toISOString().split("T")[0],
+        finishDate: values.finishDate,
+        createdBy: "ADMINISTRADOR"
       }
       
       setIsLoading(true);
-      if(currentAction === "Nuevo cliente" && isToCreate) {
-        const now = new Date();
+      if(currentAction === "Nuevo cliente") {
         const clientBody = {
           ...values,
-          department: departments.find(dep => dep.id_ubigeo === values.department).nombre_ubigeo,
-          city: provinces[values.department].find(prov => prov.id_ubigeo === values.city).nombre_ubigeo,
-          documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-          email: values.email ? values.email : `${now.getTime()}@inversiones.com`
+          documentType: values.documentType,
+          email: values.email,
+          createdBy: "ADMINISTRADOR",
         }
 
         const client = await addClient(clientBody);
         vitroBody = {
           ...vitroBody,
-          clientId: client.id
+          clientId: client.id,
         }
       }
 
-      if(!isToCreate) vitroBody = {...vitroBody, status: initialValues.status, invoiceId: invoice ? invoice.id : null};
-
-      const vitroOrder = isToCreate ? await addVitro(vitroBody) : await updateVitro(vitroId, vitroBody);
+      const vitroOrder = await addVitro(vitroBody);
       setIsLoading(false);
+      setIsActive(false);
       navigate(`/invitro/${vitroOrder.id}`);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
-  const optionsDep = departments.map(department => ({id: department.id_ubigeo, content: department.nombre_ubigeo}));
-  const optionsProv = provinces[currentDep]?.map(prov => ({id: prov.id_ubigeo, content: prov.nombre_ubigeo}));
-  const today = new Date();
-  today.setHours(12);
+  const setCurrent = (_id, name) => setCurrentAction(name);
 
   return (
     <Formik
@@ -126,23 +159,19 @@ function VitroForm({ initialValues = {
         setFieldValue
       }) => (
         <Form onSubmit={handleSubmit}>
-          <Title>{ isToCreate ? "Generar pedido" : "Editar pedido" }</Title>
-          {
-            isToCreate
-            &&
-            <FlexRow gap={1}>
-              <Category
-                currentCategory={currentAction}
-                name="Nuevo cliente"
-                setCurrentCategory={setCurrentAction}
-              />
-              <Category
-                currentCategory={currentAction}
-                name="Cliente registrado"
-                setCurrentCategory={setCurrentAction}
-              />
-            </FlexRow>
-          }
+          <Title>Registrar pedido</Title>
+          <FlexRow gap={1}>
+            <Category
+              currentCategory={currentAction}
+              name="Nuevo cliente"
+              setCurrentCategory={setCurrent}
+            />
+            <Category
+              currentCategory={currentAction}
+              name="Cliente registrado"
+              setCurrentCategory={setCurrent}
+            />
+          </FlexRow>
           <Text
             align="start"
             style={{alignSelf: "flex-start", marginBottom: "-0.8rem"}}
@@ -157,7 +186,6 @@ function VitroForm({ initialValues = {
             ? <>
                 <Group>
                   <Select
-                    disabled={!isToCreate}
                     id="documentType"
                     labelSize={17}
                     label="Tipo de documento"
@@ -165,20 +193,20 @@ function VitroForm({ initialValues = {
                     touched={touched.documentType}
                     value={values.documentType}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+                    handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
                     options={[
                       {
-                        id: 1,
+                        id: "DNI",
                         content: "DNI"
                       },
                       {
-                        id: 2,
+                        id: "RUC",
                         content: "RUC"
                       }
                     ]}
                   />
                   <Input
-                    disabled={!docType || !isToCreate}
+                    disabled={!docType}
                     labelSize={17}
                     id="document"
                     label="Documento"
@@ -187,12 +215,11 @@ function VitroForm({ initialValues = {
                     touched={touched.document}
                     value={values.document}
                     handleBlur={handleBlur}
-                    handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+                    handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
                   />
                 </Group>
                 <Input
                   labelSize={17}
-                  disabled={!isToCreate}
                   id="rsocial"
                   label="Razón Social"
                   placeholder="ej. Araujo Estrada Yurfa"
@@ -201,6 +228,7 @@ function VitroForm({ initialValues = {
                   value={values.rsocial}
                   handleBlur={handleBlur}
                   handleChange={handleChange}
+                  disabled={isDocLoaded}
                 />
                 <Group>
                   <Input
@@ -213,10 +241,8 @@ function VitroForm({ initialValues = {
                     value={values.email}
                     handleBlur={handleBlur}
                     handleChange={handleChange}
-                    disabled={!isToCreate}
                   />
                   <Input
-                    disabled={!isToCreate}
                     labelSize={17}
                     id="phone"
                     label="Teléfono"
@@ -228,35 +254,6 @@ function VitroForm({ initialValues = {
                     handleChange={handleChange}
                   />
                 </Group>
-                {
-                  isToCreate
-                  &&
-                  <Group>
-                    <Select
-                      labelSize={17}
-                      id="department"
-                      label="Departamento"
-                      error={errors.department}
-                      touched={touched.department}
-                      value={values.department}
-                      options={optionsDep}
-                      handleBlur={handleBlur}
-                      handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
-                    />
-                    <Select
-                      labelSize={17}
-                      disabled={!currentDep}
-                      id="city"
-                      label="Ciudad"
-                      options={optionsProv}
-                      error={errors.city}
-                      touched={touched.city}
-                      value={values.city}
-                      handleBlur={handleBlur}
-                      handleChange={handleChange}
-                    />
-                  </Group>
-                }
               </>
             : <>
                 <Products>
@@ -266,28 +263,43 @@ function VitroForm({ initialValues = {
 										Icon={BiSearch}
 										value={search}
 										style={{width: "60%"}}
-                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, setError, clientsBackup)}
+                    handleChange={(e) => onSearchChange(e, isGetting, setSearch, setIsGetting, setSearchClients, clientsBackup)}
 									/>
-									<List 
+									<List
                     height="150px"
                     gap="1rem"
                   >
 										{
-											isGetting
+											isGetting || isClientsLoading
 											? <Spinner color="secondary" />
-											: searchClients.map((client, index) => (
-													<Client 
-                            id={client.id}
-                            rsocial={client.rsocial}
-                            document={client.document}
-                            department={client.department}
-                            city={client.city}
-														clientSelected={clientSelected}
-														setClientSelected={setClientSelected}
-														key={index}
-                            setFieldValue={setFieldValue}
-													/>
-												))
+											: (
+                          searchClients.content?.length === 0
+                          ? <FlexRow>
+                              <IoIosSad
+                                size={20}
+                                color={COLORS.dim}
+                              />
+                              <Text
+                                align="center"
+                                size={17}
+                                weight={700}
+                              >
+                                No se encontraron clientes
+                              </Text>
+                            </FlexRow>
+                          : searchClients.content?.map((client, index) => (
+                              <Client 
+                                id={client.id}
+                                rsocial={client.rsocial}
+                                document={client.document}
+                                documentType={client.documentType}
+                                clientSelected={clientSelected}
+                                setClientSelected={setClientSelected}
+                                key={index}
+                                setFieldValue={setFieldValue}
+                              />
+                            ))
+                          )
 										}
 									</List>
 								</Products>
@@ -302,64 +314,32 @@ function VitroForm({ initialValues = {
           >
             Pedido
           </Text>
-          {
-            ((currentAction === "Cliente registrado") || !isToCreate)
-            &&
-            <Group>
-              <Select
-                disabled={!clientSelected}
-                labelSize={17}
-                id="department"
-                label="Departamento"
-                error={errors.department}
-                touched={touched.department}
-                value={values.department || clientSelected.department}
-                options={optionsDep}
-                handleBlur={handleBlur}
-                handleChange={(e) => onDepChange(e, setFieldValue, setCurrentDep)}
-              />
-              <Select
-                labelSize={17}
-                disabled={!currentDep}
-                id="city"
-                label="Ciudad"
-                options={optionsProv}
-                error={errors.city}
-                touched={touched.city}
-                value={values.city}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-              />
-            </Group>
-          }
-          <Group width={isToCreate ? 48 : ""}>
+          <Group>
             <Input
-              id="initDate"
+              disabled={isCheckingDate}
               labelSize={17}
-              label="Fecha pedido"
-              type="date"
-              max={formatDate(today)}
-              error={errors.initDate}
-              touched={touched.initDate}
-              value={values.initDate}
+              id="quantity"
+              label="Cantidad total"
+              placeholder="Cantidad de plántulas invitro"
+              error={errors.quantity}
+              touched={touched.quantity}
+              value={values.quantity}
               handleBlur={handleBlur}
-              handleChange={handleChange}
+              handleChange={(e) => onQuantityChange(e, setFieldValue)}
             />
-            {
-              !isToCreate
-              &&
-              <Input
-                labelSize={17}
-                id="finishDate"
-                label="Fecha entrega"
-                type="date"
-                error={errors.finishDate}
-                touched={touched.finishDate}
-                value={values.finishDate}
-                handleBlur={handleBlur}
-                handleChange={handleChange}
-              />
-            }
+            <Input
+              labelSize={17}
+              disabled={!quantity || quantity < 500 || isNaN(quantity * 1) || isCheckingDate}
+              id="finishDate"
+              label="Fecha de entrega"
+              type="date"
+              min={minDate}
+              error={errors.finishDate}
+              touched={touched.finishDate}
+              value={values.finishDate}
+              handleBlur={handleBlur}
+              handleChange={(e) => onDateChange(e, setFieldValue)}
+            />
           </Group>
           <Button
             type="submit"
@@ -367,7 +347,7 @@ function VitroForm({ initialValues = {
             fontSize={17}
             size="full"
             style={{marginTop: "0.7rem"}}
-            disabled={!isValid || isLoading}
+            disabled={!isValid || isLoading || isCheckingDate}
             Icon={isLoading ? null : IoMdAddCircleOutline}
           >
             {
@@ -375,10 +355,10 @@ function VitroForm({ initialValues = {
               ? <>
                   <Spinner size="sm" />
                   {
-                    isToCreate ? "Agregando..." : "Editando..."
+                    "Registrando..."
                   }
                 </>
-              : isToCreate ? "Agregar" : "Editar"
+              : "Registrar"
             }
           </Button>
         </Form>

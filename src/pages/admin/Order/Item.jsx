@@ -10,10 +10,12 @@ import { useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa6";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
-function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated }) {
+function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGenerated, setOrderItems }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { deleteOrderItem, setError } = useAdmin();
+  const { deleteOrderItem } = useAdmin();
   const { id, product, price, quantity, subTotal } = item;
   const { images = [] } = product;
   const navigate = useNavigate();
@@ -21,13 +23,12 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedOrder = await deleteOrderItem(id, orderId);
+      const updatedOrder = await deleteOrderItem(id, orderId, setOrderItems);
       setOrder(updatedOrder);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -52,6 +53,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
               align="start"
               weight={600}
               size="14px"
+              width={"150px"}
               color={COLORS.dim}
             >
               { product.name }
@@ -66,11 +68,12 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             Precio
           </Text>
           <Text
+            style={{whiteSpace: "nowrap"}}
             weight={600}
             size={14}
             color={COLORS.dim}
           >
-            S/. { price }
+            S/. { price.toFixed(2) }
           </Text>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -92,6 +95,7 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
           <Text 
             weight={700}
             size={15}
+            style={{whiteSpace: "nowrap"}}
           >
             Subtotal
           </Text>
@@ -99,8 +103,9 @@ function Item({ item, orderId, setOrder, handleEdit, orderStatus, isInvoiceGener
             weight={600}
             size={14}
             color={COLORS.dim}
+            style={{whiteSpace: "nowrap"}}
           >
-            S/. { subTotal }
+            S/. { subTotal.toFixed(2) }
           </Text>
         </FlexColumn>
       </Wrapper>

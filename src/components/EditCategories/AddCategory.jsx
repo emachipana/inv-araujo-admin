@@ -3,22 +3,42 @@ import { Form } from "./styles";
 import Input from "../Input";
 import Button from "../Button";
 import { useState } from "react";
-import { Spinner } from "reactstrap";
-import { useAdmin } from "../../context/admin";
+import { Input as InputFile, Spinner } from "reactstrap";
 import { validate } from "./validate";
 import { onSubmit } from "./handlers";
+import TextArea from "../Input/TextArea";
+import { FlexColumn, Image, Text } from "../../styles/layout";
+import { useAuth } from "../../context/auth";
 
 function AddCategory({ setCurrentAction, to, addCategory }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError } = useAdmin();
+  const [previewImage, setPreviewImage] = useState(null);
 
-  const values = {name: ""}
+  const { user } = useAuth();
+
+  const values = {name: "", description: "", file: "", employeeId: user.employeeId};
+
+  const onInputFileChange = (e, setFieldValue) => {
+    const file = e.currentTarget.files[0];
+    setFieldValue("file", file);
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => setPreviewImage(reader.result);
+
+    if(file) reader.readAsDataURL(file);
+  }
+
+  const handleSubmit = async (values) => {
+    values.employeeId = user.employeeId;
+    await onSubmit(values, setIsLoading, addCategory, setCurrentAction, to);
+  }
 
   return (
     <Formik
       initialValues={values}
-      validate={validate}
-      onSubmit={(values) => onSubmit(values, setIsLoading, addCategory, setCurrentAction, setError, to)}
+      validate={(values) => validate(values, to === "tubers" ? "tubers" : "categories")}
+      onSubmit={handleSubmit}
     >
       {({
         values,
@@ -27,6 +47,7 @@ function AddCategory({ setCurrentAction, to, addCategory }) {
         isValid,
         handleBlur,
         handleChange,
+        setFieldValue,
         handleSubmit
       }) => (
         <Form onSubmit={handleSubmit}>
@@ -42,6 +63,45 @@ function AddCategory({ setCurrentAction, to, addCategory }) {
             handleChange={handleChange}
             touched={touched.name}
           />
+          {
+            to === "categories"
+            &&
+            <>
+              <TextArea
+                fontSize={15}
+                labelSize={16}
+                id="description"
+                label="Descripción"
+                placeholder="Ingresa una descripción"
+                error={errors.description}
+                touched={touched.description}
+                value={values.description}
+                handleChange={handleChange}
+                handleBlur={handleBlur}
+              />
+              <FlexColumn>
+                <Text weight="700">Imagen</Text>
+                <InputFile
+                  id="file"
+                  type="file"
+                  accept="image/*"
+                  valid={touched.file && !errors.file}
+                  invalid={errors.file && touched.file}
+                  onBlur={handleBlur}
+                  onChange={(e) => onInputFileChange(e, setFieldValue)}
+                /> 
+              </FlexColumn>
+              {
+                previewImage
+                &&
+                <Image
+                  style={{alignSelf: "center"}}
+                  width="250px"
+                  src={previewImage}
+                />
+              }
+            </>
+          }
           <Button
             fontSize={16}
             size="full"

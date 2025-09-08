@@ -1,6 +1,8 @@
 export const validate = (values) => {
   const errors = {};
 
+  if(!values.unit) errors.unit = "Este campo es obligatorio";
+
   if(!values.name) {
     errors.name = "Este campo es obligatorio";
   }else if(values.name.length < 3) {
@@ -43,14 +45,6 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan valores mayores a 0";
   }else if((values.price * 1) <= (values.purchasePrice * 1)) {
     errors.price = "El precio de venta debe ser mayor al precio de compra";
-  }
-
-  if(!values.stock) {
-    errors.stock = "Este campo es obligatorio";
-  }else if(isNaN(values.stock * 1)) {
-    errors.stock = "Solo se aceptan números";
-  }else if(values.stock <= 0) {
-    errors.stock = "Solo se aceptan valores mayores a 0";
   }
 
   return errors;

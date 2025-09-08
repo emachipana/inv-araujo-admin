@@ -8,22 +8,23 @@ import { Variety } from "../InvitroOrder/styles";
 import { Wrapper } from "../Product/styles";
 import { useAdmin } from "../../../context/admin";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
-function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
+function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit, isRelatedToProduct, setItems }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteInvoiceItem } = useAdmin();
+  const { deleteInvoiceItem } = useAdmin();
   const { id, name, price, quantity, subTotal } = item;
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedInvoice = await deleteInvoiceItem(id, invoiceId);
+      const updatedInvoice = await deleteInvoiceItem(id, invoiceId, setItems);
       setInvoice(updatedInvoice);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -94,7 +95,7 @@ function Item({ item, isInvoiceGenerated, invoiceId, setInvoice, handleEdit }) {
         </FlexColumn>
       </Wrapper>
       {
-        !isInvoiceGenerated
+        (!isInvoiceGenerated && !isRelatedToProduct)
         &&
         <FlexRow gap={1}>
           <Button

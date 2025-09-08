@@ -10,6 +10,8 @@ import { Spinner } from "reactstrap";
 import Product from "../Order/Product";
 import Button from "../../../components/Button";
 import { MdDiscount } from "react-icons/md";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function ItemModal({ isActive, setIsActive, banner, setBanner }) {
   const [values, setValues] = useState({ productId: "" });
@@ -17,16 +19,18 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
   const [isLoading, setIsLoading] = useState(false);
   const [searchProducts, setSearchProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const { setError, backup, addBannerItem } = useAdmin();
+  const { backup, addBannerItem, loadProducts, isLoading: isProductsLoading } = useAdmin();
 
   useEffect(() => {
-    const init = () => {
-      const filteredProducts = filterProducts(banner.products, backup);
+    const init = async () => {
+      await loadProducts();
+
+      const filteredProducts = filterProducts(banner.items, backup);
       setSearchProducts(filteredProducts);
     }
 
     init();
-  }, [ banner.products, backup ]);
+  }, [ banner.items, backup, loadProducts ]);
 
   const onClose = () => {
     setValues({ productId: "" });
@@ -48,9 +52,8 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
       onClose();
       setIsSaving(false);
     }catch(error) {
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsSaving(false);
-      setError(error.message);
     }
   }
 
@@ -72,12 +75,12 @@ function ItemModal({ isActive, setIsActive, banner, setBanner }) {
             placeholder="Buscar un producto..."
             Icon={BiSearch}
             value={search}
-            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.products, setSearchProducts, backup, setError, isLoading)}
+            handleChange={(e) => onSearchChange(e, setSearch, setIsLoading, banner.items, setSearchProducts, backup, isLoading)}
             style={{width: "60%"}}
           />
           <List>
             {
-              isLoading
+              isLoading || isProductsLoading
               ? <Spinner color="secondary" />
               : <>
                   {

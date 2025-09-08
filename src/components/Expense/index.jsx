@@ -5,11 +5,16 @@ import { FlexRow, Text } from "../../styles/layout";
 import { Card, Container } from "./styles";
 import { FONTS } from "../../styles/fonts";
 
-function Expense({ id, month, totalExpenses, profit, income }) {
+function Expense({ id, month, totalExpenses, profit, income, ableToWatch }) {
   const navigate = useNavigate();
 
+  const handleClick = () => {
+    if(!ableToWatch) return;
+    navigate(`${id}`);
+  }
+
   return (
-    <Container onClick={() => navigate(`${id}`)}>
+    <Container onClick={handleClick}>
       <Text
         weight={900}
         size={26}
@@ -21,7 +26,9 @@ function Expense({ id, month, totalExpenses, profit, income }) {
         width="100%"
         justify="space-between"
       >
-        <Card>
+        <Card
+          color={COLORS.orange_medium}
+        >
           <Text
             weight={700}
             size={18}
@@ -36,7 +43,7 @@ function Expense({ id, month, totalExpenses, profit, income }) {
           </Text>
         </Card>
         <Card
-          color={COLORS.emerald}
+          color={COLORS.emerald_medium}
         >
           <Text
             weight={700}
@@ -52,7 +59,7 @@ function Expense({ id, month, totalExpenses, profit, income }) {
           </Text>
         </Card>
         <Card
-          color={(profit * 1) < 0 ? COLORS.red : COLORS.blue}
+          color={(profit * 1) < 0 ? COLORS.red_medium : COLORS.blue_medium}
         >
           <Text
             weight={700}

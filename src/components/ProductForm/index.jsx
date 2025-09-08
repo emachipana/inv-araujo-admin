@@ -11,6 +11,9 @@ import { useAdmin } from "../../context/admin";
 import Select from "../Input/Select";
 import { useNavigate } from "react-router-dom";
 import { Form } from "../../styles/layout";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/auth";
 
 function ProductForm({ initialValues = {
   name: "",
@@ -19,35 +22,55 @@ function ProductForm({ initialValues = {
   categoryId: "",
   price: "",
   purchasePrice: "",
-  stock: "",
+  unit: "",
   isActive: true
-}, isToCreate, productId }) {
+}, isToCreate, productId, setIsActive }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { categories, setError, addProduct, updateProduct } = useAdmin();
+  const { categories, addProduct, updateProduct } = useAdmin();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
+      values.employeeId = user.employeeId;
       const product = isToCreate ? await addProduct(values) : await updateProduct(productId, values);
       setIsLoading(false);
       navigate(`/productos/${product.id}`);
+      setIsActive(false);
     }catch(error) {
-      console.error(error);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 
-  const options = categories.reduce((result, category) => {
-    result.push({id: category.id, content: category.name});
-    const subCategories = category.subCategories?.map(subCategory => ({
-      id: subCategory.id,
-      content: `(${category.name}) ${subCategory.name}`
-    }));
-    if(subCategories) result.push(...subCategories);
-    return result;
-  }, []);
+  const categoryOptions = categories.map(category => ({id: category.id, content: category.name}));
+  const unitOptions = [
+    {
+      id: "NIU",
+      content: "Unidad"
+    },
+    {
+      id: "SA",
+      content: "Saco"
+    },
+    {
+      id: "KGM",
+      content: "Kilogramo"
+    },
+    {
+      id: "WG",
+      content: "Galón"
+    },
+    {
+      id: "BJ",
+      content: "Balde"
+    },
+    {
+      id: "BX",
+      content: "Caja"
+    },
+  ];
 
   return (
     <Formik
@@ -86,36 +109,26 @@ function ProductForm({ initialValues = {
             handleChange={handleChange}
             handleBlur={handleBlur}
           />
-          <Select
-            id="categoryId"
-            label="Categoría"
-            error={errors.categoryId}
-            touched={touched.categoryId}
-            handleBlur={handleBlur}
-            handleChange={handleChange}
-            options={options}
-            value={values.categoryId}
-          />
           <Group>
-            <Input 
-              id="brand"
-              label="Marca"
-              placeholder="Ingresa una marca"
-              error={errors.brand}
-              touched={touched.brand}
-              value={values.brand}
-              handleChange={handleChange}
+            <Select
+              id="categoryId"
+              label="Categoría"
+              error={errors.categoryId}
+              touched={touched.categoryId}
               handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={categoryOptions}
+              value={values.categoryId}
             />
-            <Input 
-              id="purchasePrice"
-              label="Precio compra"
-              placeholder="S/. 0.0"
-              error={errors.purchasePrice}
-              touched={touched.purchasePrice}
-              value={values.purchasePrice}
-              handleChange={handleChange}
+            <Select
+              id="unit"
+              label="Unidad de medida"
+              error={errors.unit}
+              touched={touched.unit}
               handleBlur={handleBlur}
+              handleChange={handleChange}
+              options={unitOptions}
+              value={values.unit}
             />
           </Group>
           <Group>
@@ -130,16 +143,26 @@ function ProductForm({ initialValues = {
               handleBlur={handleBlur}
             />
             <Input 
-              id="stock"
-              label="Cantidad"
-              placeholder="Ingresa el stock"
-              error={errors.stock}
-              touched={touched.stock}
-              value={values.stock}
+              id="purchasePrice"
+              label="Precio compra"
+              placeholder="S/. 0.0"
+              error={errors.purchasePrice}
+              touched={touched.purchasePrice}
+              value={values.purchasePrice}
               handleChange={handleChange}
               handleBlur={handleBlur}
             />
           </Group>
+          <Input 
+            id="brand"
+            label="Marca"
+            placeholder="Ingresa una marca"
+            error={errors.brand}
+            touched={touched.brand}
+            value={values.brand}
+            handleChange={handleChange}
+            handleBlur={handleBlur}
+          />
           <Button
             type="submit"
             iconSize={18}

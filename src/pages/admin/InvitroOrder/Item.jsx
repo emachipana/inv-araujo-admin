@@ -7,24 +7,29 @@ import { useAdmin } from "../../../context/admin";
 import Button from "../../../components/Button";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
 
-function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGenerated }) {
+function Item({ item, vitroId, setVitro, handleEdit, setOrderItems, isAbleToEdit }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteItem } = useAdmin();
+  const { deleteItem } = useAdmin();
+  const { user } = useAuth();
   const { id, variety, price, quantity, subTotal } = item;
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedVitroOrder = await deleteItem(id, vitroId);
+      const updatedVitroOrder = await deleteItem(id, vitroId, setOrderItems, user.employeeId);
       setVitro(updatedVitroOrder);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   } 
+
+  const userPermissions = user.role.permissions;
 
   return (
     <Variety>
@@ -91,37 +96,45 @@ function Item({ item, vitroId, setVitro, handleEdit, orderStatus, isInvoiceGener
         </FlexColumn>
       </Wrapper>
       {
-        (orderStatus === "PENDIENTE" && !isInvoiceGenerated)
+        isAbleToEdit
         &&
         <FlexRow gap={1}>
-          <Button
-            style={{padding: "0.3rem 0.6rem"}}
-            iconSize={15}
-            fontSize={14}
-            Icon={FaEdit}
-            color="warning"
-            onClick={() => handleEdit(item)}
-          >
-            Editar
-          </Button>
-          <Button
-            style={{padding: "0.3rem 0.6rem"}}
-            iconSize={14}
-            fontSize={14}
-            Icon={isDeleting ? null : FaTrashAlt}
-            color="danger"
-            onClick={handleDelete}
-            disabled={isDeleting}
-          >
-            {
-              isDeleting
-              ? <>
-                  <Spinner size="sm" />
-                  Eliminado...
-                </>
-              : "Eliminar"
-            }
-          </Button>
+          {
+            userPermissions.includes("INVITRO_ITEM_UPDATE")
+            &&
+            <Button
+              style={{padding: "0.3rem 0.6rem"}}
+              iconSize={15}
+              fontSize={14}
+              Icon={FaEdit}
+              color="warning"
+              onClick={() => handleEdit(item)}
+            >
+              Editar
+            </Button>
+          }
+          {
+            userPermissions.includes("INVITRO_ITEM_DELETE")
+            &&
+            <Button
+              style={{padding: "0.3rem 0.6rem"}}
+              iconSize={14}
+              fontSize={14}
+              Icon={isDeleting ? null : FaTrashAlt}
+              color="danger"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {
+                isDeleting
+                ? <>
+                    <Spinner size="sm" />
+                    Eliminado...
+                  </>
+                : "Eliminar"
+              }
+            </Button>
+          }
         </FlexRow>
       }
     </Variety>

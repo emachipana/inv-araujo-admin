@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Title } from "../styles";
@@ -12,31 +11,33 @@ import Item from "./Item";
 import { AiFillProduct } from "react-icons/ai";
 import ItemModal from "./ItemModal";
 import Button from "../../../components/Button";
-import AlertError from "../../../components/AlertError";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Expense() {
   const [isLoading, setIsLoading] = useState(true);
+  const [expenses, setExpenses] = useState([]);
   const [itemModal, setItemModal] = useState(false);
   const [item, setItem] = useState("");
   const { id } = useParams();
   const [expense, setExpense] = useState({});
-  const { error, setError } = useAdmin();
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const expense = await apiFetch(`profits/${id}`);
+        const expenses = await apiFetch(`expenses/profit/${id}`);
         setExpense(expense.data);
+        setExpenses(expenses);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [ id, setError ]);
+  }, [ id ]);
 
   const handleEdit = (item) => {
     setItemModal(true);
@@ -116,13 +117,16 @@ function Expense() {
                       gap={1}
                     >
                       {
-                        expense.expenses?.map((item, index) => (
+                        expenses.length <= 0
+                        ? <Text>Aún no hay gastos</Text>
+                        : expenses?.map((item, index) => (
                           <Item 
                             key={index}
                             handleEdit={() => handleEdit(item)}
                             item={item}
                             profitId={expense.id}
                             setExpense={setExpense}
+                            setExpenses={setExpenses}
                           />
                         ))
                       }
@@ -146,16 +150,9 @@ function Expense() {
                 profitId={expense.id}
                 setExpense={setExpense}
                 setItem={setItem}
+                setExpenses={setExpenses}
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

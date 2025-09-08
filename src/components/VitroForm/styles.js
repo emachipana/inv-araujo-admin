@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
 import { shadowSm } from "../../styles/layout";
+import { COLORS } from "../../styles/colors";
 
 export const ClientSection = styled.section`
   width: 100%;
@@ -8,7 +9,8 @@ export const ClientSection = styled.section`
   justify-content: flex-start;
   gap: 1rem;
   padding: 0.5rem 1rem;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   box-shadow: ${shadowSm};
-  background-color: rgba(255, 255, 255, .8);
+  background-color: white;
+  border: 1px solid ${COLORS.platinium};
 `;

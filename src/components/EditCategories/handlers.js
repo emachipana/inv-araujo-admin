@@ -1,3 +1,6 @@
+import toast from "react-hot-toast";
+import { errorParser } from "../../helpers/errorParser";
+
 export const handleChange = (event, setCategory) => {
   const value = event.target.value;
   let error;
@@ -26,12 +29,12 @@ export const onSave = async (category, id, body, setIsToEdit, setCategory, updat
     closeEdit(setIsToEdit, setCategory);
     setIsLoading(false);
   }catch(error) {
-    console.error(error);
     setIsLoading(false);
+    toast.error(errorParser(error.message));
   }
 }
 
-export const onSubmit = async (values, setIsLoading, addCategory, setCurrentAction, setError, to) => {
+export const onSubmit = async (values, setIsLoading, addCategory, setCurrentAction, to) => {
   try {
     setIsLoading(true);
     await addCategory(values);
@@ -39,7 +42,6 @@ export const onSubmit = async (values, setIsLoading, addCategory, setCurrentActi
     setCurrentAction(to);
   }catch(error) {
     setIsLoading(false);
-    console.error(error);
-    setError(error.message);
+    toast.error(errorParser(error.message));
   }
 }

@@ -22,6 +22,14 @@ function Button({ Icon, color, fontSize, iconPosition, iconSize, children, ...pr
     white: {
       background: "white",
       hover: COLORS.persian
+    },
+    blue: {
+      background: COLORS.blue,
+      hover: COLORS.blue_hover
+    },
+    purple: {
+      background: COLORS.purple,
+      hover: COLORS.purple_hover
     }
   }
 

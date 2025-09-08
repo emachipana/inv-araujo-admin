@@ -1,14 +1,13 @@
 import styled from "@emotion/styled";
 
 export const Container = styled.div`
-  padding: 3px 5px;
-  border-radius: 4px;
+  padding: 0.2rem 0.7rem;
+  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${({color}) => color};
-  text-transform: uppercase;
-  color: white;
+  background-color: ${({bgColor}) => bgColor};
+  color: ${({color}) => color};
   font-size: ${({ size }) => size || 12}px;
-  font-weight: 800;
+  font-weight: 700;
 `;

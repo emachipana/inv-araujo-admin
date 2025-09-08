@@ -10,12 +10,14 @@ import { useNavigate } from "react-router-dom";
 import { FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 import { useAdmin } from "../../../context/admin";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Item({ item, setBanner, banner }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const { images = [] } = item.product;
   const navigate = useNavigate();
-  const { setError, deleteBannerItem } = useAdmin();
+  const { deleteBannerItem } = useAdmin();
 
   const handleDelete = async () => {
     try {
@@ -24,9 +26,8 @@ function Item({ item, setBanner, banner }) {
       setBanner(updatedBanner);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   };
 

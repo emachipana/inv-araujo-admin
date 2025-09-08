@@ -1,30 +1,16 @@
-import { useEffect } from "react";
 import { useAdmin } from "../../../context/admin";
-import apiFetch from "../../../services/apiFetch";
 import { Container } from "../../../components/Categories/styles";
 import { Spinner } from "reactstrap";
 import Category from "../../../components/Category";
 
-function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
-  const { isLoading, ordersBackup, setOrders, setError } = useAdmin();
+function Status({ currentStatus, setFilters, isBlocked }) {
+  const { isLoading } = useAdmin();
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        if(currentStatus === "Todo") return setOrders(ordersBackup);
-        setIsGetting(true);
-        const orders = await apiFetch(`orders?status=${currentStatus.toUpperCase()}`);
-        setOrders(orders);
-        setIsGetting(false);
-      }catch(error) {
-        setIsGetting(false);
-        console.error(error);
-        setError(error.message);
-      }
-    }
+  const setCurrent = (id, name) => {
+    if(name === "Todo") return setFilters(filters => ({...filters, status: {id: null, name: null}, page: 0}));
 
-    fetch();
-  }, [ currentStatus, ordersBackup, setError, setOrders, setIsGetting ]);
+    setFilters(filters => ({...filters, status: {id, name}, page: 0}));
+  }
 
   return (
     <Container isLoading={isLoading}>
@@ -34,21 +20,38 @@ function Status({ currentStatus, setCurrentStatus, isBlocked, setIsGetting }) {
         : <>
             <Category
               isBlocked={isBlocked}
+              id={null}
               name="Todo"
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
             />
             <Category
               isBlocked={isBlocked}
+              id="ENTREGADO"
               name="Entregado"
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
             />
             <Category 
+              id="PENDIENTE"
               name="Pendiente"
               isBlocked={isBlocked}
               currentCategory={currentStatus}
-              setCurrentCategory={setCurrentStatus}
+              setCurrentCategory={setCurrent}
+            />
+            <Category
+              id="PAGADO"
+              name="Pagado"
+              isBlocked={isBlocked}
+              currentCategory={currentStatus}
+              setCurrentCategory={setCurrent}
+            />
+            <Category
+              id="CANCELADO"
+              name="Cancelado"
+              isBlocked={isBlocked}
+              currentCategory={currentStatus}
+              setCurrentCategory={setCurrent}
             />
           </>
       }

@@ -16,7 +16,8 @@ import { MdDiscount } from "react-icons/md";
 import Item from "./Item";
 import ItemModal from "./ItemModal";
 import DeleteModal from "../Product/DeleteModal";
-import AlertError from "../../../components/AlertError";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 
 function Banner() {
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +25,7 @@ function Banner() {
   const [itemModal, setItemModal] = useState(false);
   const [isUsed, setIsUsed] = useState(false);
   const [banner, setBanner] = useState({});
-  const { error, setError, deleteBanner, matcher, loadProducts, updateBanner } = useAdmin();
+  const { deleteBanner, updateBanner } = useAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -32,23 +33,17 @@ function Banner() {
     const fetch = async () => {
       try {
         const banner = await apiFetch(`offers/${id}`);
-        if(!matcher.products) {
-          setIsLoading(true);
-          await loadProducts();
-        }
-
         setBanner(banner.data);
-        setIsUsed(banner.data.used);
+        setIsUsed(banner.data.isUsed);
         setIsLoading(false);
       }catch(error) {
-        console.error(error);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ id, loadProducts, matcher.products, setError ]);
+  }, [ id ]);
 
   return (
     isLoading
@@ -104,9 +99,9 @@ function Banner() {
                       fontSize={15}
                       iconSize={17}
                       color="secondary"
-                      onClick={(e) => handleChecked(e, isUsed, banner, setIsUsed, updateBanner, setError)}
+                      onClick={(e) => handleChecked(e, isUsed, banner, setIsUsed, updateBanner)}
                     >
-                      { banner.used ? "Dejar de usar" : "Empezar a usar" }
+                      { banner.isUsed ? "Dejar de usar" : "Empezar a usar" }
                     </Button>
                     <Button
                       Icon={FaEdit}
@@ -142,7 +137,7 @@ function Banner() {
                       gap={1}
                     >
                       {
-                        banner.products?.map((item, index) => (
+                        banner.items?.map((item, index) => (
                           <Item 
                             key={index}
                             item={item}
@@ -152,7 +147,7 @@ function Banner() {
                         ))
                       }
                       {
-                        banner.products.length < 4
+                        banner.items?.length < 4
                         &&
                         <Button
                           style={{marginTop: "1rem"}}
@@ -168,12 +163,16 @@ function Banner() {
                   </FlexColumn>
                 </Card>
               </Section>
-              <ItemModal 
-                banner={banner}
-                isActive={itemModal}
-                setBanner={setBanner}
-                setIsActive={setItemModal}
-              />
+              {
+                itemModal
+                &&
+                <ItemModal 
+                  banner={banner}
+                  isActive={itemModal}
+                  setBanner={setBanner}
+                  setIsActive={setItemModal}
+                />
+              }
               <DeleteModal 
                 handleDelete={deleteBanner}
                 id={banner.id}
@@ -183,14 +182,6 @@ function Banner() {
                 title="¿Eliminar banner?"
               />
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-          />
         }
       </>
   );

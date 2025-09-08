@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Card, ImageCard as AddCard, Section, Wrapper } from "./styles";
-import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
 import Button from "../../../components/Button";
@@ -12,37 +12,50 @@ import { BiSolidOffer } from "react-icons/bi";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import DiscountModal from "./DiscountModal";
 import { useAdmin } from "../../../context/admin";
-import AlertError from "../../../components/AlertError";
 import DeleteModal from "./DeleteModal";
 import { AiTwotoneFileAdd } from "react-icons/ai";
 import ImageModal from "./ImageModal";
 import ImageCard from "./ImageCard";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
+import { IoBagRemoveSharp } from "react-icons/io5";
+import NewCategory from "../../../components/Category/New";
+import RemoveStockModal from "./RemoveStockModal";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [imageModal, setImageModal] = useState(false);
+  const [discountStock, setDiscountStock] = useState([]);
   const [product, setProduct] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [removeStockModal, setRemoveStockModal] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
-  const { error, setError, deleteProduct } = useAdmin();
+  const { deleteProduct } = useAdmin();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
       try {
         const product = await apiFetch(`products/${id}`);
+        const discounts = await apiFetch(`removeStock/product/${id}`);
+        setDiscountStock(discounts?.reverse());
         setProduct(product.data);
         setIsLoading(false);
       }catch(error) {
-        console.error(error.message);
-        setError(error.message);
+        toast.error(errorParser(error.message));
         setIsLoading(false);
       }
     }
 
     fetch();
-  }, [id, setError]);
+  }, [ id ]);
+
+  const permissions = user.role.permissions;
+
+  console.log(discountStock);
 
   return (
     isLoading
@@ -53,6 +66,17 @@ function Product() {
           ? <Title>El producto no existe</Title>
           : <>
               <Title>{ product.name }</Title>
+              {
+                discountStock.length > 0
+                &&
+                <NewCategory
+                  Icon={IoBagRemoveSharp}
+                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                  onClick={() => setRemoveStockModal(!removeStockModal)}
+                >
+                  Disminución de stock
+                </NewCategory>
+              }
               <Section>
                 <Card>
                   <Wrapper>
@@ -82,7 +106,7 @@ function Product() {
                         size={15}
                         color={COLORS.dim}
                       >
-                        { product.category.name }
+                        { product.categoryName }
                       </Text>
                     </FlexColumn>
                     <FlexColumn gap={0.3}>
@@ -105,8 +129,8 @@ function Product() {
                       >
                         Estado
                       </Text>
-                      <Badge color={product.active ? "primary" : "danger"}>
-                        { product.active ? "activo" : "inactivo" }
+                      <Badge color={product.isActive ? "primary" : "danger"}>
+                        { product.isActive ? "Activo" : "Inactivo" }
                       </Badge>
                     </FlexColumn>
                   </Wrapper>
@@ -211,37 +235,49 @@ function Product() {
                     </FlexColumn>
                   </Wrapper>
                   <Wrapper isButtons>
-                    <Button
-                      Icon={BiSolidOffer}
-                      fontSize={15}
-                      iconSize={19}
-                      color="secondary"
-                      onClick={() => setDiscountModal(!discountModal)}
-                    >
-                      {
-                        product.discount
-                        ? "Editar dscto."
-                        : "Crear dscto."
-                      }
-                    </Button>
-                    <Button
-                      Icon={FaEdit}
-                      fontSize={15}
-                      iconSize={18}
-                      color="warning"
-                      onClick={() => navigate("edit")}
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => setDeleteModal(!deleteModal)}
-                      Icon={FaTrashAlt}
-                      fontSize={15}
-                      iconSize={16}
-                      color="danger"
-                    >
-                      Eliminar
-                    </Button>
+                    {
+                      (permissions.includes("PRODUCTS_DISCOUNT_CREATE") || permissions.includes("PRODUCTS_DISCOUNT_UPDATE"))
+                      &&
+                      <Button
+                        Icon={BiSolidOffer}
+                        fontSize={15}
+                        iconSize={19}
+                        color="secondary"
+                        onClick={() => setDiscountModal(!discountModal)}
+                      >
+                        {
+                          product.discount
+                          ? "Editar dscto."
+                          : "Crear dscto."
+                        }
+                      </Button>
+                    }
+                    {
+                      permissions.includes("PRODUCTS_UPDATE")
+                      &&
+                      <Button
+                        Icon={FaEdit}
+                        fontSize={15}
+                        iconSize={18}
+                        color="warning"
+                        onClick={() => navigate("edit")}
+                      >
+                        Editar
+                      </Button>
+                    }
+                    {
+                      permissions.includes("PRODUCTS_DELETE")
+                      &&
+                      <Button
+                        onClick={() => setDeleteModal(!deleteModal)}
+                        Icon={FaTrashAlt}
+                        fontSize={15}
+                        iconSize={16}
+                        color="danger"
+                      >
+                        Eliminar
+                      </Button>
+                    }
                   </Wrapper>
                 </Card>
                 <Card>
@@ -253,14 +289,18 @@ function Product() {
                       Imagenes
                     </Text>
                     <Wrapper wrap="true">
-                      <AddCard
-                        onClick={() => setImageModal(!imageModal)}
-                      >
-                        <AiTwotoneFileAdd 
-                          size={70}
-                          color={COLORS.dim}
-                        />
-                      </AddCard>
+                      {
+                        permissions.includes("PRODUCTS_IMAGE_CREATE")
+                        &&
+                        <AddCard
+                          onClick={() => setImageModal(!imageModal)}
+                        >
+                          <AiTwotoneFileAdd 
+                            size={70}
+                            color={COLORS.dim}
+                          />
+                        </AddCard>
+                      }
                       {
                         product?.images.map((image, index) => (
                           <ImageCard
@@ -295,16 +335,16 @@ function Product() {
                 setIsActive={setImageModal}
                 setProduct={setProduct}
               />
+              {
+                discountStock.length > 0
+                &&
+                <RemoveStockModal
+                  isActive={removeStockModal}
+                  setIsActive={setRemoveStockModal}
+                  discounts={discountStock}
+                />
+              }
             </>
-        }
-        {
-          error
-          &&
-          <AlertError 
-            error={error}
-            setError={setError}
-            from="product"
-          />
         }
       </>
   );

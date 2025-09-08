@@ -5,12 +5,14 @@ import { CategoryContainer as Container, Wrapper } from "./styles";
 import { MdClose, MdCheck } from "react-icons/md";
 import { FaEdit, FaTrashAlt, FaCaretRight } from "react-icons/fa";
 import Input from "../Input";
-import { useAdmin } from "../../context/admin";
 import { Spinner } from "reactstrap";
 import { closeEdit, handleChange, handleBlur, setupEdit, onSave } from "./handlers";
 import SubCategory from "./SubCategory";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/auth";
 
-function Category({ id, children, isFromTuber, subCategories, forCategory, forSubCategory }) {
+function Category({ id, children, isFromTuber, subCategories = [], forCategory, forSubCategory, ableToEdit, ableToDelete }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isToEdit, setIsToEdit] = useState(false);
@@ -19,14 +21,13 @@ function Category({ id, children, isFromTuber, subCategories, forCategory, forSu
     error: "",
     touched: false
   });
-  const { setError } = useAdmin();
+  const { user } = useAuth();
 
   const onDelete = async () => {
     try {
       await forCategory.deleteCategory(id);
     }catch(error) {
-      setError(error.message);
-      console.error(error);
+      toast.error(errorParser(error.message));
     }
   }
 
@@ -75,7 +76,7 @@ function Category({ id, children, isFromTuber, subCategories, forCategory, forSu
                       onClick={() => onSave(
                         category,
                         id,
-                        { name: category.value },
+                        { name: category.value, employeeId: user.employeeId },
                         setIsToEdit,
                         setCategory,
                         forCategory.updateCategory,
@@ -91,18 +92,26 @@ function Category({ id, children, isFromTuber, subCategories, forCategory, forSu
                 />
               </>
             : <>
-                <FaEdit
-                  onClick={() => setupEdit(children, setIsToEdit, setCategory)}
-                  size={19}
-                  color={COLORS.dim}
-                  style={{cursor: "pointer"}}
-                />
-                <FaTrashAlt 
-                  size={18}
-                  color={COLORS.red}
-                  style={{cursor: "pointer"}}
-                  onClick={onDelete}
-                />
+                {
+                  ableToEdit
+                  &&
+                  <FaEdit
+                    onClick={() => setupEdit(children, setIsToEdit, setCategory)}
+                    size={19}
+                    color={COLORS.dim}
+                    style={{cursor: "pointer"}}
+                  />
+                }
+                {
+                  ableToDelete
+                  &&
+                  <FaTrashAlt 
+                    size={18}
+                    color={COLORS.red}
+                    style={{cursor: "pointer"}}
+                    onClick={onDelete}
+                  />
+                }
               </>
           }
         </FlexRow>
@@ -123,6 +132,8 @@ function Category({ id, children, isFromTuber, subCategories, forCategory, forSu
                 id={subCategory.id}
                 deleteSubCategory={forSubCategory.deleteSubCategory}
                 updateSubCategory={forSubCategory.updateSubCategory}
+                ableToEdit={ableToEdit}
+                ableToDelete={ableToDelete}
               >
                 { subCategory.name }
               </SubCategory>

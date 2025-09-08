@@ -1,52 +1,67 @@
-import { IoMdAddCircleOutline } from "react-icons/io";
+import { RiSlideshow2Fill } from "react-icons/ri";
 import Button from "../../../components/Button";
 import { Title } from "../styles";
-import { Section as Filter } from "./styles";
 import { useAdmin } from "../../../context/admin";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Banner from "../../../components/Banner";
 import { Spinner } from "reactstrap";
-import AlertError from "../../../components/AlertError";
 import Modal from "../../../components/Modal";
 import BannerForm from "../../../components/BannerForm";
 import { Section } from "../Products/styles";
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
+import { useModal } from "../../../context/modal";
+import { useAuth } from "../../../context/auth";
+import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { COLORS } from "../../../styles/colors";
 
 function Banners() {
-  const [modalCreate, setModalCreate] = useState(false);
-  const { isLoading, setIsLoading, error, setError, matcher, loadBanners, banners } = useAdmin();
+  const { isLoading, setIsLoading, loadBanners, banners } = useAdmin();
+  const { bannersModal: modalCreate, setBannersModal: setModalCreate } = useModal();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
       try {
-        if(!matcher.banners) {
-          setIsLoading(true);
-          await loadBanners();
-          setIsLoading(false);
-        }
+        await loadBanners();
       }catch(error) {
+        toast.error(errorParser(error.message));
         setIsLoading(false);
-        console.error(error);
-        setError(error.message);
       }
     }
 
     fetch();
-  }, [ loadBanners, matcher.banners, setError, setIsLoading ]);
+  }, [ loadBanners, setIsLoading ]);
 
   return (
     <>
-      <Title>Banners</Title>
-      <Filter>
-        <Button
-          style={{alignSelf: "flex-end"}}
-          onClick={() => setModalCreate(!modalCreate)}
-          fontSize={15}
-          Icon={IoMdAddCircleOutline}
-          iconSize={18}
-        >
-          Nuevo banner
-        </Button>
-      </Filter>
+      <FlexRow
+        width="100%"
+        justify="space-between"
+      >
+        <FlexColumn gap={0.1}>
+          <Title>Banners</Title>
+          <Text
+            style={{marginTop: "-0.5rem"}}
+            color={COLORS.dim}
+          >
+            Gestiona todos los banners de tu tienda
+          </Text>
+        </FlexColumn>
+        {
+          user.role.permissions.includes("BANNERS_CREATE")
+          &&
+          <Button
+            style={{alignSelf: "flex-end"}}
+            onClick={() => setModalCreate(!modalCreate)}
+            fontSize={15}
+            Icon={RiSlideshow2Fill}
+            iconSize={18}
+          >
+            Nuevo banner
+          </Button>
+        }
+      </FlexRow>
       <Section style={{alignItems: "flex-start"}}>
         {
           isLoading
@@ -55,10 +70,10 @@ function Banners() {
               <Banner 
                 key={index}
                 id={banner.id}
-                isUsed={banner.used}
+                isUsed={banner.isUsed}
                 description={banner.description}
                 title={banner.title}
-                products={banner.products || []}
+                items={banner.items || []}
                 markedWord={banner.markedWord}
               />
             ))
@@ -68,16 +83,11 @@ function Banners() {
         isActive={modalCreate}
         setIsActive={setModalCreate}
       >
-        <BannerForm isToCreate />
-      </Modal>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
+        <BannerForm 
+          isToCreate
+          setIsActive={setModalCreate}
         />
-      }
+      </Modal>
     </>
   );
 }

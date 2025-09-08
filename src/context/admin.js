@@ -1,127 +1,241 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import apiFetch from "../services/apiFetch";
-import depJson from "../data/departamentos.json";
-import provJson from "../data/provincias.json";
+import { useAuth } from "./auth";
 
 const AdminContext = createContext();
 
 const AdminProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [backup, setBackup] = useState([]);
+  const [products, setProducts] = useState({});
+  const [backup, setBackup] = useState({});
   const [tubers, setTubers] = useState([]);
-  const [vitroOrders, setVitroOrders] = useState([]);
-  const [vitroOrdersBack, setVitroOrdersBack] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [ordersBackup, setOrdersBackup] = useState([]);
-  const [invoices, setInvoices] = useState([]);
-  const [invoicesBackup, setInvoicesBackup] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [provinces, setProvinces] = useState({});
+  const [vitroOrders, setVitroOrders] = useState({});
+  const [vitroOrdersBack, setVitroOrdersBack] = useState({});
+  const [orders, setOrders] = useState({});
+  const [ordersBackup, setOrdersBackup] = useState({});
+  const [invoices, setInvoices] = useState({});
+  const [invoicesBackup, setInvoicesBackup] = useState({});
   const [banners, setBanners] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [clientsBackup, setClientsBackup] = useState([]);
+  const [clients, setClients] = useState({});
+  const [clientsBackup, setClientsBackup] = useState({});
+  const [warehouses, setWarehouses] = useState([]);
+  const [warehousesBackup, setWarehousesBackup] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [employeesBackup, setEmployeesBackup] = useState([]);
   const [expenses, setExpenses] = useState([]);
-  const [error, setError] = useState(null);
-  const [info, setInfo] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [roles, setRoles] = useState([]);
+  const [productionSummary, setProductionSummary] = useState([]);
+  const [messages, setMessages] = useState({});
+  const [messagesBackup, setMessagesBackup] = useState({});
+  const [homeData, setHomeData] = useState({
+    orders: {
+      data: {ship: 0, pen: 0},
+      content: []
+    },
+    vitroOrders: {
+      data: {ship: 0, pen: 0},
+      content: []
+    }
+  });
   const [matcher, setMatcher] = useState({
+    home: false,
     products: false,
-    vitroOrder: false,
+    vitroOrders: false,
     orders: false,
-    departments: false,
     tubers: false,
     invoices: false,
     banners: false,
     clients: false,
-    expenses: false
+    expenses: false,
+    warehouses: false,
+    employees: false,
+    notifications: false,
   });
+  const [chatMessages, setChatMessages] = useState([
+    { 
+      id: 1,
+      text: "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?", 
+      sender: 'bot',
+      type: 'text'
+    }
+  ]);
 
-  const loadExpenses = async () => {
+  const { user } = useAuth();
+
+  const markAsRead = async (id) => {
+    if(!id) throw Error("Hubo un problema vuelve a intentarlo más tarde");
+    const index = notifications.findIndex((noti) => noti.id === id);
+    const notification = notifications[index];
+    if(!notification) return;
+    notifications[index] = {...notification, isRead: true};
+    setNotifications([...notifications]);
+
+    await apiFetch(`notifications/${id}`, { method: "PUT" });
+  }
+
+  const loadNotifications = useCallback(async () => {
+    if(matcher.notifications) return;
+    const notifications = await apiFetch("notifications/getByUser");
+    setNotifications(notifications.data?.reverse());
+    setMatcher(matcher => ({...matcher, notifications: true}));
+  }, [matcher.notifications]);
+
+  const loadMessages = useCallback(async () => {
+    if(matcher.messages) return;
+    const messages = await apiFetch("messages");
+    setMessages(messages);
+    setMessagesBackup(messages);
+    setIsLoading(false);
+    setMatcher(matcher => ({...matcher, messages: true}));
+  }, [matcher.messages]);
+
+  const loadExpenses = useCallback(async () => {
+    if(!user.role.permissions.includes("PROFITS_WATCH")) return;
+
+    if(matcher.expenses) return;
+    setIsLoading(true);
     const expenses = await apiFetch("profits");
     setExpenses(expenses);
     setMatcher(matcher => ({...matcher, expenses: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.expenses, user.role]);
 
-  const loadClients = async () => {
+  const loadClients = useCallback(async () => {
+    if(matcher.clients) return;
+    setIsLoading(true);
     const clients = await apiFetch("clients");
     setClients(clients);
     setClientsBackup(clients);
     setMatcher(matcher => ({...matcher, clients: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.clients]);
 
-  const loadBanners = async () => {
+  const loadWarehouses = useCallback(async () => {
+    if(matcher.warehouses) return;
+    setIsLoading(true);
+    const warehouses = await apiFetch("warehouses");
+    setWarehouses(warehouses);
+    setWarehousesBackup(warehouses);
+    setMatcher(matcher => ({...matcher, warehouses: true}));
+    setIsLoading(false);
+  }, [matcher.warehouses]);
+
+  const loadBanners = useCallback(async () => {
+    if(matcher.banners) return;
+    setIsLoading(true);
     const banners = await apiFetch("offers");
     setBanners(banners);
     setMatcher(matcher => ({...matcher, banners: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.banners]);
 
-  const loadInvoices = async () => {
+  const loadInvoices = useCallback(async () => {
+    if(matcher.invoices) return;
+    setIsLoading(true);
     const invoices = await apiFetch("invoices");
-    const reversed = invoices.reverse();
-    setInvoices(reversed);
-    setInvoicesBackup(reversed);
+    setInvoices(invoices);
+    setInvoicesBackup(invoices);
     setMatcher(matcher => ({...matcher, invoices: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.invoices]);
 
-  const loadTubers = async () => {
-    const tubers = await apiFetch("tubers");
-    setTubers(tubers);
-    setMatcher(matcher => ({...matcher, tubers: true}));
-  }
+  const loadOnHome = useCallback(async () => {
+    if(matcher.home) return;
+    await loadExpenses();
+    setIsLoading(true);
+    let vitroOrdersData = {};
+    let ordersData = {};
+    let orders = {};
+    let vitroOrders = {};
 
-  const loadDepartments = () => {
-    setDepartments(depJson);
-    setProvinces(provJson);
-    setMatcher(matcher => ({...matcher, departments: true}));
-  }
+    if(user.role.permissions.includes("ORDERS_WATCH")) {
+      ordersData = await apiFetch("orders/data");
+      orders = await apiFetch("orders?size=5&direction=DESC&sortby=date");
+    }
 
-  const loadProducts = async () => {
+    if(user.role.permissions.includes("INVITRO_WATCH")) {
+      vitroOrdersData = await apiFetch("vitroOrders/data");
+      vitroOrders = await apiFetch("vitroOrders?size=5&direction=DESC&sortby=initDate");
+    }
+    
+    setHomeData({
+      orders: {
+        data: ordersData.data,
+        content: orders.content
+      },
+      vitroOrders: {
+        data: vitroOrdersData.data,
+        content: vitroOrders.content
+      }
+    });
+    setMatcher(matcher => ({...matcher, home: true}));
+    setIsLoading(false);
+    // eslint-disable-next-line
+  }, [matcher.home]);
+
+  const loadProducts = useCallback(async () => {
+    if(matcher.products) return;
+    setIsLoading(true);
     const categories = await apiFetch("categories");
-    const products = await apiFetch("products");
+    const products = await apiFetch("products?activeProducts=false");
     setCategories(categories);
     setProducts(products);
     setBackup(products);
     setMatcher(matcher => ({...matcher, products: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.products]);
 
-  const loadVitroOrders = async () => {
+  const loadVitroOrders = useCallback(async () => {
+    if(matcher.vitroOrders) return;
+    setIsLoading(true);
     const tubers = await apiFetch("tubers");
     const vitroOrders = await apiFetch("vitroOrders");
+    const productionSummary = await apiFetch("vitroOrders/productionSummary");
     setTubers(tubers);
-    const reversed = vitroOrders.reverse();
-    setVitroOrders(reversed);        
-    setVitroOrdersBack(reversed);
+    setVitroOrders(vitroOrders);        
+    setVitroOrdersBack(vitroOrders);
+    setProductionSummary(productionSummary.data);
     setMatcher(matcher => ({...matcher, vitroOrders: true, tubers: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.vitroOrders]);
 
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
+    if(matcher.orders) return;
+    setIsLoading(true);
     const orders = await apiFetch("orders");
-    const reversed = orders.reverse();
-    setOrders(reversed);
-    setOrdersBackup(reversed);
+    setOrders(orders);
+    setOrdersBackup(orders);
     setMatcher(matcher => ({...matcher, orders: true}));
-  }
+    setIsLoading(false);
+  }, [matcher.orders]);
+
+  const loadEmployees = useCallback(async () => {
+    if(matcher.employees) return;
+    const rolesToFilter = ["CLIENTE", "ADMINISTRADOR"];
+
+    setIsLoading(true);
+    const employees = await apiFetch("employees");
+    const roles = await apiFetch("roles");
+    const employeesFiltered = employees.filter((emp) => !rolesToFilter.includes(emp?.role?.name));
+    setRoles(roles.filter(role => !rolesToFilter.includes(role?.name)));
+    setEmployees(employeesFiltered);
+    setEmployeesBackup(employeesFiltered);
+    setMatcher(matcher => ({...matcher, employees: true}));
+    setIsLoading(false);
+  }, [matcher.employees]);
 
   const updateCategory = async (id, body) => {
-    const newCategory = await apiFetch(`categories/${id}`, { body, method: "PUT" });
+    const category = categories.find(category => category.id === id);
+    const newCategory = await apiFetch(`categories/${id}`, { body: {
+      ...body,
+      description: category.description,
+      imageId: category.image.id
+    }, method: "PUT" });
     const tempCategories = categories;
     const index = categories.findIndex(category => category.id === id);
     tempCategories[index] = newCategory.data;
-    setCategories([...tempCategories]);
-  }
-
-  const updateSubCategory = async (id, body) => {
-    const { categoryId } = body;
-    const updatedCategory = await apiFetch(`categories/${id}`, { body, method: "PUT" });
-    const category = categories.find(category => category.id === categoryId);
-    const tempSubCategories = category.subCategories;
-    const index = category.subCategories.findIndex(subCategory => subCategory.id === id);
-    tempSubCategories[index] = updatedCategory.data;
-    category.subCategories = tempSubCategories;
-    const tempCategories = categories;
-    const categoryIndex = categories.findIndex(category => category.id === categoryId);
-    tempCategories[categoryIndex] = category;
     setCategories([...tempCategories]);
   }
 
@@ -131,30 +245,90 @@ const AdminProvider = ({ children }) => {
     setCategories([...newCategories]);
   }
 
-  const deleteSubCategory = async (id, parentId) => {
-    await apiFetch(`categories/${id}`, { method: "DELETE" });
-    const category = categories.find(category => category.id === parentId);
-    const tempCategories = categories;
-    const index = categories.findIndex(category => category.id === parentId);
-    category.subCategories = category.subCategories.filter(subCategory => subCategory.id !== id);
-    tempCategories[index] = category;
-    setCategories([...tempCategories]);
+  const deleteMessage = async (id) => {
+    await apiFetch(`messages/${id}`, { method: "DELETE" });
+    const newMessages = messages.content.filter(message => message.id !== id);
+    const backupUpdatedMessages = messagesBackup.content.filter(message => message.id !== id);
+    setMessages({...messages, content: [...newMessages]});
+    setMessagesBackup({...messagesBackup, content: [...backupUpdatedMessages]});
+  }
+
+  const uploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const image = await apiFetch("images", { body: formData, isFile: true });
+
+    return image.data;
   }
 
   const addCategory = async (body) => {
-    const newCategory = await apiFetch("categories", { body });
+    const image = await uploadImage(body.file);
+
+    const newCategory = await apiFetch("categories", { body: {
+      name: body.name,
+      description: body.description,
+      imageId: image.id,
+      employeeId: body.employeeId
+    }});
     setCategories(categories => [...categories, newCategory.data]);
   }
 
-  const addSubCategory = async (body) => {
-    const { categoryId } = body;
-    const newSubCategory = await apiFetch("categories", { body });
-    const category = categories.find(category => category.id === (categoryId * 1));
-    category.subCategories = [...category.subCategories || [], {...newSubCategory.data, subCategories: []}];
-    const index = categories.findIndex(category => category.id === (categoryId * 1));
-    const tempCategories = categories;
-    tempCategories[index] = category;
-    setCategories([...tempCategories]);
+  const orderAtAgency = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      ...body,
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`orders/${orderId}/agency`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+  
+  const vitroOrderAtAgency = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      ...body,
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`vitroOrders/${orderId}/agency`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+
+  const orderDelivered = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+    const orderBody = {
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`orders/${orderId}/delivered`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+    
+  const vitroOrderDelivered = async (orderId, body) => {
+    const image = await uploadImage(body.file);
+
+    const orderBody = {
+      employeeId: user.employeeId,
+      evidenceId: image.id,
+    }
+
+    const updatedOrder = await apiFetch(`vitroOrders/${orderId}/delivered`, { body: orderBody, method: "PUT" });
+    
+    return updatedOrder.data;
+  }
+
+  const addRole = async (body) => {
+    const newRole = await apiFetch("roles", { body });
+    setRoles(roles => [...roles, newRole.data]);
   }
 
   const updateProduct = async (id, body) => {
@@ -163,56 +337,81 @@ const AdminProvider = ({ children }) => {
     return updatedProduct.data;
   }
 
+  const newBatch = async (body) => {
+    const product = backup.content?.find((prod) => prod.id === body.productId);
+    await apiFetch("warehouseProducts", {body});
+    if(product) setProduct(product.id, {...product, stock: product.stock + +body.quantity});
+  }
+
+  const updateActiveProduct = async (id, body) => {
+    setProduct(id, body);
+    await apiFetch(`products/${id}`, { body, method: "PUT" });
+  }
+
   const addProduct = async (body) => {
     const newProduct = await apiFetch("products", { body });
-    setProducts(products => [...products, newProduct.data]);
-    setBackup(products => [...products, newProduct.data]);
+    setProducts(products => ({...products, content: [newProduct.data, ...products.content]}));
+    setBackup(products => ({...products, content: [newProduct.data, ...products.content]}));
     return newProduct.data;
   }
 
+  const addWarehouse = async (body) => {
+    body.employeeId = user.employeeId;
+    const newWarehouse = await apiFetch("warehouses", { body });
+    setWarehouses(warehouses => [...warehouses, newWarehouse.data]);
+    setWarehousesBackup(warehouses => [...warehouses, newWarehouse.data]);
+    return newWarehouse.data;
+  }
+
   const addBanner = async (body) => {
+    body.employeeId = user.employeeId;
     const newBanner = await apiFetch("offers", { body });
     setBanners(banners => [...banners, newBanner.data]);
     return newBanner.data;
   }
 
   const addVitro = async (body) => {
-    const newVitro = await apiFetch("vitroOrders", { body });
-    setVitroOrders(vitros => [newVitro.data, ...vitros]);
-    setVitroOrdersBack(vitros => [newVitro.data, ...vitros]);
+    const newVitro = await apiFetch("vitroOrders?alert=false", { body });
+    setVitroOrders(vitros => ({...vitros, content: [newVitro.data, ...vitros.content]}));
+    setVitroOrdersBack(vitros => ({...vitros, content: [newVitro.data, ...vitros.content]}));
     return newVitro.data;
   }
 
   const addOrder = async (body) => {
-    const newOrder = await apiFetch("orders", { body });
-    setOrders(orders => [newOrder.data, ...orders]);
-    setOrdersBackup(orders => [newOrder.data, ...orders]);
+    body.operatorId = user.employeeId;
+    const newOrder = await apiFetch("orders?alert=false", { body });
+    setOrders(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
+    setOrdersBackup(orders => ({...orders, content: [newOrder.data, ...orders.content]}));
     return newOrder.data;
   }
 
   const addClient = async (body) => {
+    body.employeeId = user.employeeId;
     const newClient = await apiFetch("clients", { body });
-    setClients(clients => [...clients, newClient.data]);
-    setClientsBackup(clients => [...clients, newClient.data]);
+    setClients(clients => ({...clients, content: [newClient.data, ...clients.content]}));
+    setClientsBackup(clients => ({...clients, content: [newClient.data, ...clients.content]}));
     return newClient.data;
   }
 
   const addInvoice = async (body) => {
+    body.employeeId = user.employeeId;
     const newInvoice = await apiFetch("invoices", { body });
-    setInvoices(invoices => [newInvoice.data, ...invoices]);
-    setInvoicesBackup(invoices => [newInvoice.data, ...invoices]);
+    setInvoices(invoices => ({...invoices, content: [newInvoice.data, ...invoices.content]}));
+    setInvoicesBackup(invoices => ({...invoices, content: [newInvoice.data, ...invoices.content]}));
     return newInvoice.data;
   }
 
   const setProduct = (id, product) => {
+    if(!products.content) return;
+
     const tempProducts = products;
     const tempBackup = backup;
-    const index = tempProducts.findIndex(product => product.id === id);
-    const indexBackup = tempBackup.findIndex(product => product.id === id);
-    tempProducts[index] = product;
-    tempBackup[indexBackup] = product;
-    setProducts([...tempProducts]);
-    setBackup([...tempBackup]);
+    const index = tempProducts.content?.findIndex(product => product.id === id);
+    const indexBackup = tempBackup.content?.findIndex(product => product.id === id);
+    tempProducts.content[index] = product;
+    tempBackup.content[indexBackup] = product;
+    setProducts({...tempProducts});
+    setBackup({...tempBackup});
   }
 
   const deleteProduct = async (id) => {
@@ -224,12 +423,11 @@ const AdminProvider = ({ children }) => {
   }
 
   const addProductImage = async (product, file) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    const image = await apiFetch("images", { body: formData, isFile: true });
+    const image = await uploadImage(file);
     const body = {
       productId: product.id,
-      imageId: image.data.id
+      imageId: image.id,
+      employeeId: user.employeeId
     }
     const newProductImage = await apiFetch("productImages", { body });
     const images = product.images ? [...product.images, newProductImage.data] : [newProductImage.data];
@@ -239,7 +437,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const deleteProductImage = async (imageId, product) => {
-    await apiFetch(`productImages/${imageId}`, { method: "DELETE" });
+    await apiFetch(`productImages/${imageId}?employeeId=${user.employeeId}`, { method: "DELETE" });
     const images = product.images.filter(image => image.id !== imageId);
     const updatedProduct = {...product, images};
     setProduct(product.id, updatedProduct);
@@ -247,6 +445,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateTuber = async (id, body) => {
+    body.employeeId = user.employeeId;
     const newTuber = await apiFetch(`tubers/${id}`, { body, method: "PUT" });
     const tempTubers = tubers;
     const index = tubers.findIndex(tuber => tuber.id === id);
@@ -261,11 +460,13 @@ const AdminProvider = ({ children }) => {
   }
 
   const addTuber = async (body) => {
+    body.employeeId = user.employeeId;
     const newTuber = await apiFetch("tubers", { body });
     setTubers(tubers => [...tubers, newTuber.data]);
   }
 
   const addVariety = async (body) => {
+    body.employeeId = user.employeeId;
     const { tuberId } = body;
     const newVariety = await apiFetch("varieties", { body });
     const tuber = tubers.find(tuber => tuber.id === (tuberId * 1));
@@ -277,6 +478,7 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateVariety = async (body) => {
+    body.employeeId = user.employeeId;
     const { id, ...toUpdate } = body;
     await apiFetch(`varieties/${id}`, { body: toUpdate, method: "PUT" });
     const tubers = await apiFetch("tubers");
@@ -295,23 +497,24 @@ const AdminProvider = ({ children }) => {
 
   const deleteVitro  = async (id) => {
     await apiFetch(`vitroOrders/${id}`, { method: "DELETE" });
-    const vitro = vitroOrdersBack.find(vitroO => vitroO.id === id);
-    if(!!vitro.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
-    const updatedOrders = vitroOrders.filter(order => order.id !== id);
-    const updatedBackup = vitroOrdersBack.filter(order => order.id !== id);
-    setVitroOrders([...updatedOrders]);
-    setVitroOrdersBack([...updatedBackup]);
+    const vitro = vitroOrdersBack.content.find(vitro => vitro.id === id);
+    if(!vitro) return;
+
+    const updatedOrders = vitroOrders.content.filter(order => order.id !== id);
+    const updatedBackup = vitroOrdersBack.content.filter(order => order.id !== id);
+    setVitroOrders({...vitroOrders, content: [...updatedOrders]});
+    setVitroOrdersBack({...vitroOrdersBack, content: [...updatedBackup]});
   }
 
   const deleteOrder = async (id) => {
     await apiFetch(`orders/${id}`, { method: "DELETE" });
-    const order = ordersBackup.find(orderF => orderF.id === id);
+    const order = ordersBackup.content.find(orderF => orderF.id === id);
     if(!!order.invoice && matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
     setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
-    const updatedOrders = orders.filter(order => order.id !== id);
-    const updatedBackup = ordersBackup.filter(order => order.id !== id); 
-    setOrders([...updatedOrders]);
-    setOrdersBackup([...updatedBackup]);
+    const updatedOrders = orders.content.filter(order => order.id !== id);
+    const updatedBackup = ordersBackup.content.filter(order => order.id !== id); 
+    setOrders({...orders, content: [...updatedOrders]});
+    setOrdersBackup({...ordersBackup, content: [...updatedBackup]});
   }
 
   const updateVitro = async (id, body) => {
@@ -321,38 +524,42 @@ const AdminProvider = ({ children }) => {
   }
 
   const updateInvoice = async (id, body) => {
-    const { comment, issueDate, address } = body;
-    const updatedInvoice = await apiFetch(`invoices/${id}`, { body: { comment, issueDate, address }, method: "PUT" });
-    setInvoice(id, updatedInvoice.data);
+    const updatedInvoice = await apiFetch(`invoices/${id}`, { body, method: "PUT" });
+    setMatcher(matcher => ({...matcher, invoices: false}));
     return updatedInvoice.data;
   }
 
   const updateBanner = async (id, body) => {
+    body.employeeId = user.employeeId;
     const updatedBanner = await apiFetch(`offers/${id}`, { body, method: "PUT" });
     setBanner(id, updatedBanner.data);
     return updatedBanner.data;
   }
 
   const setVitro = (id, order) => {
+    if(!vitroOrders.content) return;
+
     const tempOrders = vitroOrders;
     const tempBackup = vitroOrdersBack;
-    const index = tempOrders.findIndex(order => order.id === id);
-    const indexBack = tempBackup.findIndex(order => order.id === id);
-    tempOrders[index] = order;
-    tempBackup[indexBack] = order;
-    setVitroOrders([...tempOrders]);
-    setVitroOrdersBack([...tempBackup]);
+    const index = tempOrders.content.findIndex(order => order.id === id);
+    const indexBack = tempBackup.content.findIndex(order => order.id === id);
+    tempOrders.content[index] = order;
+    tempBackup.content[indexBack] = order;
+    setVitroOrders({...tempOrders});
+    setVitroOrdersBack({...tempBackup});
   }
 
   const setOrder = (id, order) => {
+    if(!orders.content) return;
+
     const tempOrders = orders;
     const tempBack = ordersBackup;
-    const index = tempOrders.findIndex(order => order.id === id);
-    const indexBack = tempBack.findIndex(order => order.id === id);
+    const index = tempOrders.content.findIndex(order => order.id === id);
+    const indexBack = tempBack.content.findIndex(order => order.id === id);
     tempOrders[index] = order;
     tempBack[indexBack] = order;
-    setOrders([...tempOrders]);
-    setOrdersBackup([...tempBack]);
+    setOrders({...tempOrders});
+    setOrdersBackup({...tempBack});
   }
 
   const setExpense = (id, expense) => {
@@ -363,14 +570,16 @@ const AdminProvider = ({ children }) => {
   }
 
   const setInvoice = (id, invoice) => {
-    const tempInvoices = invoices;
-    const tempBackup = invoicesBackup;
+    if(!matcher.invoices) return invoice;
+
+    const tempInvoices = invoices.content;
+    const tempBackup = invoicesBackup.content;
     const index = tempInvoices.findIndex(invoice => invoice.id === id);
     const indexBackup = tempBackup.findIndex(invoice => invoice.id === id);
     tempInvoices[index] = invoice;
     tempBackup[indexBackup] = invoice;
-    setInvoices([...tempInvoices]);
-    setInvoicesBackup([...tempBackup]);
+    setInvoices({...invoices, content: [...tempInvoices]});
+    setInvoicesBackup({...invoicesBackup, content: [...tempBackup]});
   }
 
   const setBanner = (id, banner) => {
@@ -382,42 +591,79 @@ const AdminProvider = ({ children }) => {
 
   const addItem = async (body) => {
     const { vitroOrderId } = body;
-    await apiFetch("orderVarieties", { body });
-    return getVitroOrder(vitroOrderId);
+    const orderVariety = await apiFetch("orderVarieties", { body });
+    const newVitroOrder = await getVitroOrder(vitroOrderId);
+
+    return {orderVariety: orderVariety.data, newVitroOrder};
   }
 
   const addExpenseItem = async (body) => {
     const { profitId } = body;
-    await apiFetch("expenses", { body });
-    return getExpense(profitId);
+    const expense = await apiFetch("expenses", { body });
+    const updatedProfit = await apiFetch(`profits/${profitId}`);
+    setMatcher(matcher => ({...matcher, expenses: false}));
+
+    return {expense: expense.data, updatedProfit: updatedProfit.data};
   }
 
   const addInvoiceItem = async (body) => {
     const { invoiceId } = body;
-    await apiFetch("invoiceItems", { body });
-    return getInvoice(invoiceId);
+    const invoiceItem = await apiFetch("invoiceItems", { body });
+    const updatedInvoice = await apiFetch(`invoices/${invoiceId}`);
+    setMatcher(matcher => ({...matcher, invoices: false}));
+
+    return {updatedInvoice: updatedInvoice.data, invoiceItem: invoiceItem};
   }
  
-  const editItem = async (id, body) => {
+  const editItem = async (id, body, setItems) => {
     const { vitroOrderId } = body;
-    await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
-    return getVitroOrder(vitroOrderId);
+    const updatedVariety = await apiFetch(`orderVarieties/${id}`, { body, method: "PUT" });
+    const newVitroOrder = await getVitroOrder(vitroOrderId);
+
+    setItems((items) => {
+      const index = items.findIndex((item) => item.id === updatedVariety.data.id);
+      items[index] = updatedVariety.data;
+
+      return [...items];
+    });
+    
+    return {orderVariety: updatedVariety.data, newVitroOrder};
   }
 
-  const editExpenseItem = async (id, body) => {
+  const editExpenseItem = async (id, body, setExpenses) => {
     const { profitId } = body;
-    await apiFetch(`expenses/${id}`, { body, method: "PUT" });
-    return getExpense(profitId);
+    const updatedExpense = await apiFetch(`expenses/${id}`, { body, method: "PUT" });
+    const updatedProfit = await apiFetch(`profits/${profitId}`);
+    setMatcher(matcher => ({...matcher, expenses: false}));
+
+    setExpenses((expenses) => {
+      const index = expenses.findIndex((expense) => expense.id === updatedExpense.data.id);
+      expenses[index] = updatedExpense.data;
+
+      return [...expenses];
+    });
+
+    return {expense: updatedExpense.data, updatedProfit: updatedProfit.data};
   }
 
-  const editInvoiceItem = async (id, body) => {
+  const editInvoiceItem = async (id, body, setItems) => {
     const { invoiceId } = body;
-    await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
-    return getInvoice(invoiceId);
+    const newItem = await apiFetch(`invoiceItems/${id}`, { body, method: "PUT" });
+    const updatedInvoice = await apiFetch(`invoices/${invoiceId}`);
+    setMatcher(matcher => ({...matcher, invoices: false}));
+
+    setItems((items) => {
+      const index = items.findIndex((item) => item.id === newItem.data.id);
+      items[index] = newItem.data;
+
+      return [...items];
+    });
+
+    return {updatedInvoice: updatedInvoice.data, invoiceItem: newItem.data};
   }
 
   const generateDoc = async (invoiceId) => {
-    await apiFetch(`invoices/generatePDF/${invoiceId}`, { method: "POST" });
+    await apiFetch(`invoices/sendToSunat/${invoiceId}`, { method: "POST" });
     return getInvoice(invoiceId);
   }
 
@@ -426,22 +672,30 @@ const AdminProvider = ({ children }) => {
     return getInvoice(invoiceId);
   }
 
-  const deleteItem = async (id, vitroOrderId) => {
-    await apiFetch(`orderVarieties/${id}`, { method: "DELETE" });
+  const deleteItem = async (id, vitroOrderId, setItems, employeeId) => {
+    await apiFetch(`orderVarieties/${id}?employeeId=${employeeId}`, { method: "DELETE" });
+
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
+
     return getVitroOrder(vitroOrderId);
   }
 
-  const deleteExpenseItem = async (id, profitId) => {
+  const deleteExpenseItem = async (id, profitId, setItems) => {
     await apiFetch(`expenses/${id}`, { method: "DELETE" });
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
+    setMatcher(matcher => ({...matcher, expenses: false}));
     return getExpense(profitId);
   }
 
-  const deleteInvoiceItem = async (id, invoiceId) => {
-    await apiFetch(`invoiceItems/${id}`, { method: "DELETE" });
+  const deleteInvoiceItem = async (id, invoiceId, setItems) => {
+    await apiFetch(`invoiceItems/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
+    setMatcher(matcher => ({...matcher, invoices: false}));
     return getInvoice(invoiceId);
   }
 
   const updateOrder = async (id, body) => {
+    body.operatorId = user.employeeId;
     const updatedOrder = await apiFetch(`orders/${id}`, { body, method: "PUT" });
     setOrder(id, updatedOrder.data);
     return updatedOrder.data;
@@ -455,29 +709,41 @@ const AdminProvider = ({ children }) => {
 
   const deleteInvoice = async (id) => {
     await apiFetch(`invoices/${id}`, { method: "DELETE" });
-    const updatedInvoices = invoices.filter(invoice => invoice.id !== id);
-    const updatedBack = invoicesBackup.filter(invoice => invoice.id !== id);
-    setInvoices([...updatedInvoices]);
-    setInvoicesBackup([...updatedBack]);
+    const updatedInvoices = invoices.content.filter(invoice => invoice.id !== id);
+    const updatedBack = invoicesBackup.content.filter(invoice => invoice.id !== id);
+    setInvoices({...invoices, content: [...updatedInvoices]});
+    setInvoicesBackup({...invoicesBackup, content: [...updatedBack]});
   }
 
   const addAdvance = async (body) => {
     const { vitroOrderId } = body;
-    await apiFetch("advances", { body });
-    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
-    return getVitroOrder(vitroOrderId);
+    const newAdvance = await apiFetch("advances", { body });
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false, home: false}));
+    const updatedVitroOrder = await getVitroOrder(vitroOrderId);
+
+    return {advance: newAdvance.data, updatedVitroOrder};
   }
 
-  const editAdvance = async (id, body) => {
+  const editAdvance = async (id, body, setAdvances) => {
     const { vitroOrderId } = body;
-    await apiFetch(`advances/${id}`, { body, method: "PUT" });
-    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
-    return getVitroOrder(vitroOrderId);
+    const updatedAdvance = await apiFetch(`advances/${id}`, { body, method: "PUT" });
+    const updatedVitroOrder = await getVitroOrder(vitroOrderId);
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false, home: false}));
+
+    setAdvances((advances) => {
+      const index = advances.findIndex((advance) => advance.id === updatedAdvance.data.id);
+      advances[index] = updatedAdvance.data;
+
+      return [...advances];
+    });
+
+    return {advance: updatedAdvance.data, updatedVitroOrder};
   }
 
-  const deleteAdvance = async (id, vitroId) => {
+  const deleteAdvance = async (id, vitroId, setAdvances) => {
     await apiFetch(`advances/${id}`, { method: "DELETE" });
-    setMatcher(matcher => ({...matcher, expenses: false, clients: false}));
+    setMatcher(matcher => ({...matcher, expenses: false, clients: false, home: false}));
+    setAdvances((advances) => [...advances.filter((advance) => advance.id !== id)]);
     return getVitroOrder(vitroId);
   }
 
@@ -513,29 +779,34 @@ const AdminProvider = ({ children }) => {
 
   const addOrderItem = async (body) => {
     const { orderId } = body;
-    await apiFetch("orderProducts", { body });
+    body.employeeId = user.employeeId;
+    const orderItem = await apiFetch("orderProducts", { body });
+    const newOrder = await apiFetch(`orders/${orderId}`);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
-    return getOrder(orderId);
+
+    return {newOrder: newOrder.data, orderItem};
   }
 
   const addBannerItem = async (body) => {
     const { offerId } = body;
+    body.employeeId = user.employeeId;
     await apiFetch("offerProducts", { body });
     return getBanner(offerId);
   }
 
-  const deleteOrderItem = async (id, orderId) => {
-    await apiFetch(`orderProducts/${id}`, { method: "DELETE" });
+  const deleteOrderItem = async (id, orderId, setItems) => {
+    await apiFetch(`orderProducts/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
+    setItems((items) => [...items.filter((item) => item.id !== id)]);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
     return getOrder(orderId);
   }
 
   const deleteBannerItem = async (id, banner) => {
-    await apiFetch(`offerProducts/${id}`, { method: "DELETE" });
-    if(banner.products.length <= 1 && banner.used) {
+    await apiFetch(`offerProducts/${id}?employeeId=${user.employeeId}`, { method: "DELETE" });
+    if(banner.items.length <= 1 && banner.isUsed) {
       const body = {
         ...banner,
-        used: !banner.used
+        isUsed: !banner.isUsed
       }
 
       return updateBanner(banner.id, body);
@@ -544,11 +815,36 @@ const AdminProvider = ({ children }) => {
     return getBanner(banner.id);
   }
 
-  const editOrderItem = async (id, body) => {
+  const editOrderItem = async (id, body, setItems) => {
     const { orderId } = body;
-    await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
+    body.employeeId = user.employeeId;
+    const orderItem = await apiFetch(`orderProducts/${id}`, { body, method: "PUT" });
+    const newOrder = await apiFetch(`orders/${orderId}`);
     setMatcher(matcher => ({...matcher, products: false, expenses: false, clients: false}));
-    return getOrder(orderId);
+
+    setItems((items) => {
+      const index = items.findIndex((item) => item.id === orderItem.data.id);
+      items[index] = orderItem.data;
+
+      return [...items];
+    });
+
+    return {newOrder: newOrder.data, orderItem};
+  }
+
+  const addEmployee = async (body) => {
+    const newEmployee = await apiFetch(`employees`, { body });
+    const employee = {...newEmployee.data?.employee, role: newEmployee.data?.user.role};
+    setEmployees(employees => [employee, ...employees]);
+    setEmployeesBackup(employees => [employee, ...employees]);
+    return employee;
+  }
+
+  const updateEmployee = async (employeeId, body) => {
+    const updatedEmployee = await apiFetch(`employees/${employeeId}`, { body, method: "PUT" });
+    setEmployees(employees => employees.map((employee) => employee.id === employeeId ? updatedEmployee.data : employee));
+    setEmployeesBackup(employees => employees.map((employee) => employee.id === employeeId ? updatedEmployee.data : employee));
+    return updatedEmployee.data;
   }
 
   return (
@@ -561,34 +857,45 @@ const AdminProvider = ({ children }) => {
         invoicesBackup,
         products,
         backup,
-        error,
         isLoading,
         tubers,
         vitroOrders,
         vitroOrdersBack,
         orders,
         matcher,
-        departments,
-        provinces,
         banners,
         clients,
         clientsBackup,
-        info,
-        setInfo,
+        homeData,
+        warehouses,
+        warehousesBackup,
+        employees,
+        employeesBackup,
+        notifications,
+        roles,
+        productionSummary,
+        messages,
+        messagesBackup,
+        chatMessages,
+        setChatMessages,
+        loadMessages,
+        setProductionSummary,
+        setRoles,
+        addEmployee,
+        setEmployees,
+        setEmployeesBackup,
+        updateEmployee,
+        loadEmployees,
         loadBanners,
-        loadDepartments,
         setTubers,
         setVitroOrders,
         setCategories,
         setProducts,
-        setError,
+        addWarehouse,
         updateCategory,
-        updateSubCategory,
         deleteCategory,
-        deleteSubCategory,
         addCategory,
         setIsLoading,
-        addSubCategory,
         updateProduct,
         addProduct,
         setProduct,
@@ -611,6 +918,7 @@ const AdminProvider = ({ children }) => {
         deleteItem,
         updateVitro,
         updateInvoice,
+        deleteMessage,
         updateBanner,
         addOrder,
         deleteOrder,
@@ -618,7 +926,6 @@ const AdminProvider = ({ children }) => {
         loadProducts,
         loadOrders,
         loadVitroOrders,
-        loadTubers,
         addAdvance,
         editAdvance,
         deleteAdvance,
@@ -645,7 +952,24 @@ const AdminProvider = ({ children }) => {
         addClient,
         loadExpenses,
         setClients,
-        setOrders
+        setOrders,
+        loadOnHome,
+        updateActiveProduct,
+        loadWarehouses,
+        newBatch,
+        loadNotifications,
+        setNotifications,
+        markAsRead,
+        setOrdersBackup,
+        setWarehouses,
+        setWarehousesBackup,
+        addRole,
+        orderAtAgency,
+        orderDelivered,
+        vitroOrderAtAgency,
+        vitroOrderDelivered,
+        setMessages,
+        setMessagesBackup
       }}
     >
       { children }

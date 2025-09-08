@@ -108,7 +108,7 @@ function List() {
       </thead>
       <tbody>
         {
-          products.map((product, index) => {
+          products.content?.map((product, index) => {
             const { images = [] } = product;
 
             return (
@@ -214,7 +214,7 @@ function List() {
                     weight={500}
                     color={COLORS.dim}
                   >
-                    { product.category.name }
+                    { product.categoryName }
                   </Text>
                 </td>
                 <td>
@@ -227,8 +227,8 @@ function List() {
                   </Text>
                 </td>
                 <td>
-                  <Badge color={product.active ? "primary" : "danger"}>
-                    { product.active ? "activo" : "inactivo" }
+                  <Badge color={product.isActive ? "primary" : "danger"}>
+                    { product.isActive ? "activo" : "inactivo" }
                   </Badge>
                 </td>
                 <td>

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../../context/auth";
 import { Container } from "../Product/styles";
-import AlertError from "../../../components/AlertError";
 import { Section } from "../InvitroOrder/styles";
 import { Formik } from "formik";
 import { validate } from "./validate";
@@ -11,10 +10,12 @@ import Input from "../../../components/Input";
 import { FaEdit } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 import Button from "../../../components/Button";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Profile() {
   const [isLoading, setIsLoading] = useState(false);
-  const { user, error, setError, updateUser } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const initialValues = {
     ...user,
@@ -35,9 +36,8 @@ function Profile() {
       resetForm();
       setIsLoading(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -143,14 +143,6 @@ function Profile() {
           </Formik>
         </Container>
       </Section>
-      {
-        error
-        &&
-        <AlertError 
-          error={error}
-          setError={setError}
-        />
-      }
     </>
   );
 }

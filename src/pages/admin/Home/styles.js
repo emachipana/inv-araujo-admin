@@ -1,6 +1,7 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../../styles/layout";
+import { shadowMd } from "../../../styles/layout";
 import { css } from "@emotion/react";
+import { COLORS } from "../../../styles/colors";
 
 export const Container = styled.div`
   width: 100%;
@@ -40,7 +41,8 @@ export const Section = styled.section`
   justify-content: ${({ justify }) => justify || "center"};
   padding: 1rem;
   border-radius: 1rem;
-  box-shadow: ${shadowSm};
+  border: 1px solid ${COLORS.platinium};
+  box-shadow: ${shadowMd};
   overflow-x: auto;
 
   @media screen and (max-width: 890px) {

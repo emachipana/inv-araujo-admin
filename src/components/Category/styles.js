@@ -24,3 +24,16 @@ export const Container = styled.div`
     color: white;
   } 
 `;
+
+export const Section = styled.section`
+  position: absolute;
+  padding: 1rem 0.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 160px;
+  top: 100%;
+  left: 0;
+`;

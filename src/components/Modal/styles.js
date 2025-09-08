@@ -37,7 +37,7 @@ export const Container = styled.div`
 export const Section = styled.section`
   padding: ${({ padding }) => padding || "1.5rem"};
   width: ${({ width }) => width};
-  background-color: ${COLORS.white};
+  background-color: white;
   position: relative;
   border-radius: 1rem;
   z-index: 70;

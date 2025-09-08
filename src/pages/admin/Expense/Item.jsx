@@ -8,21 +8,22 @@ import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
 import { TextDescription } from "../../../components/Product/styles";
 import { COLORS } from "../../../styles/colors";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
-function Item({ item, handleEdit, profitId, setExpense }) {
+function Item({ item, handleEdit, profitId, setExpense, setExpenses }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const { setError, deleteExpenseItem } = useAdmin();
+  const { deleteExpenseItem } = useAdmin();
 
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-      const updatedExpense = await deleteExpenseItem(item.id, profitId);
+      const updatedExpense = await deleteExpenseItem(item.id, profitId, setExpenses);
       setExpense(updatedExpense);
       setIsDeleting(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsDeleting(false);
-      console.error(error);
-      setError(error.message);
     }
   }
 
@@ -37,6 +38,7 @@ function Item({ item, handleEdit, profitId, setExpense }) {
             Nombre
           </Text>
           <TextDescription
+            width={120}
             lines={1}
             align="start"
             weight={600}
@@ -51,14 +53,14 @@ function Item({ item, handleEdit, profitId, setExpense }) {
             weight={700}
             size={15}
           >
-            Precio
+            Tipo
           </Text>
           <Text
             weight={600}
             size={14}
             color={COLORS.dim}
           >
-            S/. { item.price.toFixed(1) }
+            { item.type }
           </Text>
         </FlexColumn>
         <FlexColumn gap={0.1}>
@@ -66,31 +68,56 @@ function Item({ item, handleEdit, profitId, setExpense }) {
             weight={700}
             size={15}
           >
-            Cantidad
+            {
+              item.type === "SERVICIO"
+              ? "Monto"
+              : "Precio"
+            }
           </Text>
           <Text
             weight={600}
             size={14}
             color={COLORS.dim}
           >
-            { item.quantity }
+            S/. { item.price.toFixed(2) }
           </Text>
         </FlexColumn>
-        <FlexColumn gap={0.1}>
-          <Text 
-            weight={700}
-            size={15}
-          >
-            Subtotal
-          </Text>
-          <Text
-            weight={600}
-            size={14}
-            color={COLORS.dim}
-          >
-            S/. { item.subTotal.toFixed(1) }
-          </Text>
-        </FlexColumn>
+        {
+          item.type === "BIEN"
+          &&
+          <>
+            <FlexColumn gap={0.1}>
+              <Text 
+                weight={700}
+                size={15}
+              >
+                Cantidad
+              </Text>
+              <Text
+                weight={600}
+                size={14}
+                color={COLORS.dim}
+              >
+                { item.quantity }
+              </Text>
+            </FlexColumn>
+            <FlexColumn gap={0.1}>
+              <Text 
+                weight={700}
+                size={15}
+              >
+                Subtotal
+              </Text>
+              <Text
+                weight={600}
+                size={14}
+                color={COLORS.dim}
+              >
+                S/. { item.subTotal.toFixed(2) }
+              </Text>
+            </FlexColumn>
+          </>
+        }
       </Wrapper>
       <FlexRow gap={1}>
         <Button

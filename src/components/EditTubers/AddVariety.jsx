@@ -11,7 +11,7 @@ import { Spinner } from "reactstrap";
 
 function AddVariety({ setCurrentAction, id, tuberId, setEdit }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { tubers, setError, updateVariety, addVariety } = useAdmin();
+  const { tubers, updateVariety, addVariety } = useAdmin();
 
   const handleUpdateVariety = async (body) => {
     await updateVariety(body);
@@ -43,7 +43,7 @@ function AddVariety({ setCurrentAction, id, tuberId, setEdit }) {
     <Formik
       initialValues={initialValues}
       validate={validate}
-      onSubmit={(values) => onSubmit(values, setIsLoading, (id ? handleUpdateVariety : addVariety), setCurrentAction, setError, "tubers")}
+      onSubmit={(values) => onSubmit(values, setIsLoading, (id ? handleUpdateVariety : addVariety), setCurrentAction, "tubers")}
     >
       {({
         values,

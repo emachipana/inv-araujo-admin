@@ -9,12 +9,9 @@ import Products from "./pages/admin/Products";
 import EditProduct from "./pages/admin/Product/Edit";
 import InvitroOrders from "./pages/admin/InvitroOrders";
 import InvitroOrder from "./pages/admin/InvitroOrder";
-import EditVitroOrder from "./pages/admin/InvitroOrder/Edit";
 import Orders from "./pages/admin/Orders";
 import Product from "./pages/admin/Product";
 import Order from "./pages/admin/Order";
-import EditOrder from "./pages/admin/Order/Edit";
-import Calendar from "./pages/admin/Calendar";
 import Invoices from "./pages/admin/Invoices";
 import Invoice from "./pages/admin/Invoice";
 import EditInvoice from "./pages/admin/Invoice/Edit";
@@ -26,43 +23,120 @@ import Expense from "./pages/admin/Expense";
 import Clients from "./pages/admin/Clients";
 import Profile from "./pages/admin/Profile";
 import NotFound from "./pages/admin/NotFound";
+import Employees from "./pages/admin/Employees";
+import { WebSocketProvider } from "./context/websocket";
+import { useAuth } from "./context/auth";
+import { ModalProvider } from "./context/modal";
+import { PrimeReactProvider } from "primereact/api";
+import "primereact/resources/themes/lara-light-cyan/theme.css";
+import Employee from "./pages/admin/Employee";
+import Messages from "./pages/admin/Messages";
+import VirtualAssistant from "./pages/admin/Assistant";
+import Client from "./pages/admin/Client";
+import EditClient from "./pages/admin/Client/Edit";
+import EditEmployee from "./pages/admin/Employee/Edit";
 
 function AuthenticatedApp() {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <AdminProvider>
-      <AdminNavbar setIsOpen={setIsOpen} />
-      <Aside 
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
-      <Section>
-        <Routes>
-          <Route index path="/" element={<Home />} />
-          <Route path="/productos" element={<Products />} />
-          <Route path="/productos/:id" element={<Product />} />
-          <Route path="/productos/:id/edit" element={<EditProduct />} />
-          <Route path="/invitro" element={<InvitroOrders />} />
-          <Route path="/invitro/:id" element={<InvitroOrder />} />
-          <Route path="/invitro/:id/edit" element={<EditVitroOrder />} />
-          <Route path="/pedidos" element={<Orders />} />
-          <Route path="/pedidos/:id" element={<Order />} />
-          <Route path="/pedidos/:id/edit" element={<EditOrder />} />
-          <Route path="/calendario" element={<Calendar />} />
-          <Route path="/comprobantes" element={<Invoices />} />
-          <Route path="/comprobantes/:id" element={<Invoice />} />
-          <Route path="/comprobantes/:id/edit" element={<EditInvoice />} />
-          <Route path="/banners" element={<Banners />} />
-          <Route path="/banners/:id" element={<Banner />} />
-          <Route path="/banners/:id/edit" element={<EditBanner />} />
-          <Route path="/gastos" element={<Expenses />} />
-          <Route path="/gastos/:id" element={<Expense />} />
-          <Route path="/clientes" element={<Clients />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="*" element={<NotFound navTo="/" />} />
-        </Routes>
-      </Section>
+      <WebSocketProvider>
+        <ModalProvider>
+          <PrimeReactProvider>
+            <AdminNavbar setIsOpen={setIsOpen} />
+            <Aside
+              isOpen={isOpen}
+              setIsOpen={setIsOpen}
+            />
+            <Section>
+              <Routes>
+                <Route index path="/" element={<Home />} />
+                {
+                  user.role.permissions.includes("PRODUCTS_WATCH")
+                  &&
+                  <>
+                    <Route path="/productos" element={<Products />} />
+                    <Route path="/productos/:id" element={<Product />} />
+                    <Route path="/productos/:id/edit" element={<EditProduct />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("INVITRO_WATCH")
+                  &&
+                  <>
+                    <Route path="/invitro" element={<InvitroOrders />} />
+                    <Route path="/invitro/:id" element={<InvitroOrder />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("ORDERS_WATCH")
+                  &&
+                  <>
+                    <Route path="/pedidos" element={<Orders />} />
+                    <Route path="/pedidos/:id" element={<Order />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("INVOICES_WATCH")
+                  &&
+                  <>
+                    <Route path="/comprobantes" element={<Invoices />} />
+                    <Route path="/comprobantes/:id" element={<Invoice />} />
+                    <Route path="/comprobantes/:id/edit" element={<EditInvoice />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("BANNERS_WATCH")
+                  &&
+                  <>
+                    <Route path="/banners" element={<Banners />} />
+                    <Route path="/banners/:id" element={<Banner />} />
+                    <Route path="/banners/:id/edit" element={<EditBanner />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("PROFITS_WATCH")
+                  &&
+                  <Route path="/gastos" element={<Expenses />} />
+                }
+                {
+                  user.role.permissions.includes("EXPENSES_WATCH")
+                  &&
+                  <Route path="/gastos/:id" element={<Expense />} />
+                }
+                {
+                  user.role.permissions.includes("CLIENTS_WATCH")
+                  &&
+                  <>
+                    <Route path="/clientes" element={<Clients />} />
+                    <Route path="/clientes/:id" element={<Client />} />
+                    <Route path="/clientes/:id/edit" element={<EditClient />} />
+                  </>
+                }
+                <Route path="/perfil" element={<Profile />} />
+                {
+                  user.role.permissions.includes("EMPLOYEES_WATCH")
+                  &&
+                  <>
+                    <Route path="/empleados" element={<Employees />} />
+                    <Route path="/empleados/:id" element={<Employee />} />
+                    <Route path="/empleados/:id/edit" element={<EditEmployee />} />
+                  </>
+                }
+                {
+                  user.role.permissions.includes("MESSAGES_WATCH")
+                  &&
+                  <Route path="/mensajes" element={<Messages />} />
+                }
+                <Route path="/asistente" element={<VirtualAssistant />} />
+                <Route path="*" element={<NotFound navTo="/" />} />
+              </Routes>
+            </Section>
+          </PrimeReactProvider>
+        </ModalProvider>
+      </WebSocketProvider>
     </AdminProvider>
   );
 }

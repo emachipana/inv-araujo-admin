@@ -6,13 +6,14 @@ import { FaMoneyBillWheat } from "react-icons/fa6";
 import Advance from "./Advance";
 import AdvanceForm from "./AdvanceForm";
 import { Variety } from "./styles";
+import { COLORS } from "../../../styles/colors";
 
-function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId, currentAdvance, total }) {
+function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId, currentAdvance, total, setAdvances, createdBy }) {
   const [isCreating, setIsCreating] = useState(false);
   
   return (
     <Modal
-      align={advances.length <= 3 ? "center" : "flex-start"}
+      size="md"
       isActive={isActive}
       setIsActive={setIsActive}
     >
@@ -29,18 +30,22 @@ function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId
           gap={1}
         >
           {
-            advances.map((advance, index) => (
-              <Advance 
-                amount={advance.amount}
-                date={advance.date}
-                key={index}
-                id={advance.id}
-                setOrder={setVitroOrder}
-                vitroId={vitroId}
-                currentAdvance={currentAdvance}
-                total={total}
-              />
-            ))
+            advances.length <= 0
+            ? <Text
+                size={15}
+                weight={600}
+                color={COLORS.dim}
+              >
+                Registra el primer adelanto
+              </Text>
+            : advances.map((advance, index) => (
+                <Advance 
+                  amount={advance.amount}
+                  date={advance.createdAt}
+                  key={index}
+                  paymentType={advance.paymentType}
+                />
+              ))
           }
           {
             isCreating
@@ -50,20 +55,24 @@ function AdvancesModal({ isActive, setIsActive, advances, setVitroOrder, vitroId
                 setIsActive={setIsCreating}
                 setVitroOrder={setVitroOrder}
                 vitroOrderId={vitroId}
-                currentAdvance={currentAdvance}
                 total={total}
+                setAdvances={setAdvances}
               />
             </Variety>
           }
-          <Button
-            disabled={isCreating}
-            fontSize={16}
-            iconSize={18}
-            Icon={FaMoneyBillWheat}
-            onClick={() => setIsCreating(true)}
-          >
-            Registrar adelanto
-          </Button>
+          {
+            (currentAdvance < total && createdBy === "ADMINISTRADOR")
+            &&
+            <Button
+              disabled={isCreating}
+              fontSize={14}
+              iconSize={16}
+              Icon={FaMoneyBillWheat}
+              onClick={() => setIsCreating(true)}
+            >
+              Registrar adelanto
+            </Button>
+          }
         </FlexColumn>
       </FlexColumn>
     </Modal>

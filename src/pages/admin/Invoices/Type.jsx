@@ -1,30 +1,16 @@
-import { useEffect } from "react";
 import { useAdmin } from "../../../context/admin";
-import apiFetch from "../../../services/apiFetch";
 import { Container } from "../../../components/Categories/styles";
 import { Spinner } from "reactstrap";
 import Category from "../../../components/Category";
 
-function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
-  const { isLoading, invoicesBackup, setInvoices, setError } = useAdmin();
+function Type({ currentType, setFilters, isBlocked }) {
+  const { isLoading } = useAdmin();
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        if(currentType === "Todo") return setInvoices(invoicesBackup);
-        setIsGetting(true);
-        const invoices = await apiFetch(`invoices?type=${currentType.toUpperCase()}`);
-        setInvoices(invoices);
-        setIsGetting(false);
-      }catch(error) {
-        setIsGetting(false);
-        console.error(error);
-        setError(error.message);
-      }
-    }
+  const setCurrentType = (id, name) => {
+    if(name === "Todo") return setFilters(filters => ({...filters, invoiceType: {id: null, name: null}, page: 0}));
 
-    fetch();
-  }, [ currentType, invoicesBackup, setError, setInvoices, setIsGetting ]);
+    setFilters(filters => ({...filters, invoiceType: {id, name}, page: 0}));
+  };
 
   return (
     <Container isLoading={isLoading}>
@@ -34,17 +20,20 @@ function Type({ currentType, setCurrentType, isBlocked, setIsGetting }) {
         : <>
             <Category
               isBlocked={isBlocked}
+              id={null}
               name="Todo"
               currentCategory={currentType}
               setCurrentCategory={setCurrentType}
             />
             <Category
               isBlocked={isBlocked}
+              id="FACTURA"
               name="Factura"
               currentCategory={currentType}
               setCurrentCategory={setCurrentType}
             />
             <Category 
+              id="BOLETA"
               name="Boleta"
               isBlocked={isBlocked}
               currentCategory={currentType}

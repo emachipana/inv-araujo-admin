@@ -24,25 +24,78 @@ export const validate = (values, variety) => {
   return errors;
 }
 
-export const advanceValidate = (values, total, currentAdvance) => {
+export const advanceValidate = (values) => {
   const errors = {};
 
-  if(!values.date) errors.date = "Este campo es obligatorio";
+  if(values.paymentType === "") errors.paymentType = "Este campo es obligatorio";
 
-  if(!values.amount) {
-    errors.amount = "Este campo es obligatorio";
-  }else if(isNaN(values.amount * 1)) {
-    errors.amount = "Solo se aceptan números";
-  }else if(values.amount <= 0) {
-    errors.amount = "Solo se aceptan valores mayores a 0";
-  }else if(currentAdvance + parseInt(values.amount) > total) {
-    errors.amount = "El adelanto es mayor que el total";
+  return errors;
+}
+
+export const orderStateValidate = (values, action, shippingType) => {
+  const errors = {};
+
+  if(action === "select-shipping") {
+    if(!values.shippingType) errors.shippingType = "Este campo es obligatorio";
+
+    if(shippingType === "ENVIO_AGENCIA") {
+      if(!values.department) {
+        errors.department = "Este campo es obligatorio";
+      }else if(values.department.length < 3) {
+        errors.department = "El mínimo son 3 caracteres";
+      }
+
+      if(!values.city) {
+        errors.city = "Este campo es obligatorio";
+      }else if(values.city.length < 3) {
+        errors.city = "El mínimo son 3 caracteres";
+      }
+
+      if(!values.fullName) {
+        errors.fullName = "Este campo es obligatorio";
+      }else if(values.fullName.length < 3) {
+        errors.fullName = "El mínimo son 3 caracteres";
+      }
+
+      if(!values.document) {
+        errors.document = "Este campo es obligatorio";
+      }else if(values.document.length < 8) {
+        errors.document = "El mínimo son 8 caracteres";
+      }
+
+      if(!values.phone) {
+        errors.phone = "Este campo es obligatorio";
+      }else if(values.phone.length < 9) {
+        errors.phone = "El mínimo son 9 caracteres";
+      }
+    }
+
+    if(shippingType === "RECOJO_ALMACEN") {
+      if(!values.date) {
+        errors.date = "Este campo es obligatorio";
+      }
+
+      if(!values.hour) {
+        errors.hour = "Este campo es obligatorio";
+      }
+    }
+  }else if(action === "agency") {
+    if(!values.trackingCode) {
+      errors.trackingCode = "Este campo es obligatorio";
+    }else if(values.trackingCode.length < 3) {
+      errors.trackingCode = "Debe tener al menos 3 caracteres";
+    }
+
+    if(!values.code) {
+      errors.code = "Este campo es obligatorio";
+    }else if(values.code.length < 3) {
+      errors.code = "Debe tener al menos 3 caracteres";
+    }
+
+    if(!values.file) errors.file = "Este campo es obligatorio";
+  }else if(action === "delivered-warehouse") {
+    if(!values.file) errors.file = "Este campo es obligatorio";
   }
-
-  console.log("adelnto total", currentAdvance);
-  console.log("amount actual", values.amount);
-  console.log("total", total);
-  console.log(currentAdvance + values.amount);
 
   return errors;
 }

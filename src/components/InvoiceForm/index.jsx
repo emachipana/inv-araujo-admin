@@ -12,6 +12,8 @@ import Button from "../Button";
 import { Spinner } from "reactstrap";
 import { PiWalletFill } from "react-icons/pi";
 import { onDocChange } from "./handlers";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function InvoiceForm({ initialValues = {
   invoiceType: "",
@@ -19,37 +21,43 @@ function InvoiceForm({ initialValues = {
   rsocial: "",
   document: "",
   issueDate: "",
-  comment: "",
   address: ""
-}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "", isGenerated }) {
+}, isToCreate, invoiceId, initDocType = "", initInvoiceType = "", isGenerated, setIsActive }) {
   const [docType, setDocType] = useState(initDocType);
   const [invoiceType, setInvoiceType] = useState(initInvoiceType);
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addInvoice, updateInvoice } = useAdmin();
+  const { addInvoice, updateInvoice } = useAdmin();
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     try {
+      setIsLoading(true);
+      const issueDate = new Date(values.issueDate);
+
       const body = {
         ...values,
-        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-        invoiceType: (values.invoiceType * 1) === 1 ? "BOLETA" : "FACTURA"
+        issueDate: issueDate.toISOString()
       }
-      setIsLoading(true);
-      const invoice = isToCreate ? await addInvoice(body) : await updateInvoice(invoiceId, body)
+
+      const invoice = isToCreate ? await addInvoice(body) : await updateInvoice(invoiceId, body);
       setIsLoading(false);
       navigate(`/comprobantes/${invoice.id}`);
+      if(isToCreate) setIsActive(false);
     }catch(error) {
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 
   const onInvoiceChange = (event, setFieldValue) => {
     const value = event.target.value;
     setFieldValue("invoiceType", value);
-    setInvoiceType((value * 1) === 1 ? "BOLETA" : "FACTURA");
+    setFieldValue("document", "");
+    setFieldValue("rsocial", "");
+    setFieldValue("address", "");
+    setIsDocLoaded(false);
+    setInvoiceType(value);
   }
 
   const today = new Date();
@@ -86,11 +94,11 @@ function InvoiceForm({ initialValues = {
               handleChange={(e) => onInvoiceChange(e, setFieldValue)}
               options={[
                 {
-                  id: 1,
+                  id: "BOLETA",
                   content: "BOLETA"
                 },
                 {
-                  id: 2,
+                  id: "FACTURA",
                   content: "FACTURA"
                 }
               ]}
@@ -103,15 +111,15 @@ function InvoiceForm({ initialValues = {
               touched={touched.documentType}
               value={values.documentType}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
               options={[
                 {
-                  id: 1,
+                  id: "DNI",
                   content: "DNI",
                   disabled: invoiceType === "FACTURA"
                 },
                 {
-                  id: 2,
+                  id: "RUC",
                   content: "RUC"
                 }
               ]}
@@ -127,10 +135,9 @@ function InvoiceForm({ initialValues = {
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
             />
             <Input
-              disabled={invoiceType === "FACTURA"}
               id="rsocial"
               label="Razón social"
               placeholder="Razón social"
@@ -139,11 +146,11 @@ function InvoiceForm({ initialValues = {
               value={values.rsocial}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded}
             />
           </Group>
           <Group>
             <Input
-              disabled={invoiceType === "FACTURA" || !invoiceType}
               id="address"
               label="Dirección"
               placeholder="Dirección"
@@ -152,6 +159,7 @@ function InvoiceForm({ initialValues = {
               value={values.address}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded && invoiceType === "FACTURA"}
             />
             <Input
               id="issueDate"
@@ -167,16 +175,6 @@ function InvoiceForm({ initialValues = {
               onKeyDown={(e) => e.preventDefault()}
             />
           </Group>
-          <Input
-            id="comment"
-            label="Comentario (*opcional)"
-            placeholder="Comentario"
-            error={errors.comment}
-            touched={touched.comment}
-            value={values.comment}
-            handleBlur={handleBlur}
-            handleChange={handleChange}
-          />
           <Button
             type="submit"
             iconSize={18}

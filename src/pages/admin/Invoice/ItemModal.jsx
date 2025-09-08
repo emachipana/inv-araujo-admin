@@ -9,16 +9,20 @@ import Input from "../../../components/Input";
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Spinner } from "reactstrap";
 import Button from "../../../components/Button";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
+import Select from "../../../components/Input/Select";
 
-function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem }) {
+function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem, setItems}) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addInvoiceItem, editInvoiceItem } = useAdmin();
+  const { addInvoiceItem, editInvoiceItem } = useAdmin();
 
   let initialValues = {
     invoiceId,
     name: "",
     price: "",
-    quantity: ""
+    quantity: "",
+    unit: "",
   };
 
   if(item) {
@@ -26,21 +30,22 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
       ...initialValues,
       name: item.name,
       price: item.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      unit: item.unit
     }
   }
 
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const updatedInvoice = item ? await editInvoiceItem(item.id, values) : await addInvoiceItem(values);
+      const {updatedInvoice, invoiceItem} = item ? await editInvoiceItem(item.id, values, setItems) : await addInvoiceItem(values);
       setInvoice(updatedInvoice);
+      if(!item) setItems((invoiceItems) => [invoiceItem.data, ...invoiceItems]);
       setIsLoading(false);
       onClose();
     }catch(error) {
-      console.error(error);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      setError(error.message);
     }
   }
 
@@ -49,10 +54,38 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
     setIsActive(false);
   }
 
+  const unitOptions = [
+    {
+      id: "NIU",
+      content: "Unidad"
+    },
+    {
+      id: "SA",
+      content: "Saco"
+    },
+    {
+      id: "KGM",
+      content: "Kilogramo"
+    },
+    {
+      id: "WG",
+      content: "Galón"
+    },
+    {
+      id: "BJ",
+      content: "Balde"
+    },
+    {
+      id: "BX",
+      content: "Caja"
+    },
+  ];
+
   return (
     <Modal
       isActive={isActive}
       setIsActive={onClose}
+      size="md"
     >
       <Formik
         initialValues={initialValues}
@@ -70,16 +103,28 @@ function ItemModal({ isActive, setIsActive, item, invoiceId, setInvoice, setItem
         }) => (
           <Form onSubmit={handleSubmit}>
             <Title>{ item ? "Editar item" : "Agregar item" }</Title>
-            <Input 
-              id="name"
-              label="Nombre"
-              placeholder="Nombre del item"
-              value={values.name}
-              error={errors.name}
-              touched={touched.name}
-              handleBlur={handleBlur}
-              handleChange={handleChange}
-            />
+            <Group>
+              <Input 
+                id="name"
+                label="Nombre"
+                placeholder="Nombre del item"
+                value={values.name}
+                error={errors.name}
+                touched={touched.name}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+              />
+              <Select
+                id="unit"
+                label="Unidad de medida"
+                error={errors.unit}
+                touched={touched.unit}
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                options={unitOptions}
+                value={values.unit}
+              />
+            </Group>
             <Group>
               <Input 
                 id="price"

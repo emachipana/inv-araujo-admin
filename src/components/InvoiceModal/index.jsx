@@ -7,99 +7,72 @@ import { Title } from "../ProductForm/styles";
 import Select from "../Input/Select";
 import { onDocTypeChange } from "../VitroForm/handlers";
 import { onDocChange } from "../InvoiceForm/handlers";
-import { useAdmin } from "../../context/admin";
 import { PiWalletFill } from "react-icons/pi";
 import { Spinner } from "reactstrap";
 import Button from "../Button";
 import Input from "../Input";
 import { useNavigate } from "react-router-dom";
 import apiFetch from "../../services/apiFetch";
+import toast from "react-hot-toast";
 
-function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, address, items, order, updateOrder }) {
+function InvoiceModal({ isActive, setIsActive, invoiceDetail, isAbleToEdit, clientId, orderId, type = "order" }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [invoiceType, setInvoiceType] = useState("");
-  const [docType, setDocType] = useState("");
-  const { setError, addInvoice, matcher, setMatcher, setInfo } = useAdmin();
+  const [invoicePreference, setInvoicePreference] = useState(invoiceDetail.invoicePreference);
+  const [docType, setDocType] = useState(invoiceDetail.documentType);
+  const [isDocLoaded, setIsDocLoaded] = useState(false);
   const navigate = useNavigate();
 
   const initialValues = {
-    invoiceType: "",
-    document,
-    documentType: documentType === "DNI" ? 1 : 2,
-    rsocial,
-    address
+    invoicePreference: invoiceDetail.invoicePreference,
+    document: invoiceDetail.document,
+    documentType: invoiceDetail.documentType,
+    rsocial: invoiceDetail.rsocial,
+    address: invoiceDetail.address
   }
   
   const onSubmit = async (values) => {
     try {
       setIsLoading(true);
-      const now = new Date();
-      now.setHours(12);
       const body = {
-        ...values,
-        documentType: (values.documentType * 1) === 1 ? "DNI" : "RUC",
-        invoiceType: (values.invoiceType * 1) === 1 ? "BOLETA" : "FACTURA",
-        issueDate: now.toISOString(),
-        comment: ""
+        ...values
       }
 
-      const invoice = await addInvoice(body);
-      const { id, ...restOrder } = order;
-      const orderBody = {
-        ...restOrder,
-        clientId: restOrder.client?.id,
-        docType: restOrder.documentType,
-        invoiceId: invoice.id
+      if(!invoiceDetail.invoicePreference) {
+        await apiFetch(`clients/${clientId}/invoiceDetails`, { body, method: "POST" });
+      }else if(invoiceDetail.invoicePreference) {
+        await apiFetch(`clients/${clientId}/invoiceDetails/${invoiceDetail.id}`, { body, method: "PUT" });
       }
 
-      await updateOrder(id, orderBody);
-
-      for (let item of items) {
-        const body = {
-          invoiceId: invoice.id,
-          ...item
-        }
-
-        await apiFetch("invoiceItems", { body });
-      }
-
-      if(matcher.invoices) setMatcher(matcher => ({...matcher, invoices: false}));
-
+      const response = await apiFetch(`${type === "order" ? "orders" : "vitroOrders"}/${orderId}/generate-invoice`, { method: "POST" });
+      navigate(`/comprobantes/${response.data.invoiceId}`);
       setIsLoading(false);
-      navigate(`/comprobantes/${invoice.id}`);
-      setInfo(true);
+      setIsActive(false);
     }catch(error) {
-      console.error(error.message);
       setIsLoading(false);
-      setError(error.message);
+      toast.error("Hubo un error vuelve a intentalo");
     }
   }
 
   const onClose = () => {
-    setInvoiceType("");
+    setInvoicePreference("");
     setIsActive(false);
   }
 
   const onInvoiceTypeChange = (e, setFieldValue) => {
     const value = e.target.value;
-    setFieldValue("invoiceType", value);
-    const toSave = (value * 1) === 1 ? "BOLETA" : "FACTURA";
-    setInvoiceType(toSave);
+    setFieldValue("invoicePreference", value);
+    setInvoicePreference(value);
 
-    if(toSave === "FACTURA" && documentType !== "RUC") {
-      setFieldValue("documentType", 2);
+    setFieldValue("documentType", "");
+    setDocType("");
+    setFieldValue("document", "");
+    setFieldValue("rsocial", "");
+    setFieldValue("address", "");
+
+    if(value === "FACTURA") {
+      setFieldValue("documentType", "RUC");
       setDocType("RUC");
-      setFieldValue("document", "");
-      setFieldValue("rsocial", "");
-      setFieldValue("address", "");
-      return;
-    };
-
-    setFieldValue("documentType", documentType === "DNI" ? 1 : 2);
-    setDocType(documentType);
-    setFieldValue("document", document);
-    setFieldValue("rsocial", rsocial);
-    setFieldValue("address", address);
+    }
   }
 
   return (
@@ -109,7 +82,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
     >
       <Formik
         initialValues={initialValues}
-        validate={(values) => validate(values, docType, invoiceType)}
+        validate={(values) => validate(values, docType, invoicePreference)}
         onSubmit={onSubmit}
       >
         {({
@@ -124,48 +97,49 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
         }) => (
           <Form onSubmit={handleSubmit}>
             <Title>Generar comprobante</Title>
-            <Select 
-              id="invoiceType"
+            <Select
+              disabled={!isAbleToEdit}
+              id="invoicePreference"
               label="Tipo de comprobante"
-              error={errors.invoiceType}
-              touched={touched.invoiceType}
-              value={values.invoiceType}
+              error={errors.invoicePreference}
+              touched={touched.invoicePreference}
+              value={values.invoicePreference}
               handleBlur={handleBlur}
               handleChange={(e) => onInvoiceTypeChange(e, setFieldValue)}
               options={[
                 {
-                  id: 1,
+                  id: "BOLETA",
                   content: "BOLETA"
                 },
                 {
-                  id: 2,
+                  id: "FACTURA",
                   content: "FACTURA"
                 }
               ]}
             />
             <Select
-              disabled={!invoiceType || !(invoiceType === "FACTURA" && documentType !== "RUC")}
+              disabled={!invoicePreference || !isAbleToEdit}
               id="documentType"
               label="Tipo de documento"
               error={errors.documentType}
               touched={touched.documentType}
               value={values.documentType}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType")}
+              handleChange={(e) => onDocTypeChange(e, setFieldValue, setDocType, "documentType", setIsDocLoaded)}
               options={[
                 {
-                  id: 1,
+                  id: "DNI",
                   content: "DNI",
-                  disabled: invoiceType === "FACTURA"
+                  disabled: invoicePreference === "FACTURA"
                 },
                 {
-                  id: 2,
+                  id: "RUC",
                   content: "RUC"
                 }
               ]}
             />
             <Input
-              disabled={!docType || !(invoiceType === "FACTURA" && documentType !== "RUC")}
+              disabled={!docType || !isAbleToEdit}
               id="document"
               label="Documento"
               placeholder={docType || "Documento"}
@@ -173,10 +147,9 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               touched={touched.document}
               value={values.document}
               handleBlur={handleBlur}
-              handleChange={(e) => onDocChange(e, setFieldValue, setError, docType)}
+              handleChange={(e) => onDocChange(e, setFieldValue, docType, setIsDocLoaded)}
             />
             <Input
-              disabled={invoiceType === "FACTURA" || !(invoiceType === "FACTURA" && documentType !== "RUC")}
               id="rsocial"
               label="Razón social"
               placeholder="Razón social"
@@ -185,9 +158,9 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               value={values.rsocial}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={isDocLoaded || !isAbleToEdit}
             />
             <Input
-              disabled={invoiceType === "FACTURA" || !invoiceType || !(invoiceType === "FACTURA" && documentType !== "RUC")}
               id="address"
               label="Dirección"
               placeholder="Dirección"
@@ -196,6 +169,7 @@ function InvoiceModal({ isActive, setIsActive, document, documentType, rsocial, 
               value={values.address}
               handleBlur={handleBlur}
               handleChange={handleChange}
+              disabled={(isDocLoaded && invoicePreference === "FACTURA") || !isAbleToEdit}
             />
             <Button
               type="submit"

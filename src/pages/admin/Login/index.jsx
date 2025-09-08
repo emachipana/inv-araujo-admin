@@ -10,11 +10,12 @@ import { Spinner } from "reactstrap";
 import Button from "../../../components/Button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AlertError from "../../../components/AlertError";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function Login() {
   const [isLoading, setIsLoading] = useState(false);
-  const { login, error, setError } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   
   const credentials = {
@@ -28,11 +29,10 @@ function Login() {
       await login(values, "admin");
       navigate("/");
       setIsLoading(false);
-      setError(null)
+      toast.success("Bienvenido nuevamente!");
     }catch(error) {
-      console.error(error);
-      setError(error.message);
       setIsLoading(false);
+      toast.error(errorParser(error.message));
     }
   }
 
@@ -105,13 +105,6 @@ function Login() {
               >
                 Olvidé mi contraseña
               </Text>
-              {
-                error && 
-                <AlertError 
-                  error={error}
-                  setError={setError}
-                />
-              }
               <Button
                 style={{alignSelf: "center"}}
                 type="submit"

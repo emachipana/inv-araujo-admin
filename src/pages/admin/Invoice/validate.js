@@ -23,5 +23,7 @@ export const validate = (values) => {
     errors.quantity = "Solo se aceptan valores mayores a 0";
   }
 
+  if(!values.unit) errors.unit = "Este campo es obligatorio";
+
   return errors;
 }

@@ -1,10 +1,13 @@
+import toast from "react-hot-toast";
 import apiFetch from "../../../services/apiFetch";
+import { errorParser } from "../../../helpers/errorParser";
+import { departments } from "../../../data/places";
 
-export const filterProducts = (items, backup) => { 
-  return backup.filter(product => !items.find(item => item.product.id === product.id));
+export const filterProducts = (items, backup) => {
+  return backup.content?.filter(product => !items.find(item => item.product.id === product.id)) || [];
 }
 
-export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearchProducts, toFind, setError, isLoading) => {
+export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearchProducts, toFind, isLoading) => {
   try {
     if(isLoading) return;
 
@@ -22,8 +25,9 @@ export const onSearchChange = async (e, setSearch, setIsLoading, items, setSearc
     const filteredProducts = filterProducts(items, toFind);
     setSearchProducts(filteredProducts);
   }catch(error) {
+    toast.error(errorParser(error.message));
     setIsLoading(false);
-    console.error(error);
-    setError(error.message);
   }
 }
+
+export const getCurrentDep = (order) => departments.find(department => department.nombre_ubigeo === order.department)?.id_ubigeo;

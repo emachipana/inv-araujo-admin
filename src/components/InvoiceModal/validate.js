@@ -1,7 +1,7 @@
 export const validate = (values, docType, invoiceType) => {
   const errors = {};
 
-  if(!values.invoiceType) errors.invoiceType = "Este campo es obligatorio";
+  if(!values.invoicePreference) errors.invoicePreference = "Este campo es obligatorio";
   if(!values.documentType) errors.documentType = "Este campo es obligatorio";
   if(!values.rsocial) errors.rsocial = "Este campo es obligatorio";
 
@@ -16,6 +16,7 @@ export const validate = (values, docType, invoiceType) => {
   }
 
   if(invoiceType === "FACTURA" && !values.address) errors.address = "Este campo es obligatorio";
-
+  
   return errors;
+
 }

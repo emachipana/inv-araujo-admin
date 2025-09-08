@@ -18,7 +18,5 @@ export const validate = (values, docType, invoiceType) => {
 
   if(invoiceType === "FACTURA" && !values.address) errors.address = "Este campo es obligatorio";
 
-  if(values.comment && values.comment.length < 10) errors.comment = "El mínimo son 10 caracteres";
-
   return errors;
 }

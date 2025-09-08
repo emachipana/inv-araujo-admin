@@ -3,6 +3,7 @@ import Loader from "./components/Loader";
 import { Container } from "./styles/layout";
 import AuthenticatedApp from "./AuthenticatedApp";
 import UnauthenticatedApp from "./UnauthenticatedApp";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { isLoading, user } = useAuth();
@@ -12,8 +13,9 @@ function App() {
     ? <Loader />
     :
     <Container>
+      <Toaster />
       {
-        user && user.role === "ADMINISTRADOR"
+        user && user.role.name === "ADMINISTRADOR"
         ? <AuthenticatedApp />
         : <UnauthenticatedApp />
       }

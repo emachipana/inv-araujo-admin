@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../../styles/layout";
+import { shadowMd } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import { css } from "@emotion/react";
 
@@ -21,7 +21,8 @@ export const Card = styled.div`
   width: ${({ position, width }) => width ? width : (position === "first" ? 42 : 58)}%;
   background-color: white;
   border-radius: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  border: 1px solid ${COLORS.platinium};
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -38,7 +39,7 @@ export const Wrapper = styled.section`
   display: flex;
   align-items: flex-start;
   justify-content: ${({ justify }) => justify || "space-between"};
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: ${({ wrap }) => wrap ? "wrap" : ""};
 
   @media screen and (max-width: 1340px) {
@@ -74,7 +75,7 @@ export const Container = styled.div`
   background-color: white;
   padding: 1rem;
   border-radius: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
   margin: ${({ notAuto }) => notAuto ? "" : "auto"};
 `;
 

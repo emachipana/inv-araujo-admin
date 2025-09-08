@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useAdmin } from "../../../context/admin";
 import { useNavigate } from "react-router-dom";
 import Modal from "../../../components/Modal";
 import { Title } from "../../../components/ProductForm/styles";
@@ -7,10 +6,11 @@ import { FlexRow } from "../../../styles/layout";
 import Button from "../../../components/Button";
 import { FaTrashAlt } from "react-icons/fa";
 import { Spinner } from "reactstrap";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function DeleteModal({ id, isActive, setIsActive, handleDelete, navTo, title }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError } = useAdmin();
   const navigate = useNavigate();
 
   const onDelete = async () => {
@@ -19,10 +19,10 @@ function DeleteModal({ id, isActive, setIsActive, handleDelete, navTo, title }) 
       await handleDelete(id);
       setIsLoading(false);
       navigate(`/${navTo}`);
+      setIsActive(false);
     }catch(error) {
+      toast.error(errorParser(error.message));
       setIsLoading(false);
-      console.error(error);
-      setError(error.message);
     }
   } 
 

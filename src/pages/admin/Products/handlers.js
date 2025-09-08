@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+import { errorParser } from "../../../helpers/errorParser";
 import apiFetch from "../../../services/apiFetch";
 
 export const handleClick = (event, id, navigate) => {
@@ -5,7 +7,7 @@ export const handleClick = (event, id, navigate) => {
   navigate(`${id}/edit`);
 }
 
-export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup, setError, setIsSearching) => {
+export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setSearched, from, backup) => {
   const value = e.target.value;
   
   try {
@@ -15,17 +17,45 @@ export const onSearchChange = async (e, isGetting, setSearch, setIsGetting, setS
     if(value.length >= 3) {
       setIsGetting(true);
       const searched = await apiFetch(`${from}/search?param=${value}`);
-      setSearched(searched);
+      if(from === "employees") {
+        const rolesToFilter = ["ADMINISTRADOR"];
+        const employeesFiltered = searched.filter((emp) => !rolesToFilter.includes(emp.role.name));
+        setSearched(employeesFiltered);
+      }else {
+        setSearched(searched);
+      }
       setIsGetting(false);
       return;
     }
 
     setSearched(backup);
-
-    if(value.length <= 0) setIsSearching(false);
   }catch(error) {
-    console.error(error);
+    toast.error(errorParser(error.message));
     setIsGetting(false);
-    setError(error.message);
   }
+}
+
+const sortData = {
+  "PRICE_HIGH_TO_LOW": "sortby=price&direction=DESC",
+  "PRICE_LOW_TO_HIGH": "sortby=price&direction=ASC",
+  "STOCK_HIGH_TO_LOW": "sortby=stock&direction=DESC",
+  "STOCK_LOW_TO_HIGH": "sortby=stock&direction=ASC",
+}
+
+export const filterBuilder = (filters = { category: { id: null }, sort: null, page: 0 }) => {
+  let filter = "";
+
+  if(filters.category.id) filter += `?categoryId=${filters.category.id}`;
+  
+  if(filters.sort) {
+    const op = filters.category.id ? "&" : "?";
+    filter += `${op}${sortData[filters.sort]}`;
+  } 
+
+  if(filters.page > 0) {
+    const op = (filters.category.id || filters.sort) ? "&" : "?";
+    filter += `${op}page=${filters.page}`;
+  }
+
+  return filter;
 }

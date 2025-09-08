@@ -18,6 +18,7 @@ export const Container = styled.button`
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+  white-space: nowrap;
 
   &:hover {
     background-color: ${({ color }) => color.hover};

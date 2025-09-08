@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import { COLORS } from "./colors";
+import { FONTS } from "./fonts";
 
 export const Text = styled.p`
   font-size: ${({ size }) => size || 16}px;
@@ -8,11 +8,7 @@ export const Text = styled.p`
   text-decoration: ${({ isLink }) => isLink ? "underline" : "none"};
   cursor: ${({ isLink }) => isLink ? "pointer" : "inherit"};
   text-align: ${({ align }) => align || "center"};
-  transition: color .1s ease;
-
-  &:hover {
-    color: ${({ hColor, color }) => hColor || color};
-  }
+  font-family: ${FONTS.primary};
 `;
 
 export const FlexRow = styled.div`
@@ -38,7 +34,7 @@ export const Container = styled.div`
   display: grid;
   grid-template-columns: 280px 1fr;
   grid-template-rows: 70px 1fr;
-  background-color: ${COLORS.smoke};
+  background-color: #F9FAFB;
   position: relative;
   grid-template-areas: 
             "navbar navbar"
@@ -57,8 +53,8 @@ export const Section = styled.section`
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
-  gap: 1.5rem;
-  padding-bottom: 3rem;
+  gap: 1rem;
+  // padding-bottom: 3rem;
   overflow: auto;
   position: relative;
 `;
@@ -70,7 +66,11 @@ export const Image = styled.img`
   mix-blend-mode: multiply;
 `;
 
-export const shadowSm = "0 2px 3px 1px rgba(0, 0, 0, .2)";
+export const shadowSm = "0 1px 2px 0 rgba(0, 0, 0, 0.05)";
+
+export const shadowMd = "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)";
+
+export const shadowLg = "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
 
 export const Form = styled.form`
   width: ${({ width }) => width || "100%"};
@@ -78,7 +78,7 @@ export const Form = styled.form`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: ${({ gap }) => gap || 1}rem;
 
   @media screen and (max-width: 480px) {
     width: 100%;

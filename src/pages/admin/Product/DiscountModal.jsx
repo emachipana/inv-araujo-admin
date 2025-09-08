@@ -11,10 +11,15 @@ import { useAdmin } from "../../../context/admin";
 import apiFetch from "../../../services/apiFetch";
 import { validate } from "./validate";
 import { FaTrashAlt } from "react-icons/fa";
+import { errorParser } from "../../../helpers/errorParser";
+import toast from "react-hot-toast";
+import { useAuth } from "../../../context/auth";
 
 function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, setProduct } = useAdmin();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { setProduct } = useAdmin();
+  const { user } = useAuth();
 
   const initialValues = {
     price: product.discount ? product.discount.price : ""
@@ -25,7 +30,8 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
       setIsLoading(true);
       const body = {
         productId: product.id,
-        price: values.price * 1
+        price: values.price * 1,
+        employeeId: user.employeeId
       }
 
       const url = product.discount ? `discounts/${product.discount.id}` : "discounts";
@@ -36,25 +42,23 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
       setIsLoading(false);
       setIsActive(false);
     }catch(error) {
-      console.error(error.message);
-      setError(error.message);
+      toast.error(errorParser(error.message));
       setIsLoading(false);
     }
   }
 
   const onDelete = async () => {
     try {
-      setIsLoading(true);
-      await apiFetch(`discounts/${product.discount.id}`, { method: "DELETE" });
+      setIsDeleting(true);
+      await apiFetch(`discounts/${product.discount.id}?employeeId=${user.employeeId}`, { method: "DELETE" });
       const updatedProduct = {...product, discount: null};
       setProduct(product.id, updatedProduct);
       setMainProduct(updatedProduct);
-      setIsLoading(false);
+      setIsDeleting(false);
       setIsActive(false);
     }catch(error) {
-      console.error(error.message);
-      setError(error.message);
-      setIsLoading(false);
+      toast.error(errorParser(error.message));
+      setIsDeleting(false);
     }
   }
   
@@ -130,12 +134,19 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
                   iconSize={18}
                   fontSize={17}
                   size="full"
-                  disabled={isLoading}
+                  disabled={isDeleting || isLoading}
                   Icon={FaTrashAlt}
                   color="danger"
                   onClick={onDelete}
                 >
-                  Eliminar
+                  {
+                    isDeleting
+                    ? <>
+                        <Spinner size="sm" />
+                        Eliminando...
+                      </>
+                    : "Eliminar"
+                  }
                 </Button>
               }
             </FlexRow>

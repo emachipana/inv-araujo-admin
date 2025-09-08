@@ -10,15 +10,17 @@ import TextArea from "../Input/TextArea";
 import Button from "../Button";
 import { Spinner } from "reactstrap";
 import { IoMdAddCircleOutline } from "react-icons/io";
+import { errorParser } from "../../helpers/errorParser";
+import toast from "react-hot-toast";
 
 function BannerForm({ initialValues = {
   title: "",
   description: "",
   markedWord: "",
   used: false
-}, isToCreate, bannerId, width }) {
+}, isToCreate, bannerId, width, setIsActive }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { setError, addBanner, updateBanner } = useAdmin();
+  const { addBanner, updateBanner } = useAdmin();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
@@ -27,10 +29,10 @@ function BannerForm({ initialValues = {
       const banner = isToCreate ? await addBanner(values) : await updateBanner(bannerId, values);
       setIsLoading(false);
       navigate(`/banners/${banner.id}`);
+      setIsActive(false);
     }catch(error) {
-      console.error(error);
       setIsLoading(false);
-      setError(error.message);
+      toast.error(errorParser(error.message));
     }
   }
 

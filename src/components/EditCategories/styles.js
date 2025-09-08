@@ -1,5 +1,6 @@
 import styled from "@emotion/styled";
-import { shadowSm } from "../../styles/layout";
+import { shadowMd } from "../../styles/layout";
+import { COLORS } from "../../styles/colors";
 
 export const Container = styled.div`
   width: 100%;
@@ -37,13 +38,13 @@ export const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
   background-color: white;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
   border-radius: 0.8rem;
   padding: 1rem 0;
 `;
 
 export const Form = styled.form`
-  width: 65%;
+  width: ${({ width }) => width || "65%"};
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -52,7 +53,9 @@ export const Form = styled.form`
   border-radius: 1rem;
   gap: 1rem;
   padding: 1rem;
-  box-shadow: ${shadowSm};
+  box-shadow: ${shadowMd};
+  background-color: white;
+  border: 1px solid ${COLORS.platinium};
 
   @media screen and (max-width: 550px) {
     width: 80%;

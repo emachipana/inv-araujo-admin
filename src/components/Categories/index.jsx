@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Container } from "./styles";
 import NewCategory from "../Category/New";
 import Category from "../Category";
@@ -7,30 +7,20 @@ import { Spinner } from "reactstrap";
 import Modal from "../Modal";
 import EditCategories from "../EditCategories";
 import { FaRegEdit } from "react-icons/fa";
-import apiFetch from "../../services/apiFetch";
+import { useAuth } from "../../context/auth";
 
-function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetting }) {
+function Categories({ isBlocked, currentCategory, setFilters }) {
   const [editModal, setEditModal] = useState(false);
-  const { categories, isLoading, setProducts, backup, setError } = useAdmin();
+  const { categories, isLoading } = useAdmin();
+  const { user } = useAuth();
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        if(currentCategory === "Todo") return setProducts(backup);
-        setIsGetting(true);
-        const category = categories.find(category => category.name === currentCategory);
-        const products = await apiFetch(`products?categoryId=${category.id}`);
-        setProducts(products);
-        setIsGetting(false);
-      }catch(error) {
-        setIsGetting(false);
-        console.error(error);
-        setError(error.message);
-      }
-    }
+  const setCurrentCategory = (id, name) => {
+    if(name === "Todo") return setFilters(filters => ({...filters, category: { id: null, name: null }, page: 0 }));
 
-    fetch();
-  }, [currentCategory, backup, categories, setProducts, setError, setIsGetting]);
+    setFilters(filters => ({...filters, category: {id, name}, page: 0 }));
+  }
+
+  const userPermissions = user.role.permissions;
 
   return (
     <Container isLoading={isLoading}>
@@ -38,13 +28,17 @@ function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetti
         isLoading
         ? <Spinner color="secondary" />
         : <>
-            <NewCategory
-              isBlocked={isBlocked}
-              Icon={FaRegEdit}
-              onClick={() => setEditModal(true)}
-            >
-              Editar categorias
-            </NewCategory>
+            {
+              (userPermissions.includes("PRODUCTS_CATEGORY_CREATE") || userPermissions.includes("PRODUCTS_CATEGORY_UPDATE"))
+              &&
+              <NewCategory
+                isBlocked={isBlocked}
+                Icon={FaRegEdit}
+                onClick={() => setEditModal(true)}
+              >
+                Editar categorias
+              </NewCategory>
+            }
             <Category
               isBlocked={isBlocked}
               name="Todo"
@@ -54,6 +48,7 @@ function Categories({ isBlocked, currentCategory, setCurrentCategory, setIsGetti
             {
               categories.map((category, index) => (
                 <Category
+                  id={category.id}
                   isBlocked={isBlocked}
                   key={index}
                   name={category.name}
