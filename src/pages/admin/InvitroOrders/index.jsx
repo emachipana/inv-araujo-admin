@@ -12,7 +12,7 @@ import { onSearchChange } from "../Products/handlers";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
-import { PiPlantFill } from "react-icons/pi";
+import { PiMicrosoftExcelLogoBold, PiPlantFill } from "react-icons/pi";
 import Button from "../../../components/Button";
 import { COLORS } from "../../../styles/colors";
 import { HeaderPage, MenuSection } from "./styles";
@@ -30,6 +30,8 @@ import { useAuth } from "../../../context/auth";
 import { useModal } from "../../../context/modal";
 import ProductionModal from "./ProductionModal";
 import { FaSadCry } from "react-icons/fa";
+import { utils, write } from "xlsx";
+import { saveAs } from "file-saver";
 
 function InvitroOrders() {
   const [filters, setFilters] = useState({
@@ -41,6 +43,7 @@ function InvitroOrders() {
   const [productionModal, setProductionModal] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [search, setSearch] = useState("");
   const [type, setType] = useState(localStorage.getItem("vitroType") || "group");
   const [isRangeDateOpen, setIsRangeDateOpen] = useState(false);
@@ -95,6 +98,78 @@ function InvitroOrders() {
     setIsRangeDateOpen(false);
   }
 
+  const exportOrders = async () => {
+    try {
+      const statusData = {
+        "PENDIENTE": "Pendiente",
+        "ENVIADO": "Enviado",
+        "ENTREGADO": "Entregado",
+        "CANCELADO": "Cancelado",
+        "PAGADO": "Pagado"
+      }
+
+      setIsExporting(true);
+      const allOrders = await apiFetch("vitroOrders?size=50&sortby=initDate&direction=DESC");
+
+      const ordersMapped = allOrders.content?.map((order) => {
+        const date = new Date(order.initDate);
+        const finishDate = order.finishDate ? new Date(order.finishDate) : null;
+        const deliveryDate = order.deliveredAt ? new Date(order.deliveredAt) : null;
+
+        return {
+          "Cliente": order.client.rsocial,
+          "Documento": order.client.document,
+          "Adelanto": order.totalAdvance.toFixed(2),
+          "Pendiente": order.pending.toFixed(2),
+          "Total": order.total.toFixed(2),
+          "Fecha": date.toLocaleDateString("es-PE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }),
+          "Fecha de entrega": finishDate ? finishDate.toLocaleDateString("es-PE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }) : "Por asignar",
+          "Estado": statusData[order.status] || "PENDIENTE",
+          "Destino": order.city ? `${order.city}, ${order.department}` : "Por asignar",
+          "Tipo de entrega": order.shippingType === "ENVIO_AGENCIA" ? "Envío por agencia" : "Recojo en almacén",
+          "Creado": order.createdBy === "ADMINISTRADOR" ? "Desde el panel" : "Desde la tienda",
+          "Entregado el": !deliveryDate ? "Sin entregar" : deliveryDate.toLocaleDateString("es-PE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "America/Lima",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+          "Termino la producción": order.isReady ? "Sí" : "No",
+        }
+      });
+
+      const worksheet = utils.json_to_sheet(ordersMapped);
+      const workbook = utils.book_new();
+      utils.book_append_sheet(workbook, worksheet, "Pedidos");
+      
+      const excelBuffer = write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      const data = new Blob([excelBuffer], {type: "application/octet-stream"});
+      const now = new Date();
+      const fileName = `pedidos_invitro_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}.xlsx`;
+      saveAs(data, fileName);
+
+      setIsExporting(false);
+    }catch(error) {
+      toast.error("Hubo un error al exportar los pedidos");
+      setIsExporting(false);
+    }
+  }
+
   return (
     <>
       <FlexRow
@@ -125,6 +200,27 @@ function InvitroOrders() {
                 color="secondary"
               >
                 Producción pendiente
+              </Button>
+            }
+            {
+              vitroOrdersBack?.content?.length > 0
+              &&
+              <Button
+                onClick={exportOrders}
+                fontSize={15}
+                Icon={isExporting ? null : PiMicrosoftExcelLogoBold}
+                iconSize={18}
+                color="blue"
+                disabled={isExporting}
+              >
+                {
+                  isExporting
+                  ? <>
+                      <Spinner size="sm" />
+                      Exportando...
+                    </>
+                  : "Exportar pedidos"
+                }
               </Button>
             }
             <Button

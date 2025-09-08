@@ -35,7 +35,7 @@ Chart.register(
 
 function Home() {
   const { isLoading, setIsLoading, expenses, loadOnHome, homeData } = useAdmin();
-  const { setVitroModal, setProductsModal, setOrdersModal, setInvoicesModal, setBannersModal, setClientsModal, setEmployeesModal, setWarehousesModal, setProductsBatchModal } = useModal();
+  const { setVitroModal, setProductsModal, setOrdersModal, setInvoicesModal, setBannersModal, setClientsModal, setEmployeesModal, setProductsBatchModal } = useModal();
   const navigate = useNavigate();
   const { user } = useAuth();
 

@@ -26,8 +26,10 @@ import { sortData } from "../InvitroOrders/data";
 import { RiFilterOffFill } from "react-icons/ri";
 import Pagination from "../../../components/Pagination";
 import { useModal } from "../../../context/modal";
-import { useAuth } from "../../../context/auth";
 import { FaSadCry } from "react-icons/fa";
+import { PiMicrosoftExcelLogoBold } from "react-icons/pi";
+import { utils, write } from "xlsx";
+import { saveAs } from "file-saver";
 
 function Orders() {
   const [filters, setFilters] = useState({
@@ -37,13 +39,13 @@ function Orders() {
     page: 0,
   });
   const [isSearching, setIsSearching] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   const [isGetting, setIsGetting] = useState(false);
   const [search, setSearch] = useState("");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [type, setType] = useState(localStorage.getItem("ordersType") || "group");
   const { orders, isLoading, setIsLoading, loadOrders, setOrders, ordersBackup } = useAdmin();
   const { ordersModal: createModal, setOrdersModal: setCreateModal } = useModal();
-  const { user } = useAuth();
 
   useEffect(() => {
     const fetch = async () => {
@@ -84,6 +86,74 @@ function Orders() {
     setIsSortOpen(false);
   }
 
+  const exportOrders = async () => {
+    try {
+      const statusData = {
+        "PENDIENTE": "Pendiente",
+        "ENVIADO": "Enviado",
+        "ENTREGADO": "Entregado",
+        "CANCELADO": "Cancelado",
+        "PAGADO": "Pagado"
+      }
+
+      const paymentData = {
+        "TARJETA_ONLINE": "Tarjeta online",
+        "YAPE": "Yape",
+        "TRANSFERENCIA": "Transferencia bancaria",
+      }
+
+      setIsExporting(true);
+      const allOrders = await apiFetch("orders?size=50&sortby=date&direction=DESC");
+      const ordersMapped = allOrders.content?.map((order) => {
+        const date = new Date(order.date);
+        const deliveryDate = order.deliveredAt ? new Date(order.deliveredAt) : null;
+
+        return {
+          "Cliente": order.client.rsocial,
+          "Documento": order.client.document,
+          "Total": order.total.toFixed(2),
+          "Fecha": date.toLocaleDateString("es-PE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+          }),
+          "Estado": statusData[order.status] || "PENDIENTE",
+          "Destino": `${order.city}, ${order.department}`,
+          "Tipo de entrega": order.shippingType === "ENVIO_AGENCIA" ? "Envío por agencia" : "Recojo en almacén",
+          "Tipo de pago": paymentData[order.paymentType] || "Sin pagar aún",
+          "Creado": order.createdBy === "ADMINISTRADOR" ? "Desde el panel" : "Desde la tienda",
+          "Entregado el": !deliveryDate ? "Sin entregar" : deliveryDate.toLocaleDateString("es-PE", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+            timeZone: "America/Lima",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          }),
+        }
+      });
+
+      const worksheet = utils.json_to_sheet(ordersMapped);
+      const workbook = utils.book_new();
+      utils.book_append_sheet(workbook, worksheet, "Pedidos");
+      
+      const excelBuffer = write(workbook, {
+        bookType: "xlsx",
+        type: "array",
+      });
+
+      const data = new Blob([excelBuffer], {type: "application/octet-stream"});
+      const now = new Date();
+      saveAs(data, `pedidos_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}.xlsx`);
+
+      setIsExporting(false);
+    }catch(error) {
+      toast.error("Hubo un error al exportar los pedidos");
+      setIsExporting(false);
+    }
+  }
+
   return (
     <>
       <FlexRow
@@ -99,18 +169,38 @@ function Orders() {
             Gestiona todos los pedidos de tu tienda
           </Text>
         </FlexColumn>
-        {
-          user.role.permissions.includes("ORDERS_CREATE")
-          &&
+        <FlexRow>
+          {
+            ordersBackup?.content?.length > 0
+            &&
+            <Button
+              onClick={exportOrders}
+              fontSize={15}
+              Icon={isExporting ? null : PiMicrosoftExcelLogoBold}
+              iconSize={18}
+              color="blue"
+              disabled={isExporting}
+            >
+              {
+                isExporting
+                ? <>
+                    <Spinner size="sm" />
+                    Exportando...
+                  </>
+                : "Exportar pedidos"
+              }
+            </Button>
+          }
           <Button
             onClick={() => setCreateModal(!createModal)}
             fontSize={15}
             Icon={FaBasketShopping}
             iconSize={18}
+            disabled={isExporting}
           >
             Nuevo pedido
           </Button>
-        }
+        </FlexRow>
       </FlexRow>
       <HeaderPage>
         <Status 
