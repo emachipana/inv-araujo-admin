@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import apiFetch from "../../../services/apiFetch";
 import { Spinner } from "reactstrap";
 import { Card, ImageCard as AddCard, Section, Wrapper } from "./styles";
-import { FlexColumn, FlexRow, Text } from "../../../styles/layout";
+import { FlexColumn, FlexRow, shadowSm, Text } from "../../../styles/layout";
 import { COLORS } from "../../../styles/colors";
 import Badge from "../../../components/Badge";
 import Button from "../../../components/Button";
@@ -19,13 +19,18 @@ import ImageCard from "./ImageCard";
 import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/auth";
+import { IoBagRemoveSharp } from "react-icons/io5";
+import NewCategory from "../../../components/Category/New";
+import RemoveStockModal from "./RemoveStockModal";
 
 function Product() {
   const [discountModal, setDiscountModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
   const [imageModal, setImageModal] = useState(false);
+  const [discountStock, setDiscountStock] = useState([]);
   const [product, setProduct] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [removeStockModal, setRemoveStockModal] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
   const { deleteProduct } = useAdmin();
@@ -35,6 +40,8 @@ function Product() {
     const fetch = async () => {
       try {
         const product = await apiFetch(`products/${id}`);
+        const discounts = await apiFetch(`removeStock/product/${id}`);
+        setDiscountStock(discounts?.reverse());
         setProduct(product.data);
         setIsLoading(false);
       }catch(error) {
@@ -48,6 +55,8 @@ function Product() {
 
   const permissions = user.role.permissions;
 
+  console.log(discountStock);
+
   return (
     isLoading
     ? <Spinner color="secondary" />
@@ -57,6 +66,17 @@ function Product() {
           ? <Title>El producto no existe</Title>
           : <>
               <Title>{ product.name }</Title>
+              {
+                discountStock.length > 0
+                &&
+                <NewCategory
+                  Icon={IoBagRemoveSharp}
+                  style={{boxShadow: shadowSm, marginTop: "-0.5rem"}}
+                  onClick={() => setRemoveStockModal(!removeStockModal)}
+                >
+                  Disminución de stock
+                </NewCategory>
+              }
               <Section>
                 <Card>
                   <Wrapper>
@@ -315,6 +335,15 @@ function Product() {
                 setIsActive={setImageModal}
                 setProduct={setProduct}
               />
+              {
+                discountStock.length > 0
+                &&
+                <RemoveStockModal
+                  isActive={removeStockModal}
+                  setIsActive={setRemoveStockModal}
+                  discounts={discountStock}
+                />
+              }
             </>
         }
       </>
