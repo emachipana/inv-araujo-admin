@@ -15,7 +15,7 @@ import { errorParser } from "../../../helpers/errorParser";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../context/auth";
 
-function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
+function DiscountModal({ product, isActive, setIsActive, setMainProduct, currentPrice }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const { setProduct } = useAdmin();
@@ -69,7 +69,7 @@ function DiscountModal({ product, isActive, setIsActive, setMainProduct }) {
     >
       <Formik
         initialValues={initialValues}
-        validate={validate}
+        validate={(values) => validate(values, currentPrice)}
         onSubmit={onDiscount}
       >
         {({

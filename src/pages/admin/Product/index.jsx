@@ -320,6 +320,7 @@ function Product() {
                 isActive={discountModal}
                 setIsActive={setDiscountModal}
                 setMainProduct={setProduct}
+                currentPrice={product.price}
               />
               <DeleteModal 
                 id={product.id}

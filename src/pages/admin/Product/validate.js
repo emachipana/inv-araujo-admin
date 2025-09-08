@@ -1,4 +1,4 @@
-export const validate = (values) => {
+export const validate = (values, currentPrice) => {
   const errors = {};
 
   if(!values.price) {
@@ -7,6 +7,8 @@ export const validate = (values) => {
     errors.price = "Solo se aceptan números";
   }else if(values.price <= 0) {
     errors.price = "Solo se aceptan valores mayores a 0";
+  }else if(values.price >= currentPrice) {
+    errors.price = `El precio de descuento debe ser menor a S/. ${currentPrice}`;
   }
 
   return errors;
