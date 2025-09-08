@@ -43,6 +43,7 @@ function EditProduct() {
                   isActive: product.active
                 }}
                 productId={product.id}
+                setIsActive={() => {}}
               />
             </Container>
         }

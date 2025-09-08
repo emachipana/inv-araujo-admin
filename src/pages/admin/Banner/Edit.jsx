@@ -40,6 +40,7 @@ function EditBanner() {
                 width="400px"
                 initialValues={banner}
                 bannerId={banner.id}
+                setIsActive={() => {}}
               />
             </Container>
         }

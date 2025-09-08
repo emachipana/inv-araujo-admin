@@ -113,32 +113,6 @@ function AdminNavbar({ setIsOpen }) {
           rightPosition={"-1rem"}
         >
           <Header>Menú</Header>
-          <Item onClick={() => navigate("/perfil")}>
-            <FaUser
-              size={18}
-              style={{marginTop: "-2px"}}
-            />
-            <Text
-              size={16}
-              weight={600}
-            >
-              Perfil
-            </Text>
-          </Item>
-          <Hr />
-          <Item>
-            <MdDarkMode
-              size={18}
-              style={{marginTop: "-2px"}}
-            />
-            <Text
-              size={16}
-              weight={600}
-            >
-              Tema
-            </Text>
-          </Item>
-          <Hr />
           <Item onClick={handleLogout}>
             <RiLogoutBoxFill
               size={18}

@@ -45,6 +45,7 @@ function EditInvoice() {
                 initDocType={invoice.documentType}
                 initInvoiceType={invoice.invoiceType}
                 isGenerated={invoice.isGenerated}
+                setIsActive={() => {}}
               />
             </Container>
         }

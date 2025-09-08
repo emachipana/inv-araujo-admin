@@ -57,6 +57,7 @@ function EditVitroOrder() {
                   invoice={order.invoice}
                   evidence={order.evidence}
                   employee={order.employee}
+                  setIsActive={() => {}}
                 />
               </Container>
             </Section>

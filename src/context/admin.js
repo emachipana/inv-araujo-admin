@@ -416,10 +416,10 @@ const AdminProvider = ({ children }) => {
 
   const deleteProduct = async (id) => {
     await apiFetch(`products/${id}`, { method: "DELETE" });
-    const updatedProducts = products.filter(product => product.id !== id);
-    const updatedBackup = backup.filter(product => product.id !== id);
-    setProducts([...updatedProducts]);
-    setBackup([...updatedBackup]);
+    const updatedProducts = products.content.filter(product => product.id !== id);
+    const updatedBackup = backup.content.filter(product => product.id !== id);
+    setProducts({...products, content: [...updatedProducts]});
+    setBackup({...backup, content: [...updatedBackup]});
   }
 
   const addProductImage = async (product, file) => {
